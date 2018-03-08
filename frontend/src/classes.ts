@@ -11,17 +11,14 @@ export class Ingredient {
   fat: number;
   carbs: number;
 
-  // tslint:disable-next-line: no-any
-  static findNutrient(nutrients: any, nutrientId: string): string {
-    // tslint:disable-next-line: no-any
-    return nutrients.filter(function(nutrient: any) {
+  static findNutrient(nutrients: Nutrient[], nutrientId: string): string {
+    return nutrients.filter(function(nutrient: Nutrient) {
       return nutrient.nutrient_id === nutrientId;
     })[0].value;
   }
 
-  // tslint:disable-next-line: no-any
-  constructor(report: any) {
-    this.ndbno = report.food.ndbo;
+  constructor(report: Report) {
+    this.ndbno = report.food.ndbno;
     this.name = report.food.name;
     this.calories = parseFloat(Ingredient.findNutrient(report.food.nutrients, CALORIES_ID));
     this.protein = parseFloat(Ingredient.findNutrient(report.food.nutrients, PROTEIN_ID));
@@ -48,53 +45,71 @@ export class Recipe {
   }
 }
 
-export class ReportResponse {
-  // tslint:disable-next-line: no-any
-  report: any;
-  // tslint:disable-next-line: no-any
-  constructor(report: any) {
-    this.report = report;
-  }
-
+export class SearchListItem {
+  offset: number;
+  group: string;
+  name: string;
+  ndbno: string;
+  ds: string;
 }
 
-/* class Measure {
- *   label: string;
- *   eqv: number;
- *   eunit: string;
- *   qty: number;
- *   value: string;
- * }
- *
- * class Nutrient {
- *   static CALORIES_ID: '208';
- *   static PROTEIN_ID: '203';
- *   static FAT_ID: '204';
- *   static CARB_ID: '205';
- *
- *   nutrient_id: string;
- *   name: string;
- *   derivation: string;
- *   group: string;
- *   unit: string;
- *   value: string;
- *   measures: Measure[];
- * }
- *
- * class Food {
- *   ndbno: string;
- *   name: string;
- *   ds: string;
- *   manu: string;
- *   ru: string;
- *   nutrients: Nutrient[];
- * }
- *
- * class Report {
- *   sr: string;
- *   type: string;
- *   food: Food;
- *   footnotes: string[];
- * }
- *
- */
+// TODO not a fan of making everything optional in case of no response
+export class SearchList {
+  q?: string;
+  sr?: string;
+  ds?: string;
+  start?: number;
+  end?: number;
+  total?: number;
+  group?: string;
+  sort?: string;
+  item: SearchListItem[];
+}
+
+export class SearchResponse {
+  list: SearchList;
+}
+
+class Measure {
+  label: string;
+  eqv: number;
+  eunit: string;
+  qty: number;
+  value: string;
+}
+
+class Nutrient {
+  static CALORIES_ID: '208';
+  static PROTEIN_ID: '203';
+  static FAT_ID: '204';
+  static CARB_ID: '205';
+
+  // tslint:disable-next-line:variable-name
+  nutrient_id: string;
+  name: string;
+  derivation: string;
+  group: string;
+  unit: string;
+  value: string;
+  measures: Measure[];
+}
+
+class Food {
+  ndbno: string;
+  name: string;
+  ds: string;
+  manu: string;
+  ru: string;
+  nutrients: Nutrient[];
+}
+
+export class Report {
+  sr: string;
+  type: string;
+  food: Food;
+  footnotes: string[];
+}
+
+export class ReportResponse {
+  report: Report;
+}
