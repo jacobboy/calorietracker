@@ -1,94 +1,40 @@
-import * as constants from '../constants';
+import {
+  ADD_INGREDIENT,
+  ADD_RECIPE,
+  SELECT_DATASOURCE,
+  FOODSEARCH_INPUT,
+  FOODSEARCH_SUBMIT,
+  FOODDETAILS_CLICK,
+  FOODTRACK_CLICK
+} from '../constants/index';
 import { DataSource } from '../ndbapi';
 import { SearchListItem } from '../classes';
 
-export interface SelectDataSource {
-  type: constants.SELECT_DATASOURCE;
-  dataSource: DataSource;
+interface Action<T extends string> {
+  type: T;
 }
 
-export interface FoodSearchInput {
-  type: constants.FOODSEARCH_INPUT;
-  searchString: string;
+interface ActionWithPayload<T extends string, P> extends Action<T> {
+  payload: P;
 }
 
-export interface FoodSearchSubmit {
-  type: constants.FOODSEARCH_SUBMIT;
-  items: SearchListItem[];
+function createAction<T extends string>(type: T): Action<T>;
+function createAction<T extends string, P>(type: T, payload: P): ActionWithPayload<T, P>;
+function createAction<T extends string, P>(type: T, payload?: P) {
+  return payload ? { type, payload } : { type };
 }
 
-export interface FoodDetailsClick {
-  type: constants.FOODDETAILS_CLICK;
-  ndbno: string;
-}
+export const actions = {
+  selectDataSource: (dataSource: DataSource) => createAction(SELECT_DATASOURCE, dataSource),
+  foodSearchInput: (searchString: string) => createAction(FOODSEARCH_INPUT, searchString),
+  foodSearchSubmit: (items: SearchListItem[]) => createAction(FOODSEARCH_SUBMIT, items),
+  foodDetailsClick: (ndbno: string) => createAction(FOODDETAILS_CLICK, ndbno),
+  foodTrackClick: (ndbno: string) => createAction(FOODTRACK_CLICK, ndbno),
+  addIngredient: () => createAction(ADD_INGREDIENT),
+  addRecipe: () => createAction(ADD_RECIPE)
+};
 
-export interface FoodTrackClick {
-  type: constants.FOODTRACK_CLICK;
-  ndbno: string;
-}
-
-export interface AddIngredient {
-  type: constants.ADD_INGREDIENT;
-  // name: string;
-}
-
-export interface AddRecipe {
-  type: constants.ADD_RECIPE;
-  // name: string;
-}
-
-export type AddAction =
-  | AddIngredient
-  | AddRecipe
-  | SelectDataSource
-  | FoodSearchInput
-  | FoodSearchSubmit
-  | FoodDetailsClick
-  | FoodTrackClick;
-
-export function selectDataSource(ds: DataSource): SelectDataSource {
-  return {
-    type: constants.SELECT_DATASOURCE,
-    dataSource: ds
-  };
-}
-
-export function foodSearchInput(searchString: string): FoodSearchInput {
-  return {
-    type: constants.FOODSEARCH_INPUT,
-    searchString
-  };
-}
-
-export function foodSearchSubmit(items: SearchListItem[]): FoodSearchSubmit {
-  return {
-    type: constants.FOODSEARCH_SUBMIT,
-    items
-  };
-}
-
-export function foodDetailsClick(ndbno: string): FoodDetailsClick {
-  return {
-    type: constants.FOODDETAILS_CLICK,
-    ndbno
-  };
-}
-
-export function foodTrackClick(ndbno: string): FoodTrackClick {
-  return {
-    type: constants.FOODTRACK_CLICK,
-    ndbno
-  };
-}
-
-export function addIngredient(): AddIngredient {
-  return {
-    type: constants.ADD_INGREDIENT
-  };
-}
-
-export function addRecipe(): AddRecipe {
-  return {
-    type: constants.ADD_RECIPE
-  };
-}
+// tslint:disable-next-line:no-any
+type FunctionType = (...args: any[]) => any;
+type ActionsUnion<A extends { [ac: string]: FunctionType }> = ReturnType<A[keyof A]>;
+export type Actions = ActionsUnion<typeof actions>;

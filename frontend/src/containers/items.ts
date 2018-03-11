@@ -1,5 +1,5 @@
 import { ItemsComponent } from '../components/items';
-import * as actions from '../actions/';
+import { actions, Actions } from '../actions/';
 import { StoreState } from '../types/index';
 import { connect, Dispatch } from 'react-redux';
 import { DataSource, searchFood } from '../ndbapi';
@@ -14,7 +14,7 @@ function mapStateToProps(state: StoreState) {
   // };
 }
 
-function mapDispatchToProps(dispatch: Dispatch<actions.AddIngredient>) {
+function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
     onDataSourceSelect: (ds: DataSource) => {
       dispatch(actions.selectDataSource(ds));

@@ -1,4 +1,4 @@
-import { AddAction } from '../actions';
+import { Actions } from '../actions';
 import { StoreState } from '../types/index';
 import {
   ADD_INGREDIENT,
@@ -10,14 +10,14 @@ import {
   FOODTRACK_CLICK
 } from '../constants/index';
 
-export function reducer(state: StoreState, action: AddAction): StoreState {
+export function reducer(state: StoreState, action: Actions): StoreState {
   switch (action.type) {
     case SELECT_DATASOURCE:
       return {
         ...state,
         search: {
           ...state.search,
-          dataSource: action.dataSource
+          dataSource: action.payload
         }
       };
     case FOODSEARCH_INPUT:
@@ -25,7 +25,7 @@ export function reducer(state: StoreState, action: AddAction): StoreState {
         ...state,
         search: {
           ...state.search,
-          searchString: action.searchString
+          searchString: action.payload
         }
       };
     case FOODSEARCH_SUBMIT:
@@ -33,7 +33,7 @@ export function reducer(state: StoreState, action: AddAction): StoreState {
         ...state,
         search: {
           ...state.search,
-          items: action.items
+          items: action.payload
         }
       };
     case FOODDETAILS_CLICK:
