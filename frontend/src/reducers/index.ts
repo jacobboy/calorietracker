@@ -5,7 +5,9 @@ import {
   ADD_RECIPE,
   SELECT_DATASOURCE,
   FOODSEARCH_INPUT,
-  FOODSEARCH_SUBMIT
+  FOODSEARCH_SUBMIT,
+  FOODDETAILS_CLICK,
+  FOODTRACK_CLICK
 } from '../constants/index';
 
 export function reducer(state: StoreState, action: AddAction): StoreState {
@@ -34,6 +36,10 @@ export function reducer(state: StoreState, action: AddAction): StoreState {
           items: action.items
         }
       };
+    case FOODDETAILS_CLICK:
+      return { ...state };
+    case FOODTRACK_CLICK:
+      return { ...state };
     case ADD_INGREDIENT:
       return {
         ...state,

@@ -17,6 +17,16 @@ export interface FoodSearchSubmit {
   items: SearchListItem[];
 }
 
+export interface FoodDetailsClick {
+  type: constants.FOODDETAILS_CLICK;
+  ndbno: string;
+}
+
+export interface FoodTrackClick {
+  type: constants.FOODTRACK_CLICK;
+  ndbno: string;
+}
+
 export interface AddIngredient {
   type: constants.ADD_INGREDIENT;
   // name: string;
@@ -32,7 +42,9 @@ export type AddAction =
   | AddRecipe
   | SelectDataSource
   | FoodSearchInput
-  | FoodSearchSubmit;
+  | FoodSearchSubmit
+  | FoodDetailsClick
+  | FoodTrackClick;
 
 export function selectDataSource(ds: DataSource): SelectDataSource {
   return {
@@ -41,17 +53,31 @@ export function selectDataSource(ds: DataSource): SelectDataSource {
   };
 }
 
-export function foodSearchInput(searchString: string) {
+export function foodSearchInput(searchString: string): FoodSearchInput {
   return {
     type: constants.FOODSEARCH_INPUT,
     searchString
   };
 }
 
-export function foodSearchSubmit(items: SearchListItem[]) {
+export function foodSearchSubmit(items: SearchListItem[]): FoodSearchSubmit {
   return {
     type: constants.FOODSEARCH_SUBMIT,
     items
+  };
+}
+
+export function foodDetailsClick(ndbno: string): FoodDetailsClick {
+  return {
+    type: constants.FOODDETAILS_CLICK,
+    ndbno
+  };
+}
+
+export function foodTrackClick(ndbno: string): FoodTrackClick {
+  return {
+    type: constants.FOODTRACK_CLICK,
+    ndbno
   };
 }
 

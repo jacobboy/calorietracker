@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { SearchListItem } from '../classes';
 import { DataSource } from '../ndbapi';
+import ItemComponent from '../containers/item';
 
 interface ItemsComponentProps {
   searchString: string;
@@ -51,9 +52,11 @@ export class ItemsComponent extends React.Component<ItemsComponentProps, ItemsCo
           </label>
           <input type="submit" value="Submit" />
         </form>
-        <ul>
-          {this.props.items.map((item) => <li key={item.ndbno}>{item.name}</li>)}
-        </ul>
+        <table>
+          <tbody>
+            {this.props.items.map((item) => <ItemComponent key={item.ndbno} item={item} />)}
+          </tbody>
+        </table>
       </div>
     );
   }

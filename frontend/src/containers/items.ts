@@ -23,8 +23,6 @@ function mapDispatchToProps(dispatch: Dispatch<actions.AddIngredient>) {
       dispatch(actions.foodSearchInput(searchString));
     },
     onFoodSearchSubmit: (searchString: string, ds: DataSource) => {
-      console.log(searchString);
-      console.log(ds);
       searchFood(searchString, ds).then(
         (searchList: SearchList) => searchList.item
       ).then((foods) => dispatch(actions.foodSearchSubmit(foods)));
