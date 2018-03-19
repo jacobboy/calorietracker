@@ -1,18 +1,65 @@
+import * as uuid from 'uuid';
+import { ReportNutrient, Report } from './ndbapi/classes';
+import { scaleQuantity } from './transforms';
+
 const CALORIES_ID = '208';
 const PROTEIN_ID = '203';
 const FAT_ID = '204';
 const CARB_ID = '205';
 
-export class Ingredient {
-  ndbno: string;
-  name: string;
-  calories: number;
-  protein: number;
-  fat: number;
-  carbs: number;
+export interface Nutritional {
+  readonly calories: number;
+  readonly protein: number;
+  readonly fat: number;
+  readonly carbs: number;
+}
 
-  static findNutrient(nutrients: Nutrient[], nutrientId: string): string {
-    return nutrients.filter(function(nutrient: Nutrient) {
+export interface Quantifiable {
+  readonly name: string;
+  readonly amount: number;
+  readonly unit: string;
+}
+
+export interface NDBable {
+  readonly ndbno: string;
+}
+
+// similar to Food, but should be allowed to be reused
+// in Java the difference would be that Ingredient would override equals
+// so that identical Ingredients evaluated as equal
+export interface Ingredient extends Nutritional, Quantifiable {
+  ingredientId: string;
+}
+
+// similar to Ingredient, but identical Foods should not necessarily be
+// allowed to be shared
+export interface Food extends Nutritional, Quantifiable {
+  readonly id: string;
+}
+
+export interface FoodCombo extends Nutritional {
+  readonly id: string;
+  readonly foods: Food[];
+}
+
+export interface Meal extends FoodCombo {
+  withFood(food: Food): Meal;
+  withoutFood(food: Food): Meal;
+}
+
+// TODO It may end up actually being nicer to just use report responses
+class NDBIngredient implements Ingredient, NDBable {
+  readonly ndbno: string;
+  readonly name: string;
+  readonly calories: number;
+  readonly protein: number;
+  readonly fat: number;
+  readonly carbs: number;
+  readonly amount: number;
+  readonly unit: string;
+
+  static findNutrient(nutrients: ReportNutrient[], nutrientId: string): string {
+    return nutrients.filter(function(nutrient: ReportNutrient) {
       return nutrient.nutrient_id === nutrientId;
     })[0].value;
   }
@@ -20,96 +67,132 @@ export class Ingredient {
   constructor(report: Report) {
     this.ndbno = report.food.ndbno;
     this.name = report.food.name;
-    this.calories = parseFloat(Ingredient.findNutrient(report.food.nutrients, CALORIES_ID));
-    this.protein = parseFloat(Ingredient.findNutrient(report.food.nutrients, PROTEIN_ID));
-    this.fat = parseFloat(Ingredient.findNutrient(report.food.nutrients, FAT_ID));
-    this.carbs = parseFloat(Ingredient.findNutrient(report.food.nutrients, CARB_ID));
+    this.calories = parseFloat(
+      NDBIngredient.findNutrient(report.food.nutrients, CALORIES_ID)
+    );
+    this.protein = parseFloat(
+      NDBIngredient.findNutrient(report.food.nutrients, PROTEIN_ID)
+    );
+    this.fat = parseFloat(
+      NDBIngredient.findNutrient(report.food.nutrients, FAT_ID)
+    );
+    this.carbs = parseFloat(
+      NDBIngredient.findNutrient(report.food.nutrients, CARB_ID)
+    );
+    this.amount = 100;  // pretty sure it's always 100?
+    this.unit = report.food.ru;
+  }
+
+  get ingredientId() { return this.ndbno; }
+}
+
+class ScaledFood implements Food {
+  readonly id: string;
+  readonly food: Nutritional & Quantifiable;
+  readonly amount: number;
+
+  constructor(food: Nutritional & Quantifiable, amount: number) {
+    this.id = uuid.v4();
+    this.food = food;
+    this.amount = amount;
+  }
+
+  get name() { return this.food.name; }
+
+  get unit() { return this.food.unit; }
+
+  get calories(): number {
+    return scaleQuantity(
+      this.food.calories, this.food.amount, this.amount
+    );
+  }
+
+  get protein() {
+    return scaleQuantity(
+      this.food.protein, this.food.amount, this.amount
+    );
+  }
+
+  get fat() {
+    return scaleQuantity(
+      this.food.fat, this.food.amount, this.amount
+    );
+  }
+
+  get carbs() {
+    return scaleQuantity(
+      this.food.carbs, this.food.amount, this.amount
+    );
   }
 }
 
-export class Recipe {
-  name: string;
-  ingredients: Ingredient[];
-  calories: number;
-  protein: number;
-  fat: number;
-  carbs: number;
+export class MealImpl implements Meal {
+  readonly id: string;
+  readonly foods: Food[];
 
-  constructor(name: string, ingredients: Ingredient[]) {
+  constructor(foods: Food[]) {
+    this.id = uuid.v4();
+    this.foods = foods;
+  }
+
+  get calories() { return this.foods.reduce((l, r) => l + r.calories, 0); }
+  get protein() { return this.foods.reduce((l, r) => l + r.protein, 0); }
+  get fat() { return this.foods.reduce((l, r) => l + r.fat, 0); }
+  get carbs() { return this.foods.reduce((l, r) => l + r.carbs, 0); }
+  withFood(food: Food): Meal { return new MealImpl([...this.foods, food]); }
+  withoutFood(food: Food): Meal {
+    return new MealImpl(this.foods.filter(f => f !== food));
+  }
+}
+
+export class Recipe implements FoodCombo, Quantifiable {
+  readonly id: string;
+  readonly name: string;
+  readonly foods: Food[];
+  readonly calories: number;
+  readonly protein: number;
+  readonly fat: number;
+  readonly carbs: number;
+  readonly amount: number;
+  readonly unit: string;
+
+  constructor(name: string, foods: Food[], amount?: number, unit?: string) {
+    this.id = uuid.v4();
     this.name = name;
-    this.ingredients = ingredients;
-    this.calories = ingredients.reduce((l, r) => l + r.calories, 0);
-    this.protein = ingredients.reduce((l, r) => l + r.protein, 0);
-    this.fat = ingredients.reduce((l, r) => l + r.fat, 0);
-    this.carbs = ingredients.reduce((l, r) => l + r.carbs, 0);
+    this.foods = foods;
+    this.calories = foods.reduce((l, r) => l + r.calories, 0);
+    this.protein = foods.reduce((l, r) => l + r.protein, 0);
+    this.fat = foods.reduce((l, r) => l + r.fat, 0);
+    this.carbs = foods.reduce((l, r) => l + r.carbs, 0);
+    if (amount === undefined) {
+      amount = foods.reduce((l, r) => l + r.amount, 0);
+    }
+    this.amount = amount;
+    if (this.unit === undefined) {
+      const units: Set<string> = new Set(foods.map(f => f.unit));
+      if (units.size !== 1) {
+        // TODO propery way to handle this?
+        throw 'Not all foods are the same unit, unit must be provided';
+      }
+    }
+    this.unit = this.foods[0].unit;
   }
 }
 
-export class SearchListItem {
-  offset: number;
-  group: string;
-  name: string;
-  ndbno: string;
-  ds: string;
+export function scaleFood(
+  ingredient: Nutritional & Quantifiable, amount: number
+): Food {
+  return new ScaledFood(ingredient, amount);
 }
 
-// TODO not a fan of making everything optional in case of no response
-export class SearchList {
-  q?: string;
-  sr?: string;
-  ds?: string;
-  start?: number;
-  end?: number;
-  total?: number;
-  group?: string;
-  sort?: string;
-  item: SearchListItem[];
+export function ingredientFromReport(report: Report): Ingredient {
+  return new NDBIngredient(report);
 }
 
-export class SearchResponse {
-  list: SearchList;
+export function recipe(name: string, foods: Food[]): Recipe {
+  return new Recipe(name, foods);
 }
 
-class Measure {
-  label: string;
-  eqv: number;
-  eunit: string;
-  qty: number;
-  value: string;
-}
-
-class Nutrient {
-  static CALORIES_ID: '208';
-  static PROTEIN_ID: '203';
-  static FAT_ID: '204';
-  static CARB_ID: '205';
-
-  // tslint:disable-next-line:variable-name
-  nutrient_id: string;
-  name: string;
-  derivation: string;
-  group: string;
-  unit: string;
-  value: string;
-  measures: Measure[];
-}
-
-class Food {
-  ndbno: string;
-  name: string;
-  ds: string;
-  manu: string;
-  ru: string;
-  nutrients: Nutrient[];
-}
-
-export class Report {
-  sr: string;
-  type: string;
-  food: Food;
-  footnotes: string[];
-}
-
-export class ReportResponse {
-  report: Report;
+export function meal(foods: Food[]): Meal {
+  return new MealImpl(foods);
 }

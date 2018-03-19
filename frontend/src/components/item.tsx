@@ -1,5 +1,5 @@
-import { SearchListItem } from '../classes';
 import * as React from 'react';
+import { SearchListItem } from '../ndbapi/classes';
 
 interface ItemComponentProps {
   key: string;
@@ -8,12 +8,39 @@ interface ItemComponentProps {
   onTrackClick: (ndbno: string) => void;
 }
 
-export function ItemComponent(props: ItemComponentProps) {
-  return (
-    <tr>
-      <td>{props.item.name}</td>
-      <td><button onClick={() => props.onDetailsClick(props.item.ndbno)}>Details</button></td>
-      <td><button onClick={() => props.onTrackClick(props.item.ndbno)}>Track</button></td>
-    </tr>
-  );
+interface ItemComponentState { }
+
+export class ItemComponent extends React.Component<
+  ItemComponentProps, ItemComponentState
+  > {
+
+  constructor(props: ItemComponentProps) {
+    super(props);
+  }
+
+  handleDetailsClick() {
+    this.props.onDetailsClick(this.props.item.ndbno);
+  }
+
+  handleTrackClick() {
+    this.props.onTrackClick(this.props.item.ndbno);
+  }
+
+  render() {
+    return (
+      <tr>
+        <td>{this.props.item.name}</td>
+        <td>
+          <button onClick={() => this.handleDetailsClick()}>
+            Details
+          </button>
+        </td>
+        <td>
+          <button onClick={() => this.handleTrackClick()}>
+            Track
+          </button>
+        </td>
+      </tr >
+    );
+  }
 }

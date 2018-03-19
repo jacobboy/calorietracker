@@ -1,4 +1,4 @@
-import { SearchResponse, ReportResponse } from './classes';
+import { ReportResponse, SearchResponse } from './ndbapi/classes';
 
 export const CheddarCheese: ReportResponse = {
     'report': {

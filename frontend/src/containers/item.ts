@@ -10,18 +10,11 @@ function mapStateToProps(state: StoreState) {
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
     onDetailsClick: (ndbno: string) => {
-      console.log(ndbno);
-      actions.foodDetailsClick(ndbno);
+      dispatch(actions.foodDetailsClick(ndbno));
     },
-    onTrackClick: (ndbno: string) => {
-      console.log(ndbno);
-      actions.foodTrackClick(ndbno);
+    onTrackClick: (ingredientId: string) => {
+      dispatch(actions.foodTrackClick(ingredientId));
     }
-    // onFoodSearchSubmit: (searchString: string, ds: DataSource) => {
-    //   searchFood(searchString, ds).then(
-    //     (searchList: SearchList) => searchList.item
-    //   ).then((foods) => dispatch(actions.foodSearchSubmit(foods)));
-    // }
   };
 }
 

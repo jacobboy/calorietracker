@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { DataSource, searchFood } from './ndbapi';
-import { SearchListItem } from './classes';
+import { SearchListItem } from './ndbapi/classes';
 
 interface SearchFormComponentProps {
   handleSubmit: (value: SearchFormComponentState) => void;
@@ -89,7 +89,6 @@ export class SearchComponent extends React.Component<SearchComponentProps, Searc
   handleFormSubmit(formState: SearchFormComponentState) {
     searchFood(formState.value, formState.dataSource).then(
       (list) => {
-        console.log('Handling ' + formState.value);
         this.setState({ items: list.item });
       }
     );

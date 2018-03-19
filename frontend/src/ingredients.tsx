@@ -1,20 +1,9 @@
-import { Ingredient } from './classes';
 import * as React from 'react';
+import { Ingredient } from './classes';
 import { getIngredient } from './ndbapi';
 
-interface IngredientComponentProps {
-  ingredient: Ingredient;
-}
-
-interface IngredientComponentState { }
-
-class IngredientComponent extends React.Component<IngredientComponentProps, IngredientComponentState> {
-
-  render() {
-    return (
-      <li>{this.props.ingredient.name}</li>
-    );
-  }
+function IngredientComponent(props: { ingredient: Ingredient }) {
+  return <li>{props.ingredient.name}</li>;
 }
 
 interface IngredientsComponentProps {
@@ -26,7 +15,9 @@ interface IngredientsComponentState {
   ingredients: Ingredient[];
 }
 
-export class IngredientsComponent extends React.Component<IngredientsComponentProps, IngredientsComponentState> {
+export class IngredientsComponent extends React.Component<
+  IngredientsComponentProps, IngredientsComponentState
+  > {
   constructor(props: IngredientsComponentProps) {
     super(props);
     this.state = {
@@ -38,7 +29,9 @@ export class IngredientsComponent extends React.Component<IngredientsComponentPr
   componentDidMount() {
     this.props.ndbnos.map(
       (ndbno) => getIngredient(ndbno).then(
-        (ingredient) => this.setState({ ingredients: this.state.ingredients.concat([ingredient]) })
+        (ingredient) => this.setState({
+          ingredients: this.state.ingredients.concat([ingredient])
+        })
         /* , (error) => this.setState({ isLoaded: true, error })*/
       ));
   }
@@ -47,7 +40,12 @@ export class IngredientsComponent extends React.Component<IngredientsComponentPr
     return (
       <ul className="ingredients">
         {this.state.ingredients.map(
-          (ingredient) => <IngredientComponent key={ingredient.ndbno} ingredient={ingredient} />
+          (ingredient) => (
+            <IngredientComponent
+              key={ingredient.ingredientId}
+              ingredient={ingredient}
+            />
+          )
         )}
       </ul>
     );

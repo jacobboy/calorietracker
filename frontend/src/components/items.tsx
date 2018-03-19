@@ -1,8 +1,8 @@
-
 import * as React from 'react';
-import { SearchListItem } from '../classes';
 import { DataSource } from '../ndbapi';
 import ItemComponent from '../containers/item';
+import TrackingModal from '../containers/tracking';
+import { SearchListItem } from '../ndbapi/classes';
 
 interface ItemsComponentProps {
   searchString: string;
@@ -15,7 +15,10 @@ interface ItemsComponentProps {
 
 export interface ItemsComponentState { }
 
-export class ItemsComponent extends React.Component<ItemsComponentProps, ItemsComponentState> {
+export class ItemsComponent extends React.Component<
+  ItemsComponentProps, ItemsComponentState
+  > {
+
   constructor(props: ItemsComponentProps) {
     super(props);
   }
@@ -30,14 +33,22 @@ export class ItemsComponent extends React.Component<ItemsComponentProps, ItemsCo
 
   handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    this.props.onFoodSearchSubmit(this.props.searchString, this.props.dataSource);
+    if (this.props.searchString.length > 0) {
+      this.props.onFoodSearchSubmit(
+        this.props.searchString, this.props.dataSource
+      );
+    }
   }
 
   render() {
     return (
       <div>
+        <TrackingModal />
         <form onSubmit={(e) => this.handleSubmit(e)} >
-          <select value={this.props.dataSource} onChange={(e) => this.handleSelectChange(e)}>
+          <select
+            value={this.props.dataSource}
+            onChange={(e) => this.handleSelectChange(e)}
+          >
             <option value={DataSource.SR}>{DataSource[DataSource.SR]}</option>
             <option value={DataSource.BL}>{DataSource[DataSource.BL]}</option>
             <option value={DataSource.Any}>{DataSource[DataSource.Any]}</option>
@@ -46,7 +57,7 @@ export class ItemsComponent extends React.Component<ItemsComponentProps, ItemsCo
             Name:
             <input
               type="text"
-              value={this.props.searchString}
+              value={this.props.searchString || ''}
               onChange={(e) => this.handleSearchChange(e)}
             />
           </label>
@@ -54,7 +65,9 @@ export class ItemsComponent extends React.Component<ItemsComponentProps, ItemsCo
         </form>
         <table>
           <tbody>
-            {this.props.items.map((item) => <ItemComponent key={item.ndbno} item={item} />)}
+            {this.props.items.map(
+              (item) => <ItemComponent key={item.ndbno} item={item} />
+            )}
           </tbody>
         </table>
       </div>

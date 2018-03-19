@@ -3,7 +3,7 @@ import { actions, Actions } from '../actions/';
 import { StoreState } from '../types/index';
 import { connect, Dispatch } from 'react-redux';
 import { DataSource, searchFood } from '../ndbapi';
-import { SearchList } from '../classes';
+import { SearchList } from '../ndbapi/classes';
 
 function mapStateToProps(state: StoreState) {
   return state.search;
