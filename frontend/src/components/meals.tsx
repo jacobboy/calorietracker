@@ -1,73 +1,157 @@
 import { Food, Meal } from '../classes';
 import * as React from 'react';
-import TrackedFood from '../containers/trackedfood';
+/* import TrackedFood from '../containers/trackedfood';*/
 
-function MealComponent(props: { meal: Meal, handleDeleteMeal: () => void }) {
-  return (
-    <div>
-      <table>
-        <tbody>
-          {
-            props.meal.foods.map((food: Food, mealIdx: number) => {
-              return <TrackedFood key={food.id} food={food} mealIdx={mealIdx} />;
-            })
-          }
-          <tr>
-            <td>{props.meal.id}</td>
-            <td>{props.meal.fat}</td>
-            <td>{props.meal.protein}</td>
-            <td>{props.meal.carbs}</td>
-            <td>{props.meal.calories}</td>
-          </tr>
-        </tbody>
-      </table>
-      <button onClick={props.handleDeleteMeal}>Delete Meal</button>
-    </div>
-  );
-}
+/* interface MealComponentProps {
+ *   meal: Meal;
+ *   idx: number;
+ *   handleDeleteMeal: () => void;
+ *   thStyle: React.CSSProperties;
+ * }*/
+
+/* function MealComponent(props: MealComponentProps) {
+ *   return (
+ *     <div>
+ *       <th style={props.thStyle}>Total</th>
+ *       <th style={props.thStyle}>{props.meal.fat}</th>
+ *       <th style={props.thStyle}>{props.meal.protein}</th>
+ *       <th style={props.thStyle}>{props.meal.carbs}</th>
+ *       <th style={props.thStyle}>{props.meal.calories}</th>
+ *       <th><button onClick={props.handleDeleteMeal}>Delete Meal</button></th>
+ *
+ *       {
+ *         props.meal.foods.map((food: Food, mealIdx: number) => {
+ *           return <TrackedFood key={food.id} food={food} mealIdx={mealIdx} />;
+ *         })
+ *       }
+ *     </div>
+ *   );
+ * }*/
 
 interface MealsComponentProps {
   today: Meal[];
-  handleAddMeal: () => void;
-  handleDeleteMeal: (mealIdx: number) => void;
+  handleAddMealClick: () => void;
+  handleDeleteMealClick: (mealIdx: number) => void;
+  handleRemoveFoodClick: (mealIdx: number, food: Food) => void;
+  handleCreateIngredientClick: () => void;
+  handleCreateRecipeClick: () => void;
 }
 
 export class MealsComponent extends React.Component<
   MealsComponentProps, {}
   > {
+  tableStyle: React.CSSProperties = {
+    'borderCollapse': 'collapse',
+    'border': '1px solid black'
+  };
+
+  thStyle: React.CSSProperties = {
+    'border': '1px solid black'
+  };
+
+  tdStyle: React.CSSProperties = {
+    'border': '1px solid black'
+  };
+
   constructor(props: MealsComponentProps) {
     super(props);
   }
 
-  ensureOneMeal(today: Meal[]) {
+  ensureAtLeastOneMeal(today: Meal[]) {
     if (today.length === 0) {
-      this.props.handleAddMeal();
+      this.props.handleAddMealClick();
     }
   }
 
   componentDidMount() {
-    this.ensureOneMeal(this.props.today);
+    this.ensureAtLeastOneMeal(this.props.today);
   }
 
   componentWillReceiveProps(nextProps: MealsComponentProps) {
-    this.ensureOneMeal(nextProps.today);
+    this.ensureAtLeastOneMeal(nextProps.today);
   }
 
-  renderMeal(meal: Meal, idx: number) {
+  /* renderMeal(meal: Meal, idx: number) {
+   *   return (
+   *     <MealComponent
+   *       key={meal.id}
+   *       meal={meal}
+   *       idx={idx}
+   *       handleDeleteMeal={() => this.props.handleDeleteMeal(idx)}
+   *       thStyle={this.thStyle}
+   *     />
+   *   );
+   * }*/
+
+  makeMealRow(meal: Meal, mealIdx: number) {
     return (
-      <MealComponent
-        key={meal.id}
-        meal={meal}
-        handleDeleteMeal={() => this.props.handleDeleteMeal(idx)}
-      />
+      <tr key={meal.id}>
+        <th style={this.thStyle}>Total</th>
+        <th style={this.thStyle} />
+        <th style={this.thStyle}>{meal.fat}</th>
+        <th style={this.thStyle}>{meal.protein}</th>
+        <th style={this.thStyle}>{meal.carbs}</th>
+        <th style={this.thStyle}>{meal.calories}</th>
+        <th>
+          <button onClick={() => this.props.handleDeleteMealClick(mealIdx)}>
+            Delete Meal
+          </button>
+        </th>
+      </tr>
     );
+  }
+
+  makeFoodRow(food: Food, mealIdx: number) {
+    return (
+      <tr key={food.id}>
+        <td style={this.tdStyle}>{food.name}</td>
+        <td style={this.tdStyle}>{food.amount}</td>
+        <td style={this.tdStyle}>{food.fat}</td>
+        <td style={this.tdStyle}>{food.carbs}</td>
+        <td style={this.tdStyle}>{food.protein}</td>
+        <td style={this.tdStyle}>{food.calories}</td>
+        <td style={this.tdStyle}>
+          <button onClick={() => this.props.handleRemoveFoodClick(mealIdx, food)}>
+            Remove
+          </button>
+        </td>
+      </tr>
+
+    );
+  }
+
+  renderRows() {
+    const rows = [];
+    for (let mealIdx = 0; mealIdx < this.props.today.length; mealIdx++) {
+      let meal: Meal = this.props.today[mealIdx];
+      for (let food of meal.foods) {
+        rows.push(this.makeFoodRow(food, mealIdx));
+      }
+      rows.push(this.makeMealRow(meal, mealIdx));
+    }
+    return rows;
   }
 
   render() {
     return (
       <div>
-        {this.props.today.map((meal, idx) => this.renderMeal(meal, idx))}
-        <button onClick={() => this.props.handleAddMeal()}>Add Meal</button>
+        <table style={this.tableStyle}>
+          <tbody>
+            <tr>
+              <th style={this.thStyle} />
+              <th style={this.thStyle}>Amount</th>
+              <th style={this.thStyle}>Fat</th>
+              <th style={this.thStyle}>Carbs</th>
+              <th style={this.thStyle}>Protein</th>
+              <th style={this.thStyle}>Calories</th>
+              <th style={this.thStyle} />
+            </tr>
+            {this.renderRows()}
+          </tbody>
+        </table>
+        <button onClick={() => this.props.handleAddMealClick()}>Add Meal</button>
+        <button onClick={() => this.props.handleCreateIngredientClick()}>Create Ingredient</button>
+        <button onClick={() => this.props.handleCreateRecipeClick()}>Create Recipe</button>
       </div>
     );
   }

@@ -4,6 +4,52 @@ import { Food, ingredientFromReport, scaleFood, Ingredient } from '../classes';
 import { getIngredient } from '../ndbapi';
 import { CheddarCheese } from '../mocks';
 
+function TrackFoodInput(props: {
+  item: Ingredient,
+  amount: number,
+  handleAmount: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+
+}) {
+  const ingred = scaleFood(props.item, props.amount);
+  return (
+    <div>
+      {props.item.name}
+      <table>
+        <tbody>
+          <tr>
+            <td>Fat</td>
+            <td>{ingred.fat}</td>
+          </tr>
+          <tr>
+            <td>Protein</td>
+            <td>{ingred.protein}</td>
+          </tr>
+          <tr>
+            <td>Carbs</td>
+            <td>{ingred.carbs}</td>
+          </tr>
+          <tr>
+            <td>Calories</td>
+            <td>{ingred.calories}</td>
+          </tr>
+        </tbody>
+      </table>
+      <form onSubmit={(e) => props.handleSubmit(e)}>
+        <label>
+          Amount:
+          <input
+            type="text"
+            value={props.amount}
+            onChange={(e) => props.handleAmount(e)}
+          />
+        </label>
+        <input type="submit" value="Submit" />
+      </form>
+    </div>
+  );
+}
+
 interface TrackingModalProps {
   showModal: boolean;
   mealIdx: number;
@@ -56,8 +102,19 @@ export class TrackingModal extends React.Component<
     this.props.onCloseClick();
   }
 
+  renderContents() {
+
+    return (
+      <TrackFoodInput
+        item={this.state.item}
+        amount={this.state.amount}
+        handleAmount={(e) => this.handleAmount(e)}
+        handleSubmit={(e) => this.handleSubmit(e)}
+      />
+    );
+  }
+
   render() {
-    const ingred = scaleFood(this.state.item, this.state.amount);
     return (
       <Modal
         isOpen={this.props.showModal}
@@ -65,39 +122,7 @@ export class TrackingModal extends React.Component<
         onRequestClose={() => this.handleCloseModal()}
         contentLabel="Track Food"
       >
-        {this.state.item.name}
-        <table>
-          <tbody>
-            <tr>
-              <td>Fat</td>
-              <td>{ingred.fat}</td>
-            </tr>
-            <tr>
-              <td>Protein</td>
-              <td>{ingred.protein}</td>
-            </tr>
-            <tr>
-              <td>Carbs</td>
-              <td>{ingred.carbs}</td>
-            </tr>
-            <tr>
-              <td>Calories</td>
-              <td>{ingred.calories}</td>
-            </tr>
-          </tbody>
-        </table>
-        <form onSubmit={(e) => this.handleSubmit(e)}>
-          <label>
-            Amount:
-            <input
-              type="text"
-              value={this.state.amount}
-              onChange={(e) => this.handleAmount(e)}
-            />
-          </label>
-          <input type="submit" value="Submit" />
-        </form>
-
+        {this.renderContents()}
         <button onClick={() => this.handleCloseModal()}>Close</button>
       </Modal >
     );

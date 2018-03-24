@@ -5,7 +5,7 @@ import { TrackingModal } from '../components/tracking';
 import { Food } from '../classes';
 
 function mapStateToProps(state: StoreState) {
-  return state.tracking;
+  return { ...state.tracking, showModal: state.modals.tracking };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {

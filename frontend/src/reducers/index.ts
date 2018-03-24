@@ -1,18 +1,20 @@
 import { Actions } from '../actions';
 import { StoreState } from '../types/index';
 import {
+  CREATE_INGREDIENT_OPEN,
+  CREATE_INGREDIENT_SUBMIT,
+  CREATE_RECIPE_SUBMIT,
   SELECT_DATASOURCE,
   FOODSEARCH_INPUT,
   FOODSEARCH_SUBMIT,
   FOODDETAILS_CLICK,
   FOODTRACK_CLICK,
-  CLOSE_TRACKING_MODAL,
+  CLOSE_MODAL,
   ADD_FOOD_TO_MEAL,
   REMOVE_FOOD_FROM_MEAL,
-  CREATE_INGREDIENT,
-  CREATE_RECIPE,
   ADD_MEAL,
-  REMOVE_MEAL
+  REMOVE_MEAL,
+  CHANGE_DAY
 } from '../constants/index';
 import { dropElement, replaceElement } from '../datautil';
 import { meal, Food } from '../classes';
@@ -81,18 +83,18 @@ export function reducer(state: StoreState, action: Actions): StoreState {
           ...state.tracking,
           ingredientId: action.payload.ingredientId,
           mealIdx: mealIdx(action.payload.mealIdx),
-          showModal: true
-        }
+        },
+        modals: state.modals.openTrackingModal()
       };
-    case CLOSE_TRACKING_MODAL:
+    case CLOSE_MODAL:
       return {
         ...state,
         tracking: {
           ...state.tracking,
           ingredientId: undefined,
           mealIdx: undefined,
-          showModal: false
-        }
+        },
+        modals: state.modals.close()
       };
     case ADD_MEAL:
       return {
@@ -108,7 +110,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
       return addFoodToMeal(state, action.payload);
     case REMOVE_FOOD_FROM_MEAL:
       return removeFoodFromMeal(state, action.payload);
-    case CREATE_INGREDIENT:
+    case CREATE_INGREDIENT_OPEN:
       return {
         ...state,
         search: {
@@ -116,7 +118,12 @@ export function reducer(state: StoreState, action: Actions): StoreState {
           items: [...state.search.items]
         }
       };
-    case CREATE_RECIPE:
+    case CREATE_INGREDIENT_SUBMIT:
+      return {
+        ...state,
+
+      };
+    case CREATE_RECIPE_SUBMIT:
       return {
         ...state,
         search: {
@@ -124,6 +131,8 @@ export function reducer(state: StoreState, action: Actions): StoreState {
           items: [...state.search.items]
         }
       };
+    case CHANGE_DAY:
+      return state;
     default:
       return state;
   }

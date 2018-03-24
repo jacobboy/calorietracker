@@ -86,6 +86,41 @@ class NDBIngredient implements Ingredient, NDBable {
   get ingredientId() { return this.ndbno; }
 }
 
+class CustomIngredient implements Ingredient {
+  readonly ingredientId: string;
+  readonly name: string;
+  readonly calories: number;
+  readonly protein: number;
+  readonly fat: number;
+  readonly carbs: number;
+  readonly amount: number;
+  readonly unit: string;
+
+  static findNutrient(nutrients: ReportNutrient[], nutrientId: string): string {
+    return nutrients.filter(function(nutrient: ReportNutrient) {
+      return nutrient.nutrient_id === nutrientId;
+    })[0].value;
+  }
+
+  constructor(
+    name: string,
+    fat: number,
+    carbs: number,
+    protein: number,
+    calories: number,
+    amount: number,
+    unit: string) {
+    this.ingredientId = uuid();
+    this.name = name;
+    this.calories = calories;
+    this.protein = protein;
+    this.fat = fat;
+    this.carbs = carbs;
+    this.amount = amount;
+    this.unit = unit;
+  }
+}
+
 class ScaledFood implements Food {
   readonly id: string;
   readonly food: Nutritional & Quantifiable;
@@ -183,6 +218,17 @@ export function scaleFood(
   ingredient: Nutritional & Quantifiable, amount: number
 ): Food {
   return new ScaledFood(ingredient, amount);
+}
+
+export function makeIngredient(
+  name: string,
+  fat: number,
+  carbs: number,
+  protein: number,
+  calories: number,
+  amount: number,
+  unit: string) {
+  return new CustomIngredient(name, fat, carbs, protein, calories, amount, unit);
 }
 
 export function ingredientFromReport(report: Report): Ingredient {

@@ -1,12 +1,14 @@
 import * as React from 'react';
 import { DataSource } from '../ndbapi';
 import ItemComponent from '../containers/item';
-import TrackingModal from '../containers/tracking';
 import { SearchListItem } from '../ndbapi/classes';
+import { Ingredient, Recipe } from '../classes';
 
 interface ItemsComponentProps {
   searchString: string;
   dataSource: DataSource;
+  ingredients: Ingredient[];
+  recipes: Recipe[];
   items: SearchListItem[];
   onDataSourceSelect: (ds: DataSource) => void;
   onFoodSearchInput: (searchString: string) => void;
@@ -43,7 +45,6 @@ export class ItemsComponent extends React.Component<
   render() {
     return (
       <div>
-        <TrackingModal />
         <form onSubmit={(e) => this.handleSubmit(e)} >
           <select
             value={this.props.dataSource}

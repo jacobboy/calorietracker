@@ -1,12 +1,16 @@
-import { ItemsComponent } from '../components/items';
-import { actions, Actions } from '../actions/';
-import { StoreState } from '../types/index';
 import { connect, Dispatch } from 'react-redux';
+import { actions, Actions } from '../actions/';
+import { ItemsComponent } from '../components/items';
 import { DataSource, searchFood } from '../ndbapi';
 import { SearchList } from '../ndbapi/classes';
+import { StoreState } from '../types/index';
 
 function mapStateToProps(state: StoreState) {
-  return state.search;
+  return {
+    ...state.search,
+    ingredients: state.created.ingredients,
+    recipes: state.created.recipes
+  };
   // return {
   //   value: state.search.value,
   //   dataSource: state.search.dataSource,
