@@ -1,6 +1,6 @@
 import { GOV_API_KEY } from '../apikey';
 import { ingredientFromReport, Ingredient } from '../classes';
-import { SearchList, Report } from './classes';
+import { SearchList, Report, IngredientSearchItem } from './classes';
 
 export enum DataSource {
   SR = 'SR',
@@ -87,6 +87,13 @@ function fetchSearch(searchString: string, dataSource: DataSource): Promise<Sear
   // ).then((response) => response.list);
 }
 
-export function searchFood(searchString: string, dataSource: DataSource): Promise<SearchList> {
-  return fetchSearch(searchString, dataSource);
+export function searchFood(
+  searchString: string,
+  dataSource: DataSource): Promise<IngredientSearchItem[]> {
+  return fetchSearch(
+    searchString,
+    dataSource
+  ).then(
+    (searchList) => searchList.item.map((sli) => IngredientSearchItem.fromSearchListItem(sli))
+  );
 }

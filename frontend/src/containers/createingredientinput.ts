@@ -1,6 +1,6 @@
 import { connect, Dispatch } from 'react-redux';
 import { actions, Actions } from '../actions/';
-import { CreateIngredientInput } from '../components/createingredient';
+import { CreateIngredientInput } from '../components/createingredientinput';
 import { StoreState } from '../types/index';
 
 function mapStateToProps(state: StoreState) {
@@ -21,6 +21,7 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
       dispatch(actions.createIngredientSubmit(
         name, fat, carbs, protein, calories, amount, unit
       ));
+      dispatch(actions.closeModal());
     }
   };
 }

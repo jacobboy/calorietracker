@@ -1,3 +1,26 @@
+import { Named, NDBable } from '../classes';
+
+export class IngredientSearchItem extends NDBable implements Named {
+
+  static fromSearchListItem(item: SearchListItem) {
+    return new IngredientSearchItem(
+      item.ndbno,
+      item.offset,
+      item.group,
+      item.name,
+      item.ds,
+    );
+  }
+
+  constructor(
+    readonly ndbno: string,
+    readonly offset: number,
+    readonly group: string,
+    readonly name: string,
+    readonly ds: string
+  ) { super(ndbno); }
+}
+
 export class SearchListItem {
   offset: number;
   group: string;

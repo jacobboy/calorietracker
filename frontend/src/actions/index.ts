@@ -1,4 +1,4 @@
-import { Food, makeIngredient } from '../classes';
+import { Food, makeIngredient, Ingredient } from '../classes';
 import {
   CREATE_INGREDIENT_OPEN,
   CREATE_INGREDIENT_SUBMIT,
@@ -17,7 +17,7 @@ import {
   CHANGE_DAY
 } from '../constants/index';
 import { DataSource } from '../ndbapi';
-import { SearchListItem } from '../ndbapi/classes';
+import { IngredientSearchItem } from '../ndbapi/classes';
 
 interface Action<T extends string> {
   type: T;
@@ -30,8 +30,8 @@ interface ActionWithPayload<T extends string, P> extends Action<T> {
 function createAction<T extends string>(type: T): Action<T>;
 function createAction<T extends string, P>(type: T, payload: P): ActionWithPayload<T, P>;
 function createAction<T extends string, P>(type: T, payload?: P) {
-  // console.log('Creating action: ' + type);
-  // console.log('With payload: \n' + JSON.stringify(payload));
+  console.log('Creating action: ' + type);
+  console.log('With payload: \n' + JSON.stringify(payload));
   // TODO was payload ?, but that failed with a payload of 0
   // is there a point to this check now?
   return payload !== undefined ? { type, payload } : { type };
@@ -55,10 +55,10 @@ function createIngredient(
 export const actions = {
   selectDataSource: (dataSource: DataSource) => createAction(SELECT_DATASOURCE, dataSource),
   foodSearchInput: (searchString: string) => createAction(FOODSEARCH_INPUT, searchString),
-  foodSearchSubmit: (items: SearchListItem[]) => createAction(FOODSEARCH_SUBMIT, items),
+  foodSearchSubmit: (items: IngredientSearchItem[]) => createAction(FOODSEARCH_SUBMIT, items),
   foodDetailsClick: (ndbno: string) => createAction(FOODDETAILS_CLICK, ndbno),
-  foodTrackClick: (ingredientId: string, mealIdx?: number) => createAction(FOODTRACK_CLICK, { ingredientId, mealIdx }),
-  closeTrackingModal: () => createAction(CLOSE_MODAL),
+  foodTrackClick: (ingredient: Ingredient, mealIdx?: number) => createAction(FOODTRACK_CLICK, { ingredient, mealIdx }),
+  closeModal: () => createAction(CLOSE_MODAL),
   addMeal: () => createAction(ADD_MEAL),
   removeMeal: (mealIdx: number) => createAction(REMOVE_MEAL, mealIdx),
   addFoodToMeal: (mealIdx: number, food: Food) => createAction(ADD_FOOD_TO_MEAL, { mealIdx, food }),

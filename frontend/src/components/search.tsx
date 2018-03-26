@@ -1,27 +1,25 @@
 import * as React from 'react';
+import { Ingredient, Recipe, Ingredientable, Named } from '../classes';
+import SearchIngredientRow from '../containers/searchingredientrow';
 import { DataSource } from '../ndbapi';
-import ItemComponent from '../containers/item';
-import { SearchListItem } from '../ndbapi/classes';
-import { Ingredient, Recipe } from '../classes';
 
-interface ItemsComponentProps {
+interface SearchComponentProps {
   searchString: string;
   dataSource: DataSource;
-  ingredients: Ingredient[];
-  recipes: Recipe[];
-  items: SearchListItem[];
+  items: (Ingredientable & Named)[];
+  created: { ingredients: Ingredient[], recipes: Recipe[] };
   onDataSourceSelect: (ds: DataSource) => void;
   onFoodSearchInput: (searchString: string) => void;
   onFoodSearchSubmit: (searchString: string, ds: DataSource) => void;
 }
 
-export interface ItemsComponentState { }
+export interface SearchComponentState { }
 
-export class ItemsComponent extends React.Component<
-  ItemsComponentProps, ItemsComponentState
+export class SearchComponent extends React.Component<
+  SearchComponentProps, SearchComponentState
   > {
 
-  constructor(props: ItemsComponentProps) {
+  constructor(props: SearchComponentProps) {
     super(props);
   }
 
@@ -66,8 +64,15 @@ export class ItemsComponent extends React.Component<
         </form>
         <table>
           <tbody>
+            {this.props.created.ingredients.map(
+              (item) => <SearchIngredientRow key={item.ingredientId} item={item} />
+            )}
+          </tbody>
+        </table>
+        <table>
+          <tbody>
             {this.props.items.map(
-              (item) => <ItemComponent key={item.ndbno} item={item} />
+              (item) => <SearchIngredientRow key={item.ingredientId} item={item} />
             )}
           </tbody>
         </table>

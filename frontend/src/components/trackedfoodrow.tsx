@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Food } from '../classes';
 
-export function TrackedFood(
+export function TrackedFoodRow(
   props: {
     mealIdx: number,
     food: Food,

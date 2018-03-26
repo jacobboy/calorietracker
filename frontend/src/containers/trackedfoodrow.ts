@@ -1,7 +1,7 @@
 import { connect, Dispatch } from 'react-redux';
 import { actions, Actions } from '../actions';
 import { Food } from '../classes';
-import { TrackedFood } from '../components/trackedfood';
+import { TrackedFoodRow } from '../components/trackedfoodrow';
 import { StoreState } from '../types';
 
 function mapStateToProps(state: StoreState) {
@@ -16,4 +16,4 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(TrackedFood);
+export default connect(mapStateToProps, mapDispatchToProps)(TrackedFoodRow);

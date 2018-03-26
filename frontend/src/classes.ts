@@ -7,6 +7,10 @@ const PROTEIN_ID = '203';
 const FAT_ID = '204';
 const CARB_ID = '205';
 
+export interface Named {
+  readonly name: string;
+}
+
 export interface Nutritional {
   readonly calories: number;
   readonly protein: number;
@@ -14,22 +18,27 @@ export interface Nutritional {
   readonly carbs: number;
 }
 
-export interface Quantifiable {
-  readonly name: string;
+export interface Quantifiable extends Named {
   readonly amount: number;
   readonly unit: string;
 }
 
-export interface NDBable {
-  readonly ndbno: string;
+export interface Ingredientable {
+  readonly ingredientId: string;
+}
+
+/**
+ * Ingredient ids for food in the NDB are a function of the ndbno
+ */
+export abstract class NDBable implements Ingredientable {
+  constructor(public ndbno: string) { /* noop */ }
+  get ingredientId() { return this.ndbno; }
 }
 
 // similar to Food, but should be allowed to be reused
 // in Java the difference would be that Ingredient would override equals
 // so that identical Ingredients evaluated as equal
-export interface Ingredient extends Nutritional, Quantifiable {
-  ingredientId: string;
-}
+export interface Ingredient extends Nutritional, Quantifiable, Ingredientable { }
 
 // similar to Ingredient, but identical Foods should not necessarily be
 // allowed to be shared
@@ -48,7 +57,7 @@ export interface Meal extends FoodCombo {
 }
 
 // TODO It may end up actually being nicer to just use report responses
-class NDBIngredient implements Ingredient, NDBable {
+class NDBIngredient extends NDBable implements Ingredient {
   readonly ndbno: string;
   readonly name: string;
   readonly calories: number;
@@ -65,7 +74,7 @@ class NDBIngredient implements Ingredient, NDBable {
   }
 
   constructor(report: Report) {
-    this.ndbno = report.food.ndbno;
+    super(report.food.ndbno);
     this.name = report.food.name;
     this.calories = parseFloat(
       NDBIngredient.findNutrient(report.food.nutrients, CALORIES_ID)

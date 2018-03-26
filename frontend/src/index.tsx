@@ -6,18 +6,16 @@ import { Provider } from 'react-redux';
 import registerServiceWorker from './registerServiceWorker';
 import { reducer } from './reducers/index';
 import { initialState, StoreState } from './types/index';
-import TrackingModal from './containers/tracking';
-import ItemsComponent from './containers/items';
+import FoodModal from './containers/foodmodal';
+import SearchComponent from './containers/search';
 import MealsComponent from './containers/meals';
 
 function App() {
   return (
     <div>
-      <TrackingModal />
-      {/* <CreateIngredientModal /> */}
-      {/* <CreateRecipeModal /> */}
+      <FoodModal />
       <MealsComponent />
-      <ItemsComponent />
+      <SearchComponent />
     </div>
   );
 }

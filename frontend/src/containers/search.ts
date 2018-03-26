@@ -1,15 +1,15 @@
 import { connect, Dispatch } from 'react-redux';
 import { actions, Actions } from '../actions/';
-import { ItemsComponent } from '../components/items';
+import { SearchComponent } from '../components/search';
 import { DataSource, searchFood } from '../ndbapi';
-import { SearchList } from '../ndbapi/classes';
 import { StoreState } from '../types/index';
 
 function mapStateToProps(state: StoreState) {
   return {
     ...state.search,
-    ingredients: state.created.ingredients,
-    recipes: state.created.recipes
+    created: state.created
+    // ingredients: state.created.ingredients,
+    // recipes: state.created.recipes
   };
   // return {
   //   value: state.search.value,
@@ -28,10 +28,11 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
     },
     onFoodSearchSubmit: (searchString: string, ds: DataSource) => {
       searchFood(searchString, ds).then(
-        (searchList: SearchList) => searchList.item
-      ).then((foods) => dispatch(actions.foodSearchSubmit(foods)));
+        (searchListItems) => dispatch(
+          actions.foodSearchSubmit(searchListItems)
+        ));
     }
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ItemsComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(SearchComponent);

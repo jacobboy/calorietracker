@@ -19,7 +19,7 @@ import {
 import { dropElement, replaceElement } from '../datautil';
 import { meal, Food } from '../classes';
 
-function mealIdxFromState(state: StoreState, mealIdx?: number) {
+function mealIdxOrLast(state: StoreState, mealIdx?: number) {
   return mealIdx || (state.today.length - 1);
 }
 
@@ -27,7 +27,7 @@ function addFoodToMeal(
   state: StoreState,
   payload: { mealIdx: number, food: Food }
 ) {
-  const idx = mealIdxFromState(state, payload.mealIdx);
+  const idx = mealIdxOrLast(state, payload.mealIdx);
   const newMeal = state.today[idx].withFood(payload.food);
   const today = replaceElement(state.today, idx, newMeal);
   return { ...state, today };
@@ -37,7 +37,7 @@ function removeFoodFromMeal(
   state: StoreState,
   payload: { mealIdx: number, food: Food }
 ) {
-  const idx = mealIdxFromState(state, payload.mealIdx);
+  const idx = mealIdxOrLast(state, payload.mealIdx);
   const newMeal = state.today[idx].withoutFood(payload.food);
   const today = replaceElement(state.today, idx, newMeal);
   return { ...state, today };
@@ -45,7 +45,7 @@ function removeFoodFromMeal(
 
 export function reducer(state: StoreState, action: Actions): StoreState {
   function mealIdx(payload?: number) {
-    return mealIdxFromState(state, payload);
+    return mealIdxOrLast(state, payload);
   }
 
   // console.log('Handling: ' + action.type);
@@ -81,7 +81,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
         ...state,
         tracking: {
           ...state.tracking,
-          ingredientId: action.payload.ingredientId,
+          ingredient: action.payload.ingredient,
           mealIdx: mealIdx(action.payload.mealIdx),
         },
         modals: state.modals.openTrackingModal()
@@ -91,7 +91,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
         ...state,
         tracking: {
           ...state.tracking,
-          ingredientId: undefined,
+          ingredient: undefined,
           mealIdx: undefined,
         },
         modals: state.modals.close()
@@ -113,6 +113,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
     case CREATE_INGREDIENT_OPEN:
       return {
         ...state,
+        modals: state.modals.openIngredientModal(),
         search: {
           ...state.search,
           items: [...state.search.items]
@@ -121,14 +122,17 @@ export function reducer(state: StoreState, action: Actions): StoreState {
     case CREATE_INGREDIENT_SUBMIT:
       return {
         ...state,
-
+        created: {
+          ...state.created,
+          ingredients: state.created.ingredients.concat(action.payload)
+        }
       };
     case CREATE_RECIPE_SUBMIT:
       return {
         ...state,
-        search: {
-          ...state.search,
-          items: [...state.search.items]
+        created: {
+          ...state.created,
+          // recipes: state.created.recipes.concat(action.payload)
         }
       };
     case CHANGE_DAY:

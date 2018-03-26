@@ -12,9 +12,7 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
     handleAddMealClick: () => { dispatch(actions.addMeal()); },
     handleDeleteMealClick: (mealIdx: number) => {
-      const action = actions.removeMeal(mealIdx);
-      console.log('Created action' + JSON.stringify(action));
-      dispatch(action);
+      dispatch(actions.removeMeal(mealIdx));
     },
     handleRemoveFoodClick: (mealIdx: number, food: Food) => {
       dispatch(actions.removeFoodFromMeal(mealIdx, food));

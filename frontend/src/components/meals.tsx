@@ -89,8 +89,8 @@ export class MealsComponent extends React.Component<
         <th style={this.thStyle}>Total</th>
         <th style={this.thStyle} />
         <th style={this.thStyle}>{meal.fat}</th>
-        <th style={this.thStyle}>{meal.protein}</th>
         <th style={this.thStyle}>{meal.carbs}</th>
+        <th style={this.thStyle}>{meal.protein}</th>
         <th style={this.thStyle}>{meal.calories}</th>
         <th>
           <button onClick={() => this.props.handleDeleteMealClick(mealIdx)}>
@@ -147,11 +147,39 @@ export class MealsComponent extends React.Component<
               <th style={this.thStyle} />
             </tr>
             {this.renderRows()}
+            <tr>
+              <th style={this.thStyle}>Day Total</th>
+              <th style={this.thStyle} />
+              <th style={this.thStyle}>
+                {this.props.today.reduce((l, r) => l + r.fat, 0)}
+              </th>
+              <th style={this.thStyle}>
+                {this.props.today.reduce((l, r) => l + r.carbs, 0)}
+              </th>
+              <th style={this.thStyle}>
+                {this.props.today.reduce((l, r) => l + r.protein, 0)}
+              </th>
+              <th style={this.thStyle}>
+                {this.props.today.reduce((l, r) => l + r.calories, 0)}
+              </th>
+            </tr>
           </tbody>
         </table>
-        <button onClick={() => this.props.handleAddMealClick()}>Add Meal</button>
-        <button onClick={() => this.props.handleCreateIngredientClick()}>Create Ingredient</button>
-        <button onClick={() => this.props.handleCreateRecipeClick()}>Create Recipe</button>
+        <button
+          onClick={() => this.props.handleAddMealClick()}
+        >
+          Add Meal
+        </button>
+        <button
+          onClick={() => this.props.handleCreateIngredientClick()}
+        >
+          Create Ingredient
+        </button>
+        <button
+          onClick={() => this.props.handleCreateRecipeClick()}
+        >
+          Create Recipe
+        </button>
       </div>
     );
   }

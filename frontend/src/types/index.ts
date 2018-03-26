@@ -1,6 +1,5 @@
-import { Meal, Ingredient, Recipe } from '../classes';
+import { Meal, Ingredient, Recipe, Named, Ingredientable } from '../classes';
 import { DataSource } from '../ndbapi';
-import { SearchListItem } from '../ndbapi/classes';
 
 interface CreatedState {
   ingredients: Ingredient[];
@@ -10,12 +9,12 @@ interface CreatedState {
 interface SearchState {
   searchString: string;
   dataSource: DataSource;
-  items: SearchListItem[];
+  items: (Ingredientable & Named)[];
 }
 
 interface TrackingState {
   mealIdx?: number;
-  ingredientId?: string;
+  ingredient?: Ingredient;
 }
 
 enum Modals {
@@ -23,7 +22,7 @@ enum Modals {
 }
 
 // um could really do this with just the enum, do i need this whole class?
-class ModalState {
+export class ModalState {
   private openModal: Modals;
 
   constructor(openModal: Modals = Modals.NONE) {
@@ -31,16 +30,14 @@ class ModalState {
   }
 
   openTrackingModal(): ModalState { return new ModalState(Modals.TRACKING); }
-
   openIngredientModal(): ModalState { return new ModalState(Modals.INGREDIENT); }
-
   openRecipeModal(): ModalState { return new ModalState(Modals.RECIPE); }
-
   close(): ModalState { return new ModalState(); }
 
-  get tracking(): boolean { return this.openModal === Modals.TRACKING; }
-  get ingredient(): boolean { return this.openModal === Modals.INGREDIENT; }
-  get recipe(): boolean { return this.openModal === Modals.RECIPE; }
+  get isOpen(): boolean { return this.openModal !== Modals.NONE; }
+  get isTracking(): boolean { return this.openModal === Modals.TRACKING; }
+  get isIngredient(): boolean { return this.openModal === Modals.INGREDIENT; }
+  get isRecipe(): boolean { return this.openModal === Modals.RECIPE; }
 }
 
 export interface StoreState {
@@ -60,7 +57,7 @@ export const initialState: StoreState = {
   },
   tracking: {
     mealIdx: undefined,
-    ingredientId: undefined
+    ingredient: undefined
   },
   today: [],
   created: {
