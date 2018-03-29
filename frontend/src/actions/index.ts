@@ -1,4 +1,4 @@
-import { Food, makeIngredient, Ingredient } from '../classes';
+import { Food, makeIngredient, Ingredient, makeRecipe } from '../classes';
 import {
   CREATE_INGREDIENT_OPEN,
   CREATE_INGREDIENT_SUBMIT,
@@ -7,8 +7,7 @@ import {
   SELECT_DATASOURCE,
   FOODSEARCH_INPUT,
   FOODSEARCH_SUBMIT,
-  FOODDETAILS_CLICK,
-  FOODTRACK_CLICK,
+  TRACK_FOOD,
   CLOSE_MODAL,
   ADD_FOOD_TO_MEAL,
   REMOVE_FOOD_FROM_MEAL,
@@ -30,8 +29,7 @@ interface ActionWithPayload<T extends string, P> extends Action<T> {
 function createAction<T extends string>(type: T): Action<T>;
 function createAction<T extends string, P>(type: T, payload: P): ActionWithPayload<T, P>;
 function createAction<T extends string, P>(type: T, payload?: P) {
-  console.log('Creating action: ' + type);
-  console.log('With payload: \n' + JSON.stringify(payload));
+  console.log('Creating action: ' + type + '\nwith payload: \n' + JSON.stringify(payload));
   // TODO was payload ?, but that failed with a payload of 0
   // is there a point to this check now?
   return payload !== undefined ? { type, payload } : { type };
@@ -46,27 +44,44 @@ function createIngredient(
   amount: number,
   unit: string
 ) {
-  const ingredient = makeIngredient(name, fat, carbs, protein, calories, amount, unit);
+  const ingredient = makeIngredient(
+    name, fat, carbs, protein, calories, amount, unit
+  );
   return createAction(CREATE_INGREDIENT_SUBMIT, ingredient);
+}
+
+function createRecipe(
+  name: string, foods: Food[], amount?: number, unit?: string
+) {
+  const recipe = makeRecipe(name, foods, amount, unit);
+  return createAction(CREATE_RECIPE_SUBMIT, recipe);
 }
 
 // TODO should actions be UI-driven or business logic driven?
 // perhaps business-driven and have the containers perform business/ui mapping?
 export const actions = {
-  selectDataSource: (dataSource: DataSource) => createAction(SELECT_DATASOURCE, dataSource),
-  foodSearchInput: (searchString: string) => createAction(FOODSEARCH_INPUT, searchString),
-  foodSearchSubmit: (items: IngredientSearchItem[]) => createAction(FOODSEARCH_SUBMIT, items),
-  foodDetailsClick: (ndbno: string) => createAction(FOODDETAILS_CLICK, ndbno),
-  foodTrackClick: (ingredient: Ingredient, mealIdx?: number) => createAction(FOODTRACK_CLICK, { ingredient, mealIdx }),
+  selectDataSource:
+    (dataSource: DataSource) => createAction(SELECT_DATASOURCE, dataSource),
+  foodSearchInput:
+    (searchString: string) => createAction(FOODSEARCH_INPUT, searchString),
+  foodSearchSubmit:
+    (items: IngredientSearchItem[]) => createAction(FOODSEARCH_SUBMIT, items),
+  trackFood:
+    (ingredient: Ingredient, mealIdx?: number) =>
+      createAction(TRACK_FOOD, { ingredient, mealIdx }),
   closeModal: () => createAction(CLOSE_MODAL),
   addMeal: () => createAction(ADD_MEAL),
   removeMeal: (mealIdx: number) => createAction(REMOVE_MEAL, mealIdx),
-  addFoodToMeal: (mealIdx: number, food: Food) => createAction(ADD_FOOD_TO_MEAL, { mealIdx, food }),
-  removeFoodFromMeal: (mealIdx: number, food: Food) => createAction(REMOVE_FOOD_FROM_MEAL, { mealIdx, food }),
+  addFoodToMeal:
+    (mealIdx: number, food: Food) =>
+      createAction(ADD_FOOD_TO_MEAL, { mealIdx, food }),
+  removeFoodFromMeal:
+    (mealIdx: number, food: Food) =>
+      createAction(REMOVE_FOOD_FROM_MEAL, { mealIdx, food }),
   createIngredientOpen: () => createAction(CREATE_INGREDIENT_OPEN),
   createIngredientSubmit: createIngredient,
   createRecipeOpen: () => createAction(CREATE_RECIPE_OPEN),
-  createRecipeSubmit: () => createAction(CREATE_RECIPE_SUBMIT),
+  createRecipeSubmit: createRecipe,
   setDay: (day: Date) => createAction(CHANGE_DAY, day)
 };
 

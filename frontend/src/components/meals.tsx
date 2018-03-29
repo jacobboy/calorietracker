@@ -85,7 +85,7 @@ export class MealsComponent extends React.Component<
 
   makeMealRow(meal: Meal, mealIdx: number) {
     return (
-      <tr key={meal.id}>
+      <tr key={meal.uid}>
         <th style={this.thStyle}>Total</th>
         <th style={this.thStyle} />
         <th style={this.thStyle}>{meal.fat}</th>
@@ -103,7 +103,7 @@ export class MealsComponent extends React.Component<
 
   makeFoodRow(food: Food, mealIdx: number) {
     return (
-      <tr key={food.id}>
+      <tr key={food.uid}>
         <td style={this.tdStyle}>{food.name}</td>
         <td style={this.tdStyle}>{food.amount}</td>
         <td style={this.tdStyle}>{food.fat}</td>

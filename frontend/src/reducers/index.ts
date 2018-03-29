@@ -3,12 +3,12 @@ import { StoreState } from '../types/index';
 import {
   CREATE_INGREDIENT_OPEN,
   CREATE_INGREDIENT_SUBMIT,
+  CREATE_RECIPE_OPEN,
   CREATE_RECIPE_SUBMIT,
   SELECT_DATASOURCE,
   FOODSEARCH_INPUT,
   FOODSEARCH_SUBMIT,
-  FOODDETAILS_CLICK,
-  FOODTRACK_CLICK,
+  TRACK_FOOD,
   CLOSE_MODAL,
   ADD_FOOD_TO_MEAL,
   REMOVE_FOOD_FROM_MEAL,
@@ -17,7 +17,7 @@ import {
   CHANGE_DAY
 } from '../constants/index';
 import { dropElement, replaceElement } from '../datautil';
-import { meal, Food } from '../classes';
+import { meal, Food, Meal } from '../classes';
 
 function mealIdxOrLast(state: StoreState, mealIdx?: number) {
   return mealIdx || (state.today.length - 1);
@@ -26,9 +26,9 @@ function mealIdxOrLast(state: StoreState, mealIdx?: number) {
 function addFoodToMeal(
   state: StoreState,
   payload: { mealIdx: number, food: Food }
-) {
+): StoreState {
   const idx = mealIdxOrLast(state, payload.mealIdx);
-  const newMeal = state.today[idx].withFood(payload.food);
+  const newMeal: Meal = state.today[idx].withFood(payload.food);
   const today = replaceElement(state.today, idx, newMeal);
   return { ...state, today };
 }
@@ -74,9 +74,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
           items: action.payload
         }
       };
-    case FOODDETAILS_CLICK:
-      return { ...state };
-    case FOODTRACK_CLICK:
+    case TRACK_FOOD:
       return {
         ...state,
         tracking: {
@@ -114,25 +112,26 @@ export function reducer(state: StoreState, action: Actions): StoreState {
       return {
         ...state,
         modals: state.modals.openIngredientModal(),
-        search: {
-          ...state.search,
-          items: [...state.search.items]
-        }
       };
     case CREATE_INGREDIENT_SUBMIT:
       return {
         ...state,
-        created: {
-          ...state.created,
-          ingredients: state.created.ingredients.concat(action.payload)
+        saved: {
+          ...state.saved,
+          ingredients: state.saved.ingredients.concat(action.payload)
         }
+      };
+    case CREATE_RECIPE_OPEN:
+      return {
+        ...state,
+        modals: state.modals.openRecipeModal(),
       };
     case CREATE_RECIPE_SUBMIT:
       return {
         ...state,
-        created: {
-          ...state.created,
-          // recipes: state.created.recipes.concat(action.payload)
+        saved: {
+          ...state.saved,
+          recipes: state.saved.recipes.concat(action.payload)
         }
       };
     case CHANGE_DAY:

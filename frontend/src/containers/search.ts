@@ -7,7 +7,7 @@ import { StoreState } from '../types/index';
 function mapStateToProps(state: StoreState) {
   return {
     ...state.search,
-    created: state.created
+    saved: state.saved
     // ingredients: state.created.ingredients,
     // recipes: state.created.recipes
   };
@@ -27,6 +27,7 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
       dispatch(actions.foodSearchInput(searchString));
     },
     onFoodSearchSubmit: (searchString: string, ds: DataSource) => {
+      console.log('Searching food ' + searchString);
       searchFood(searchString, ds).then(
         (searchListItems) => dispatch(
           actions.foodSearchSubmit(searchListItems)

@@ -1,7 +1,9 @@
-import { Meal, Ingredient, Recipe, Named, Ingredientable } from '../classes';
+import { Meal, Ingredient, Recipe, Named, UIDed } from '../classes';
 import { DataSource } from '../ndbapi';
+import { getAllCustomIngredients, getAllStoredIngredients, getAllRecipes } from '../storage';
 
-interface CreatedState {
+interface SavedState {
+  ndbs: Ingredient[];
   ingredients: Ingredient[];
   recipes: Recipe[];
 }
@@ -9,7 +11,7 @@ interface CreatedState {
 interface SearchState {
   searchString: string;
   dataSource: DataSource;
-  items: (Ingredientable & Named)[];
+  items: (UIDed & Named)[];
 }
 
 interface TrackingState {
@@ -23,18 +25,17 @@ enum Modals {
 
 // um could really do this with just the enum, do i need this whole class?
 export class ModalState {
-  private openModal: Modals;
+  constructor(
+    readonly isOpen: boolean = false,
+    private readonly openModal: Modals = Modals.NONE
+  ) { /* noop */ }
 
-  constructor(openModal: Modals = Modals.NONE) {
-    this.openModal = openModal;
-  }
+  openTrackingModal(): ModalState { return new ModalState(true, Modals.TRACKING); }
+  openIngredientModal(): ModalState { return new ModalState(true, Modals.INGREDIENT); }
+  openRecipeModal(): ModalState { return new ModalState(true, Modals.RECIPE); }
+  open(): ModalState { return new ModalState(true, Modals.NONE); }
+  close(): ModalState { return new ModalState(false, Modals.NONE); }
 
-  openTrackingModal(): ModalState { return new ModalState(Modals.TRACKING); }
-  openIngredientModal(): ModalState { return new ModalState(Modals.INGREDIENT); }
-  openRecipeModal(): ModalState { return new ModalState(Modals.RECIPE); }
-  close(): ModalState { return new ModalState(); }
-
-  get isOpen(): boolean { return this.openModal !== Modals.NONE; }
   get isTracking(): boolean { return this.openModal === Modals.TRACKING; }
   get isIngredient(): boolean { return this.openModal === Modals.INGREDIENT; }
   get isRecipe(): boolean { return this.openModal === Modals.RECIPE; }
@@ -45,7 +46,7 @@ export interface StoreState {
   search: SearchState;
   tracking: TrackingState;
   today: Meal[];
-  created: CreatedState;
+  saved: SavedState;
 }
 
 export const initialState: StoreState = {
@@ -60,8 +61,9 @@ export const initialState: StoreState = {
     ingredient: undefined
   },
   today: [],
-  created: {
-    ingredients: [],
-    recipes: []
+  saved: {
+    ndbs: getAllStoredIngredients(),
+    ingredients: getAllCustomIngredients(),
+    recipes: getAllRecipes()
   }
 };
