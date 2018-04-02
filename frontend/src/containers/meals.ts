@@ -17,10 +17,6 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
     handleRemoveFoodClick: (mealIdx: number, food: Food) => {
       dispatch(actions.removeFoodFromMeal(mealIdx, food));
     },
-    handleCreateIngredientClick: () => {
-      dispatch(actions.createIngredientOpen());
-    },
-    handleCreateRecipeClick: () => { dispatch(actions.createRecipeOpen()); }
   };
 }
 

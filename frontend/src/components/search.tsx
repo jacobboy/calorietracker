@@ -2,18 +2,23 @@ import * as React from 'react';
 import { Ingredient, Recipe, UIDed, Named } from '../classes';
 import SearchIngredientRow from '../containers/searchingredientrow';
 import { DataSource } from '../ndbapi';
+/* import CreateIngredientInput from '../containers/createingredientinput';*/
 
 interface SearchComponentProps {
   searchString: string;
   dataSource: DataSource;
   items: (UIDed & Named)[];
   saved: { ndbs: Ingredient[], ingredients: Ingredient[], recipes: Recipe[] };
+  handleCreateIngredientClick: () => void;
+  handleCreateRecipeClick: () => void;
   onDataSourceSelect: (ds: DataSource) => void;
   onFoodSearchInput: (searchString: string) => void;
   onFoodSearchSubmit: (searchString: string, ds: DataSource) => void;
 }
 
-export interface SearchComponentState { }
+export interface SearchComponentState {
+  createIngredientOn: boolean;
+}
 
 export class SearchComponent extends React.Component<
   SearchComponentProps, SearchComponentState
@@ -21,6 +26,7 @@ export class SearchComponent extends React.Component<
 
   constructor(props: SearchComponentProps) {
     super(props);
+    this.state = { createIngredientOn: false };
   }
 
   handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
@@ -63,14 +69,27 @@ export class SearchComponent extends React.Component<
           <input type="submit" value="Submit" />
         </form>
         Ingredients:
+        {/* onClick={() => this.props.handleCreateIngredientClick()} */}
+        <button
+          onClick={() => this.setState({ createIngredientOn: true })}
+        >
+          Create Ingredient
+        </button>
         <table>
           <tbody>
+            {/* {this.state.createIngredientOn ?
+                  <CreateIngredientRow /> : null} */}
             {this.props.saved.ingredients.map(
               (item) => <SearchIngredientRow key={item.uid} item={item} />
             )}
           </tbody>
         </table>
         Recipes:
+        <button
+          onClick={() => this.props.handleCreateRecipeClick()}
+        >
+          Create Recipe
+        </button>
         <table>
           <tbody>
             {this.props.saved.recipes.map(

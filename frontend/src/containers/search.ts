@@ -32,7 +32,11 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
         (searchListItems) => dispatch(
           actions.foodSearchSubmit(searchListItems)
         ));
-    }
+    },
+    handleCreateIngredientClick: () => {
+      dispatch(actions.createIngredientOpen());
+    },
+    handleCreateRecipeClick: () => { dispatch(actions.createRecipeOpen()); }
   };
 }
 

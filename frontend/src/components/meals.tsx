@@ -33,8 +33,6 @@ interface MealsComponentProps {
   handleAddMealClick: () => void;
   handleDeleteMealClick: (mealIdx: number) => void;
   handleRemoveFoodClick: (mealIdx: number, food: Food) => void;
-  handleCreateIngredientClick: () => void;
-  handleCreateRecipeClick: () => void;
 }
 
 export class MealsComponent extends React.Component<
@@ -169,16 +167,6 @@ export class MealsComponent extends React.Component<
           onClick={() => this.props.handleAddMealClick()}
         >
           Add Meal
-        </button>
-        <button
-          onClick={() => this.props.handleCreateIngredientClick()}
-        >
-          Create Ingredient
-        </button>
-        <button
-          onClick={() => this.props.handleCreateRecipeClick()}
-        >
-          Create Recipe
         </button>
       </div>
     );
