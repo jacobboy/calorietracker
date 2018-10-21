@@ -46,10 +46,17 @@ export class CreateIngredientInput extends React.Component<
     /* this.props.handleNameInput(event.target.value);*/
   }
 
-  // TODO figure out how to do these programmatically
-  /* handleMacroInput(macro: string, event: React.ChangeEvent<HTMLInputElement>) {
-   *   this.setState({ [event.target.name]: event.target.value });
-   * }*/
+  // TODO figure out how to do these macronutrient handlers programmatically
+  /* handleInput(macronutrient: string) {
+    return (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = Number(event.target.value);
+      this.setState({macronutrient: value; });
+      if (this.state.useCalculatedCalories) {
+        const calories = state.fat * 9 + state.carbs * 4 + state.protein * 4;
+        this.setState({ calories });
+      }
+    };
+  } */  
 
   updateCalories(state: CreateIngredientInputState) {
     console.log('updating calories');

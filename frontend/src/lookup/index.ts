@@ -1,5 +1,5 @@
 import { ingredientFromReport, Ingredient, UIDed } from '../classes';
-import { saveReport, loadReport, loadIngredient } from '../storage';
+import { isIngredientKey, saveReport, loadReport, loadIngredient } from '../storage';
 import { queryReport } from '../ndbapi';
 import { Report } from '../ndbapi/classes';
 
@@ -18,7 +18,7 @@ function getReport(ndbno: string): Promise<Report> {
 export function getIngredient(ingredientable: UIDed): Promise<Ingredient> {
   console.log('Getting ingredient\n' + JSON.stringify(ingredientable));
   // TODO figure out how to actually distinguish how to search for them.  DAO?
-  if (ingredientable.uid.length > 10) {
+  if (isIngredientKey(ingredientable.uid)) {
     return new Promise((resolve, reject) => resolve(
       loadIngredient(ingredientable.uid))
     );

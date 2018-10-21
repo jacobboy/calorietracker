@@ -5,7 +5,7 @@ function getNdbKey(ndbno: string) {
   return ndbno;
 }
 
-function isNdbKey(key: string) {
+export function isNdbKey(key: string) {
   return key.startsWith('ndbno');
 }
 
@@ -13,7 +13,7 @@ function getIngredientKey(ingredientId: string) {
   return ingredientId;
 }
 
-function isIngredientKey(key: string) {
+export function isIngredientKey(key: string) {
   return key.startsWith('ingredient');
 }
 
