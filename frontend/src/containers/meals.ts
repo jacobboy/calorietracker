@@ -1,8 +1,9 @@
-import { connect, Dispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import { StoreState } from '../types';
 import { MealsComponent } from '../components/meals';
 import { actions, Actions } from '../actions';
 import { Food } from '../classes';
+import { Dispatch } from 'redux';
 
 function mapStateToProps(state: StoreState) {
   return { today: state.today };

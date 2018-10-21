@@ -1,7 +1,8 @@
-import { connect, Dispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import { actions, Actions } from '../actions/';
 import { CreateIngredientInput } from '../components/createingredientinput';
 import { StoreState } from '../types/index';
+import { Dispatch } from 'redux';
 
 function mapStateToProps(state: StoreState) {
   return {};

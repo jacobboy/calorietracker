@@ -1,6 +1,7 @@
 import { actions, Actions } from '../actions/';
 import { StoreState } from '../types/index';
-import { connect, Dispatch } from 'react-redux';
+import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 import { TrackFoodInput } from '../components/trackfoodinput';
 import { Food } from '../classes';
 

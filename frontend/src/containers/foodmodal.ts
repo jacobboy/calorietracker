@@ -1,7 +1,8 @@
+import { connect } from 'react-redux';
 import { actions, Actions } from '../actions/';
-import { StoreState } from '../types/index';
-import { connect, Dispatch } from 'react-redux';
 import { FoodModal } from '../components/foodmodal';
+import { StoreState } from '../types/index';
+import { Dispatch } from 'redux';
 
 function mapStateToProps(state: StoreState) {
   return { modalState: state.modals };

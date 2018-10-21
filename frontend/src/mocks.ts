@@ -2989,6 +2989,7 @@ export const mockSearchResp: SearchResponse = {
       {
         'offset': 1,
         'group': 'Branded Food Products Database',
+        // tslint:disable-next-line:max-line-length
         'name': 'BREYERS, BLASTS!, FROZEN DAIRY DESSERT, REESE\'S PEANUT BUTTER CUPS CHOCOLATE FLAVOR WITH REESE\'S PEANUT BUTTER SWIRL AND REESE\'S PEANUT BUTTER CUP PIECES, UPC: 077567205186',
         'ndbno': '45093459',
         'ds': 'BL'
@@ -3003,6 +3004,7 @@ export const mockSearchResp: SearchResponse = {
       {
         'offset': 3,
         'group': 'Branded Food Products Database',
+        // tslint:disable-next-line:max-line-length
         'name': 'COLD STONE CREAMERY, CHOCOLATE COVERED PEANUT BUTTER CREAM EGG WITH BROWNIE BITS, PEANUT BUTTER MADNESS, UPC: 041376708671',
         'ndbno': '45014899',
         'ds': 'BL'
@@ -3024,6 +3026,7 @@ export const mockSearchResp: SearchResponse = {
       {
         'offset': 6,
         'group': 'Branded Food Products Database',
+        // tslint:disable-next-line:max-line-length
         'name': 'WEIS QUALITY, POTATO CLASSICS, CREAMY BUTTER, REAL MASHED POTATOES SEASONED WITH BUTTER, UPC: 041497311163',
         'ndbno': '45017392',
         'ds': 'BL'
@@ -3122,6 +3125,7 @@ export const mockSearchResp: SearchResponse = {
       {
         'offset': 20,
         'group': 'Branded Food Products Database',
+        // tslint:disable-next-line:max-line-length
         'name': 'OLD DOMINION PEANUT COMPANY, PEANUT BUTTER DOUBLE UPS, PEANUTS, PEANUT BUTTER AND CHOCOLATE, UPC: 076138021224',
         'ndbno': '45144034',
         'ds': 'BL'
@@ -3143,6 +3147,7 @@ export const mockSearchResp: SearchResponse = {
       {
         'offset': 23,
         'group': 'Branded Food Products Database',
+        // tslint:disable-next-line:max-line-length
         'name': 'BREYERS, BLASTS!, PEANUT BUTTER LIGHT ICE CREAM* WITH REESE\'S PEANUT BUTTER CUP PIECES AND A FUDGE SWIRL, UPC: 077567275066',
         'ndbno': '45093419',
         'ds': 'BL'
@@ -3150,6 +3155,7 @@ export const mockSearchResp: SearchResponse = {
       {
         'offset': 24,
         'group': 'Branded Food Products Database',
+        // tslint:disable-next-line:max-line-length
         'name': 'BREYERS, DARK CHOCOLATE ICE CREAM WITH PEANUT BUTTER SWIRL, CHOCOLATE PEANUT BUTTER, UPC: 077567603326',
         'ndbno': '45093440',
         'ds': 'BL'

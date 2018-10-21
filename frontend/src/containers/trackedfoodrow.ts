@@ -1,4 +1,5 @@
-import { connect, Dispatch } from 'react-redux';
+import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 import { actions, Actions } from '../actions';
 import { Food } from '../classes';
 import { TrackedFoodRow } from '../components/trackedfoodrow';
