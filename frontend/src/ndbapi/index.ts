@@ -46,14 +46,17 @@ function fetchSearch(searchString: string, dataSource: DataSource): Promise<Sear
 }
 
 export function queryReport(ndbno: string): Promise<Report> {
-  console.log('Getting ' + ndbno + 'from ndb api');
+  const url = reportUrl();
+  const body = JSON.stringify({ 'ndbno': ndbno, 'type': 'b' });
+  console.log('Getting ' + ndbno + ' from ' + url);
+  console.log(body);
   return fetch(
-    reportUrl(), {
+    url, {
       method: 'POST',
-      body: JSON.stringify({ 'ndbno': ndbno, 'type': 'b' }),
+      body: body,
       headers: new Headers({ 'Content-type': 'application/json' }),
-      credentials: 'omit'
-      // mode: 'Coors'
+      credentials: 'omit',
+      mode: 'cors'
     }).then((response) => response.json())
     .then((response) => response.report);
 }
