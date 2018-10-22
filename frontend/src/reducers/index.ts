@@ -8,8 +8,6 @@ import {
   SELECT_DATASOURCE,
   FOODSEARCH_INPUT,
   FOODSEARCH_SUBMIT,
-  TRACK_FOOD,
-  CLOSE_MODAL,
   ADD_FOOD_TO_MEAL,
   REMOVE_FOOD_FROM_MEAL,
   ADD_MEAL,
@@ -25,7 +23,7 @@ function mealIdxOrLast(state: StoreState, mealIdx?: number) {
 
 function addFoodToMeal(
   state: StoreState,
-  payload: { mealIdx: number, food: Food }
+  payload: { mealIdx?: number, food: Food }
 ): StoreState {
   const idx = mealIdxOrLast(state, payload.mealIdx);
   const newMeal: Meal = state.today[idx].withFood(payload.food);
@@ -44,10 +42,6 @@ function removeFoodFromMeal(
 }
 
 export function reducer(state: StoreState, action: Actions): StoreState {
-  function mealIdx(payload?: number) {
-    return mealIdxOrLast(state, payload);
-  }
-
   // console.log('Handling: ' + action.type);
   switch (action.type) {
     case SELECT_DATASOURCE:
@@ -73,26 +67,6 @@ export function reducer(state: StoreState, action: Actions): StoreState {
           ...state.search,
           items: action.payload
         }
-      };
-    case TRACK_FOOD:
-      return {
-        ...state,
-        tracking: {
-          ...state.tracking,
-          ingredient: action.payload.ingredient,
-          mealIdx: mealIdx(action.payload.mealIdx),
-        },
-        modals: state.modals.openTrackingModal()
-      };
-    case CLOSE_MODAL:
-      return {
-        ...state,
-        tracking: {
-          ...state.tracking,
-          ingredient: undefined,
-          mealIdx: undefined,
-        },
-        modals: state.modals.close()
       };
     case ADD_MEAL:
       return {

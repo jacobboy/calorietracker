@@ -31,7 +31,9 @@ export class SearchIngredientRow extends React.Component<
   }     
 
   handleTrackClick() {
-    this.props.onTrackClick(this.props.item);
+    // hack to get around submitting the same twice putting same key in meals list
+    const ingred = scaleFood(this.state.scaledIngredient, this.state.scaledIngredient.amount);
+    this.props.onTrackClick(ingred);
   }
 
   render() {
@@ -45,7 +47,7 @@ export class SearchIngredientRow extends React.Component<
         <td>
           <input type="number" value={this.state.scaledIngredient.amount} onChange={(e) => this.handleAmount(e)} />
         </td>
-        <td>{this.props.item.unit}</td>
+        <td>{this.state.scaledIngredient.unit}</td>
         <td>
           <button onClick={() => this.handleTrackClick()}>
             Track

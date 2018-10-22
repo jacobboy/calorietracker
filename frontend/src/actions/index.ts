@@ -1,4 +1,4 @@
-import { Food, makeIngredient, Ingredient, makeRecipe, FOOD_UNIT } from '../classes';
+import { Food, makeIngredient, makeRecipe, FOOD_UNIT } from '../classes';
 import {
   CREATE_INGREDIENT_TOGGLE,
   CREATE_INGREDIENT_SUBMIT,
@@ -7,8 +7,6 @@ import {
   SELECT_DATASOURCE,
   FOODSEARCH_INPUT,
   FOODSEARCH_SUBMIT,
-  TRACK_FOOD,
-  CLOSE_MODAL,
   ADD_FOOD_TO_MEAL,
   REMOVE_FOOD_FROM_MEAL,
   ADD_MEAL,
@@ -67,14 +65,10 @@ export const actions = {
     (searchString: string) => createAction(FOODSEARCH_INPUT, searchString),
   foodSearchSubmit:
     (items: IngredientSearchItem[]) => createAction(FOODSEARCH_SUBMIT, items),
-  trackFood:
-    (ingredient: Ingredient, mealIdx?: number) =>
-      createAction(TRACK_FOOD, { ingredient, mealIdx }),
-  closeModal: () => createAction(CLOSE_MODAL),
   addMeal: () => createAction(ADD_MEAL),
   removeMeal: (mealIdx: number) => createAction(REMOVE_MEAL, mealIdx),
   addFoodToMeal:
-    (mealIdx: number, food: Food) =>
+    (food: Food, mealIdx?: number) =>
       createAction(ADD_FOOD_TO_MEAL, { mealIdx, food }),
   removeFoodFromMeal:
     (mealIdx: number, food: Food) =>

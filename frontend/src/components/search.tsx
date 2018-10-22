@@ -68,6 +68,15 @@ export class SearchComponent extends React.Component<
         Ingredients:
         <table>
           <tbody>
+            <tr>
+              <td>Name</td>              
+              <td>Fat</td>
+              <td>Carbs</td>
+              <td>Protein</td>
+              <td>Calories</td>
+              <td>Amount</td>
+              <td>Unit</td>
+            </tr>
             {this.props.saved.ingredients.map(
               (item) => <SearchIngredientRow key={item.uid} item={item} />
             )}
