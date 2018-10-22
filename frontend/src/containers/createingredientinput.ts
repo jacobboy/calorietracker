@@ -3,6 +3,7 @@ import { actions, Actions } from '../actions/';
 import { CreateIngredientInput } from '../components/createingredientinput';
 import { StoreState, TopBitDisplay } from '../types/index';
 import { Dispatch } from 'redux';
+import { FOOD_UNIT } from '../classes';
 
 function mapStateToProps(state: StoreState) {
   return {};
@@ -17,7 +18,7 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
       protein: number,
       calories: number,
       amount: number,
-      unit: string
+      unit: FOOD_UNIT
     ) => {
       dispatch(actions.createIngredientSubmit(
         name, fat, carbs, protein, calories, amount, unit

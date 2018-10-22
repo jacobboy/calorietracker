@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { FOOD_UNIT } from '../classes';
 
 interface CreateIngredientInputProps {
   handleSubmit: (
@@ -8,7 +9,7 @@ interface CreateIngredientInputProps {
     protein: number,
     calories: number,
     amount: number,
-    unit: string
+    unit: FOOD_UNIT
   ) => void;
 }
 
@@ -19,7 +20,7 @@ interface CreateIngredientInputState {
   protein: number;
   calories: number;
   amount: number;
-  unit: string;
+  unit: FOOD_UNIT;
   useCalculatedCalories: boolean;
 }
 
@@ -36,7 +37,7 @@ export class CreateIngredientInput extends React.Component<
       protein: 0,
       calories: 0,
       amount: 100,
-      unit: 'g',
+      unit: FOOD_UNIT.g,
       useCalculatedCalories: true
     };
   }
@@ -97,9 +98,9 @@ export class CreateIngredientInput extends React.Component<
     });
   }
 
-  handleUnitInput(event: React.ChangeEvent<HTMLInputElement>) {
+  handleUnitInput(event: React.ChangeEvent<HTMLSelectElement>) {
     this.setState({
-      unit: event.target.value
+      unit: FOOD_UNIT[event.target.value]
     });
   }
 
@@ -176,11 +177,12 @@ export class CreateIngredientInput extends React.Component<
           <li key="unit">
             <label>
               Unit:
-              <input
-                type="text"
+              <select
                 value={this.state.unit}
-                onChange={(e) => this.handleUnitInput(e)}
-              />
+                onChange={(e) => this.handleUnitInput(e)} 
+              >
+                {Object.keys(FOOD_UNIT).map((unit) => (<option>unit</option>))}
+              </select>
             </label>
           </li>
           <li key="submit">

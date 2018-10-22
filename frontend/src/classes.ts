@@ -13,6 +13,10 @@ function ndbnoId(ndbno: string) { return 'ndbno::' + ndbno; }
 function recipeId() { return 'recipe::' + uuid.v4(); }
 function mealId() { return 'meal::' + uuid.v4(); }
 
+export enum FOOD_UNIT {
+  'g'
+}
+
 export interface Named {
   readonly name: string;
 }
@@ -30,7 +34,7 @@ export interface Nutritional {
 
 export interface Quantifiable extends Named {
   readonly amount: number;
-  readonly unit: string;
+  readonly unit: FOOD_UNIT;
 }
 
 /**
@@ -74,7 +78,7 @@ export class NDBIngredient extends NDBable implements Ingredient {
   readonly protein: number;
   readonly calories: number;
   readonly amount: number;
-  readonly unit: string;
+  readonly unit: FOOD_UNIT;
 
   static fromReport(report: Report) {
     const ndbno = report.food.ndbno;
@@ -92,7 +96,7 @@ export class NDBIngredient extends NDBable implements Ingredient {
       NDBIngredient.findNutrient(report.food.nutrients, CARB_ID)
     );
     const amount = 100;  // pretty sure it's always 100?
-    const unit = report.food.ru;
+    const unit = FOOD_UNIT[report.food.ru];
     return new NDBIngredient(ndbno, name, fat, carbs, protein, calories, amount, unit);
   }
 
@@ -113,7 +117,7 @@ export class NDBIngredient extends NDBable implements Ingredient {
 
   private constructor(
     ndbno: string, name: string, fat: number, carbs: number,
-    protein: number, calories: number, amount: number, unit: string
+    protein: number, calories: number, amount: number, unit: FOOD_UNIT
   ) {
     super(ndbno);
     this.name = name;
@@ -129,7 +133,7 @@ export class NDBIngredient extends NDBable implements Ingredient {
 export class CustomIngredient implements Ingredient {
   static new(
     name: string, fat: number, carbs: number, protein: number,
-    calories: number, amount: number, unit: string
+    calories: number, amount: number, unit: FOOD_UNIT
   ): CustomIngredient {
     return new CustomIngredient(
       ingredientId(), name, fat, carbs, protein, calories, amount, unit
@@ -153,7 +157,7 @@ export class CustomIngredient implements Ingredient {
     readonly protein: number,
     readonly calories: number,
     readonly amount: number,
-    readonly unit: string,
+    readonly unit: FOOD_UNIT,
   ) { /* noop */ }
 }
 
@@ -201,7 +205,7 @@ class ScaledFood implements Food {
   readonly uid: string;
   readonly food: Nutritional & Quantifiable;
   readonly amount: number;
-  readonly unit: string;
+  readonly unit: FOOD_UNIT;
   readonly name: string;
   readonly fat: number;
   readonly carbs: number;
@@ -242,7 +246,7 @@ class MealImpl implements FoodCombo, UIDed {
 
 export class Recipe implements Meal, Quantifiable {
 
-  static new(name: string, foods: Food[], amount?: number, unit?: string) {
+  static new(name: string, foods: Food[], amount?: number, unit?: FOOD_UNIT) {
     const uid = recipeId();
     const calories = foods.reduce((l, r) => l + r.calories, 0);
     const protein = foods.reduce((l, r) => l + r.protein, 0);
@@ -252,7 +256,7 @@ export class Recipe implements Meal, Quantifiable {
       amount = foods.reduce((l, r) => l + r.amount, 0);
     }
     if (unit === undefined) {
-      const units: Set<string> = new Set(foods.map(f => f.unit));
+      const units: Set<FOOD_UNIT> = new Set(foods.map(f => f.unit));
       if (units.size !== 1) {
         // TODO propery way to handle this?
         throw 'Not all foods are the same unit, unit must be provided';
@@ -289,7 +293,7 @@ export class Recipe implements Meal, Quantifiable {
     readonly protein: number,
     readonly calories: number,
     readonly amount: number,
-    readonly unit: string
+    readonly unit: FOOD_UNIT
   ) { /* noop */ }
 }
 
@@ -306,7 +310,8 @@ export function makeIngredient(
   protein: number,
   calories: number,
   amount: number,
-  unit: string) {
+  unit: FOOD_UNIT
+) {
   const ingred = CustomIngredient.new(name, fat, carbs, protein, calories, amount, unit);
   saveIngredient(ingred);
   return ingred;
@@ -317,7 +322,7 @@ export function ingredientFromReport(report: Report): Ingredient {
 }
 
 export function makeRecipe(
-  name: string, foods: Food[], amount?: number, unit?: string
+  name: string, foods: Food[], amount?: number, unit?: FOOD_UNIT
 ): Recipe {
   const recipe = Recipe.new(name, foods, amount, unit);
   saveRecipe(recipe);

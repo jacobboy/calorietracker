@@ -1,12 +1,14 @@
 import * as React from 'react';
-import { UIDed, Named } from '../classes';
+import { Ingredient, scaleFood } from '../classes';
 
 interface SearchIngredientRowProps {
-  item: UIDed & Named;
-  onTrackClick: (ingredientable: UIDed) => void;
+  item: Ingredient;
+  onTrackClick: (ingredientable: Ingredient) => void;
 }
 
-interface SearchIngredientRowState { }
+interface SearchIngredientRowState { 
+  scaledIngredient: Ingredient;
+}
 
 export class SearchIngredientRow extends React.Component<
   SearchIngredientRowProps, SearchIngredientRowState
@@ -14,7 +16,19 @@ export class SearchIngredientRow extends React.Component<
 
   constructor(props: SearchIngredientRowProps) {
     super(props);
+    this.state = {
+      scaledIngredient: scaleFood(this.props.item, this.props.item.amount)
+    };
   }
+
+  handleAmount(event: React.ChangeEvent<HTMLInputElement>) {
+    const amount = Number(event.target.value);
+    if (!isNaN(amount)) {
+      this.setState(
+        {scaledIngredient: scaleFood(this.props.item, amount)}
+      );  
+    } 
+  }     
 
   handleTrackClick() {
     this.props.onTrackClick(this.props.item);
@@ -23,7 +37,15 @@ export class SearchIngredientRow extends React.Component<
   render() {
     return (
       <tr>
-        <td>{this.props.item.name}</td>
+        <td>{this.state.scaledIngredient.name}</td>
+        <td>{this.state.scaledIngredient.fat}</td>
+        <td>{this.state.scaledIngredient.carbs}</td>
+        <td>{this.state.scaledIngredient.protein}</td>
+        <td>{this.state.scaledIngredient.calories}</td>
+        <td>
+          <input type="number" value={this.state.scaledIngredient.amount} onChange={(e) => this.handleAmount(e)} />
+        </td>
+        <td>{this.props.item.unit}</td>
         <td>
           <button onClick={() => this.handleTrackClick()}>
             Track

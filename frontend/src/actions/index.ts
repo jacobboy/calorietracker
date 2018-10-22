@@ -1,4 +1,4 @@
-import { Food, makeIngredient, Ingredient, makeRecipe } from '../classes';
+import { Food, makeIngredient, Ingredient, makeRecipe, FOOD_UNIT } from '../classes';
 import {
   CREATE_INGREDIENT_TOGGLE,
   CREATE_INGREDIENT_SUBMIT,
@@ -43,7 +43,7 @@ function createIngredient(
   protein: number,
   calories: number,
   amount: number,
-  unit: string
+  unit: FOOD_UNIT
 ) {
   const ingredient = makeIngredient(
     name, fat, carbs, protein, calories, amount, unit
@@ -52,7 +52,7 @@ function createIngredient(
 }
 
 function createRecipe(
-  name: string, foods: Food[], amount?: number, unit?: string
+  name: string, foods: Food[], amount?: number, unit?: FOOD_UNIT
 ) {
   const recipe = makeRecipe(name, foods, amount, unit);
   return createAction(CREATE_RECIPE_SUBMIT, recipe);
