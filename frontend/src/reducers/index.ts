@@ -1,7 +1,7 @@
 import { Actions } from '../actions';
 import { StoreState } from '../types/index';
 import {
-  CREATE_INGREDIENT_OPEN,
+  CREATE_INGREDIENT_TOGGLE,
   CREATE_INGREDIENT_SUBMIT,
   CREATE_RECIPE_OPEN,
   CREATE_RECIPE_SUBMIT,
@@ -108,10 +108,10 @@ export function reducer(state: StoreState, action: Actions): StoreState {
       return addFoodToMeal(state, action.payload);
     case REMOVE_FOOD_FROM_MEAL:
       return removeFoodFromMeal(state, action.payload);
-    case CREATE_INGREDIENT_OPEN:
+    case CREATE_INGREDIENT_TOGGLE:
       return {
         ...state,
-        modals: state.modals.openIngredientModal(),
+        topbit: {display: action.payload},
       };
     case CREATE_INGREDIENT_SUBMIT:
       return {

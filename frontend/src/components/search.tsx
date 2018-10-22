@@ -9,8 +9,6 @@ interface SearchComponentProps {
   dataSource: DataSource;
   items: (UIDed & Named)[];
   saved: { ndbs: Ingredient[], ingredients: Ingredient[], recipes: Recipe[] };
-  handleCreateIngredientClick: () => void;
-  handleCreateRecipeClick: () => void;
   onDataSourceSelect: (ds: DataSource) => void;
   onFoodSearchInput: (searchString: string) => void;
   onFoodSearchSubmit: (searchString: string, ds: DataSource) => void;
@@ -69,12 +67,6 @@ export class SearchComponent extends React.Component<
           <input type="submit" value="Submit" />
         </form>
         Ingredients:
-        {/* onClick={() => this.props.handleCreateIngredientClick()} */}
-        <button
-          onClick={() => this.setState({ createIngredientOn: true })}
-        >
-          Create Ingredient
-        </button>
         <table>
           <tbody>
             {/* {this.state.createIngredientOn ?
@@ -85,11 +77,6 @@ export class SearchComponent extends React.Component<
           </tbody>
         </table>
         Recipes:
-        <button
-          onClick={() => this.props.handleCreateRecipeClick()}
-        >
-          Create Recipe
-        </button>
         <table>
           <tbody>
             {this.props.saved.recipes.map(

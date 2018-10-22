@@ -34,10 +34,6 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
           actions.foodSearchSubmit(searchListItems)
         ));
     },
-    handleCreateIngredientClick: () => {
-      dispatch(actions.createIngredientOpen());
-    },
-    handleCreateRecipeClick: () => { dispatch(actions.createRecipeOpen()); }
   };
 }
 

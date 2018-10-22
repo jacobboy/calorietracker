@@ -1,6 +1,6 @@
 import { Food, makeIngredient, Ingredient, makeRecipe } from '../classes';
 import {
-  CREATE_INGREDIENT_OPEN,
+  CREATE_INGREDIENT_TOGGLE,
   CREATE_INGREDIENT_SUBMIT,
   CREATE_RECIPE_OPEN,
   CREATE_RECIPE_SUBMIT,
@@ -17,6 +17,7 @@ import {
 } from '../constants/index';
 import { DataSource } from '../ndbapi';
 import { IngredientSearchItem } from '../ndbapi/classes';
+import { TopBitDisplay } from '../types';
 
 interface Action<T extends string> {
   type: T;
@@ -78,7 +79,7 @@ export const actions = {
   removeFoodFromMeal:
     (mealIdx: number, food: Food) =>
       createAction(REMOVE_FOOD_FROM_MEAL, { mealIdx, food }),
-  createIngredientOpen: () => createAction(CREATE_INGREDIENT_OPEN),
+  createIngredientToggle: (destination: TopBitDisplay) => createAction(CREATE_INGREDIENT_TOGGLE, destination),
   createIngredientSubmit: createIngredient,
   createRecipeOpen: () => createAction(CREATE_RECIPE_OPEN),
   createRecipeSubmit: createRecipe,

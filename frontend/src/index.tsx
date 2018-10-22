@@ -6,12 +6,12 @@ import registerServiceWorker from './registerServiceWorker';
 import { reducer } from './reducers/index';
 import { initialState } from './types/index';
 import SearchComponent from './containers/search';
-import MealsComponent from './containers/meals';
+import TopBitComponent from './containers/topbit';
 
 function App() {
   return (
     <div>
-      <MealsComponent />
+      <TopBitComponent />
       <SearchComponent />
     </div>
   );

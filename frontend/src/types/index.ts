@@ -19,7 +19,11 @@ interface TrackingState {
   ingredient?: Ingredient;
 }
 
-enum Modals {
+export enum TopBitDisplay {
+  MEALS, CREATE_INGREDIENT
+}
+
+export enum Modals {
   NONE, TRACKING, INGREDIENT, RECIPE
 }
 
@@ -41,8 +45,13 @@ export class ModalState {
   get isRecipe(): boolean { return this.openModal === Modals.RECIPE; }
 }
 
+export class TopBitState {
+  display: TopBitDisplay;
+}
+
 export interface StoreState {
   modals: ModalState;
+  topbit: TopBitState;
   search: SearchState;
   tracking: TrackingState;
   today: Meal[];
@@ -51,6 +60,7 @@ export interface StoreState {
 
 export const initialState: StoreState = {
   modals: new ModalState(),
+  topbit: { display: TopBitDisplay.MEALS },
   search: {
     searchString: '',
     dataSource: DataSource.SR,
