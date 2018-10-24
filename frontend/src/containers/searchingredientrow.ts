@@ -3,7 +3,8 @@ import { actions, Actions } from '../actions/';
 import { StoreState } from '../types/index';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { Ingredient } from '../classes';
+import { NDBed } from '../classes';
+import { getNDBIngredient } from '../lookup';
 
 function mapStateToProps(state: StoreState) {
   return {};
@@ -11,8 +12,8 @@ function mapStateToProps(state: StoreState) {
 
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
-    onTrackClick: (ingredient: Ingredient) => {
-      dispatch(actions.addFoodToMeal(ingredient));
+    onSaveClick: (ndbed: NDBed) => {
+      getNDBIngredient(ndbed).then((ingred) => dispatch(actions.saveIngredient(ingred)));
     }
   };
 }

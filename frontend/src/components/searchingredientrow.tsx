@@ -1,14 +1,15 @@
 import * as React from 'react';
-import { Ingredient, scaleFood } from '../classes';
+import { Named, NDBed, Ingredient } from '../classes';
+import { getNDBIngredient } from '../lookup';
 
 interface SearchIngredientRowProps {
-  item: Ingredient;
-  onTrackClick: (ingredientable: Ingredient) => void;
+  item: NDBed & Named;
+  onSaveClick: (ingredientable: NDBed) => void;
 }
 
-interface SearchIngredientRowState { 
-  scaledIngredient: Ingredient;
-}
+interface SearchIngredientRowState {
+  ingred?: Ingredient;
+ }
 
 export class SearchIngredientRow extends React.Component<
   SearchIngredientRowProps, SearchIngredientRowState
@@ -16,44 +17,47 @@ export class SearchIngredientRow extends React.Component<
 
   constructor(props: SearchIngredientRowProps) {
     super(props);
-    this.state = {
-      scaledIngredient: scaleFood(this.props.item, this.props.item.amount)
-    };
+    this.state = {};
   }
 
-  handleAmount(event: React.ChangeEvent<HTMLInputElement>) {
-    const amount = Number(event.target.value);
-    if (!isNaN(amount)) {
-      this.setState(
-        {scaledIngredient: scaleFood(this.props.item, amount)}
-      );  
-    } 
-  }     
-
-  handleTrackClick() {
-    // hack to get around submitting the same twice putting same key in meals list
-    const ingred = scaleFood(this.state.scaledIngredient, this.state.scaledIngredient.amount);
-    this.props.onTrackClick(ingred);
+  handleDetailsClick() {
+    getNDBIngredient(this.props.item).then((ingred) => this.setState({ingred}));
   }
 
   render() {
-    return (
-      <tr>
-        <td>{this.state.scaledIngredient.name}</td>
-        <td>{this.state.scaledIngredient.fat}</td>
-        <td>{this.state.scaledIngredient.carbs}</td>
-        <td>{this.state.scaledIngredient.protein}</td>
-        <td>{this.state.scaledIngredient.calories}</td>
-        <td>
-          <input type="number" value={this.state.scaledIngredient.amount} onChange={(e) => this.handleAmount(e)} />
-        </td>
-        <td>{this.state.scaledIngredient.unit}</td>
-        <td>
-          <button onClick={() => this.handleTrackClick()}>
-            Track
-          </button>
-        </td>
-      </tr >
-    );
+    if (this.state.ingred === undefined) {
+      return (
+        <tr>
+          <td>{this.props.item.name}</td>
+          <td>
+            <button onClick={() => this.handleDetailsClick()}>
+              Show Details
+            </button>
+          </td>
+          <td>
+            <button onClick={() => this.props.onSaveClick(this.props.item)}>
+              Save
+            </button>
+          </td>
+        </tr >
+      );
+    } else {
+      return (
+        <tr>
+          <td>{this.props.item.name}</td>
+          <td>{this.state.ingred.fat}</td>
+          <td>{this.state.ingred.carbs}</td>
+          <td>{this.state.ingred.protein}</td>
+          <td>{this.state.ingred.calories}</td>
+          <td>{this.state.ingred.amount}</td>
+          <td>{this.state.ingred.unit}</td>
+          <td>
+            <button onClick={() => this.props.onSaveClick(this.props.item)}>
+              Track
+            </button>
+          </td>
+        </tr >
+      );
+    }    
   }
 }

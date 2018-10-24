@@ -1,9 +1,9 @@
-import { Ingredient, ingredientFromReport, UIDed, NDBable } from '../classes';
+import { Ingredient, ingredientFromReport, UIDed, NDBable, NDBed, NDBIngredient } from '../classes';
 import { queryReport } from '../ndbapi';
 import { Report } from '../ndbapi/classes';
 import { isIngredientKey, loadIngredient, loadReport, saveReport } from '../storage';
 
-function getReport(ndbno: string): Promise<Report> {
+export function getReport(ndbno: string): Promise<Report> {
   const localReport: Report | null = loadReport(ndbno);
   if (localReport !== null) {
     return new Promise((resolve, reject) => resolve(localReport));
@@ -29,4 +29,11 @@ export function getIngredient(ingredientable: UIDed): Promise<Ingredient> {
     return getReport(ndbable.ndbno).then(
       (report) => ingredientFromReport(report));
   }
+}
+
+export function getNDBIngredient(ingredientable: NDBed): Promise<NDBIngredient> {
+  console.log('Getting ingredient\n' + JSON.stringify(ingredientable));
+  // haha gross
+  const ndbable = <NDBable> ingredientable;
+  return getReport(ndbable.ndbno).then((report) => NDBIngredient.fromReport(report));
 }

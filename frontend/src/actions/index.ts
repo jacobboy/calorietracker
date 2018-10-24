@@ -1,9 +1,10 @@
-import { Food, makeIngredient, makeRecipe, FOOD_UNIT } from '../classes';
+import { Food, makeIngredient, makeRecipe, FOOD_UNIT, NDBIngredient } from '../classes';
 import {
   CREATE_INGREDIENT_TOGGLE,
   CREATE_INGREDIENT_SUBMIT,
   CREATE_RECIPE_OPEN,
   CREATE_RECIPE_SUBMIT,
+  SAVE_INGREDIENT,
   SELECT_DATASOURCE,
   FOODSEARCH_INPUT,
   FOODSEARCH_SUBMIT,
@@ -56,6 +57,10 @@ function createRecipe(
   return createAction(CREATE_RECIPE_SUBMIT, recipe);
 }
 
+function saveIngredient(ingredient: NDBIngredient) {
+  return createAction(SAVE_INGREDIENT, ingredient);
+}
+
 // TODO should actions be UI-driven or business logic driven?
 // perhaps business-driven and have the containers perform business/ui mapping?
 export const actions = {
@@ -77,6 +82,7 @@ export const actions = {
   createIngredientSubmit: createIngredient,
   createRecipeOpen: () => createAction(CREATE_RECIPE_OPEN),
   createRecipeSubmit: createRecipe,
+  saveIngredient: saveIngredient,
   setDay: (day: Date) => createAction(CHANGE_DAY, day)
 };
 

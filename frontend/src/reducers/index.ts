@@ -12,7 +12,8 @@ import {
   REMOVE_FOOD_FROM_MEAL,
   ADD_MEAL,
   REMOVE_MEAL,
-  CHANGE_DAY
+  CHANGE_DAY,
+  SAVE_INGREDIENT
 } from '../constants/index';
 import { dropElement, replaceElement } from '../datautil';
 import { meal, Food, Meal } from '../classes';
@@ -106,6 +107,14 @@ export function reducer(state: StoreState, action: Actions): StoreState {
         saved: {
           ...state.saved,
           recipes: state.saved.recipes.concat(action.payload)
+        }
+      };
+    case SAVE_INGREDIENT:
+      return {
+        ...state,
+        saved: {
+          ...state.saved,
+          ndbs: state.saved.ndbs.concat(action.payload)
         }
       };
     case CHANGE_DAY:

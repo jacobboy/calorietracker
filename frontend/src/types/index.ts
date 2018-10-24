@@ -1,6 +1,10 @@
-import { Meal, Ingredient, Recipe, Named, UIDed } from '../classes';
+import { Meal, Ingredient, Recipe, Named, NDBable } from '../classes';
 import { DataSource } from '../ndbapi';
-import { getAllCustomIngredients, getAllStoredIngredients, getAllRecipes } from '../storage';
+import { 
+  getAllCustomIngredients, 
+  getAllStoredIngredients, 
+  getAllRecipes,
+ } from '../storage';
 
 interface SavedState {
   ndbs: Ingredient[];
@@ -11,7 +15,7 @@ interface SavedState {
 interface SearchState {
   searchString: string;
   dataSource: DataSource;
-  items: (UIDed & Named)[];
+  items: (NDBable & Named)[];
 }
 
 interface TrackingState {

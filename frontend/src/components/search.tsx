@@ -1,12 +1,13 @@
 import * as React from 'react';
-import { Ingredient, Recipe } from '../classes';
+import { Ingredient, Recipe, Named, NDBed } from '../classes';
 import SearchIngredientRow from '../containers/searchingredientrow';
 import { DataSource } from '../ndbapi';
+import IngredientRow from '../containers/ingredientrow';
 
 interface SearchComponentProps {
   searchString: string;
   dataSource: DataSource;
-  items: Ingredient[];
+  items: (NDBed & Named)[];
   saved: { ndbs: Ingredient[], ingredients: Ingredient[], recipes: Recipe[] };
   onDataSourceSelect: (ds: DataSource) => void;
   onFoodSearchInput: (searchString: string) => void;
@@ -78,7 +79,10 @@ export class SearchComponent extends React.Component<
               <td>Unit</td>
             </tr>
             {this.props.saved.ingredients.map(
-              (item) => <SearchIngredientRow key={item.uid} item={item} />
+              (item) => <IngredientRow key={item.uid} item={item} />
+            )}
+            {this.props.saved.ndbs.map(
+              (item) => <IngredientRow key={item.uid} item={item} />
             )}
           </tbody>
         </table>
@@ -86,7 +90,7 @@ export class SearchComponent extends React.Component<
         <table>
           <tbody>
             {this.props.saved.recipes.map(
-              (item) => <SearchIngredientRow key={item.uid} item={item} />
+              (item) => <IngredientRow key={item.uid} item={item} />
             )}
           </tbody>
         </table>
@@ -94,7 +98,7 @@ export class SearchComponent extends React.Component<
         <table>
           <tbody>
             {this.props.items.map(
-              (item) => <SearchIngredientRow key={item.uid} item={item} />
+              (item) => <SearchIngredientRow key={item.ndbno} item={item} />
             )}
           </tbody>
         </table>

@@ -25,6 +25,10 @@ export interface UIDed {
   readonly uid: string;
 }
 
+export interface NDBed {
+  readonly ndbno: string;
+}
+
 export interface Nutritional {
   readonly protein: number;
   readonly fat: number;
@@ -40,7 +44,7 @@ export interface Quantifiable extends Named {
 /**
  * Ingredient ids for food in the NDB are a function of the ndbno
  */
-export abstract class NDBable implements UIDed {
+export abstract class NDBable implements NDBed, UIDed {
   constructor(public ndbno: string) { /* noop */ }
   get uid() { return ndbnoId(this.ndbno); }
 }
