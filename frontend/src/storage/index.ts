@@ -1,29 +1,22 @@
 import { Report } from '../ndbapi/classes';
 import { Ingredient, CustomIngredient, NDBIngredient, Recipe } from '../classes';
 
-function getNdbKey(ndbno: string) {
-  return ndbno;
+function getKey(keyType: string) {
+  return (id: string) => keyType + '::' + id;
 }
 
-export function isNdbKey(key: string) {
-  return key.startsWith('ndbno');
+function isKey(keyType: string) {
+  return (key: string) => key.startsWith(keyType);
 }
 
-function getIngredientKey(ingredientId: string) {
-  return ingredientId;
-}
-
-export function isIngredientKey(key: string) {
-  return key.startsWith('ingredient');
-}
-
-function getRecipeKey(recipeId: string) {
-  return recipeId;
-}
-
-function isRecipeKey(key: string) {
-  return key.startsWith('recipe');
-}
+export const getNdbKey = getKey('ndbno');
+export const isNdbKey = isKey('ndbno');
+export const getIngredientKey = getKey('ingredient');
+export const isIngredientKey = isKey('ingredient');
+export const getRecipeKey = getKey('recipe');
+export const isRecipeKey = isKey('recipe');
+export const getMealKey = getKey('meal');
+export const isMealKey = isKey('meal');
 
 export function saveReport(ndbno: string, report: Report): void {
   window.localStorage.setItem(getNdbKey(ndbno), JSON.stringify(report));
@@ -31,6 +24,10 @@ export function saveReport(ndbno: string, report: Report): void {
 
 export function loadReport(ndbno: string): Report | null {
   const key = getNdbKey(ndbno);
+  return loadReportFromKey(key);
+}
+
+export function loadReportFromKey(key: string): Report | null {
   const reportStr: string | null = window.localStorage.getItem(key);
   if (reportStr !== null) {
     console.log('Retrieved ' + key + ' from window storage');
@@ -81,17 +78,17 @@ export function getAllStoredIngredients(): Ingredient[] {
   for (let i = 0; i < window.localStorage.length; i++) {
     const key = window.localStorage.key(i);
     if (key !== null && isNdbKey(key)) {
-      const ingred = window.localStorage.getItem(key);
-      if (ingred !== null) {
-        ingreds.push(NDBIngredient.fromJson(ingred));
+      const report = loadReportFromKey(key);
+      if (report !== null) {
+        ingreds.push(NDBIngredient.fromReport(report));
       }
     }
   }
   return ingreds;
 }
 
-export function getAllCustomIngredients(): CustomIngredient[] {
-  const ingreds: CustomIngredient[] = [];
+export function getAllCustomIngredients(): Ingredient[] {
+  const ingreds: Ingredient[] = [];
   for (let i = 0; i < window.localStorage.length; i++) {
     const key = window.localStorage.key(i);
     if (key !== null && isIngredientKey(key)) {

@@ -1,20 +1,20 @@
 import * as uuid from 'uuid';
 import { ReportNutrient, Report } from './ndbapi/classes';
 import { scaleQuantity } from './transforms';
-import { saveIngredient, saveRecipe } from './storage';
+import { saveIngredient, saveRecipe, getIngredientKey, getNdbKey, getRecipeKey, getMealKey } from './storage';
 
 const CALORIES_ID = '208';
 const PROTEIN_ID = '203';
 const FAT_ID = '204';
 const CARB_ID = '205';
 
-function ingredientId() { return 'ingredient::' + uuid.v4(); }
-function ndbnoId(ndbno: string) { return 'ndbno::' + ndbno; }
-function recipeId() { return 'recipe::' + uuid.v4(); }
-function mealId() { return 'meal::' + uuid.v4(); }
+function ingredientId() { return getIngredientKey(uuid.v4()); }
+function ndbnoId(ndbno: string) { return getNdbKey(ndbno); }
+function recipeId() { return getRecipeKey(uuid.v4()); }
+function mealId() { return getMealKey(uuid.v4()); }
 
 export enum FOOD_UNIT {
-  'g'
+  'g' = 'g'
 }
 
 export interface Named {
@@ -84,7 +84,7 @@ export class NDBIngredient extends NDBable implements Ingredient {
   readonly amount: number;
   readonly unit: FOOD_UNIT;
 
-  static fromReport(report: Report) {
+  static fromReport(report: Report): NDBIngredient {
     const ndbno = report.food.ndbno;
     const name = report.food.name;
     const calories = parseFloat(
@@ -104,7 +104,7 @@ export class NDBIngredient extends NDBable implements Ingredient {
     return new NDBIngredient(ndbno, name, fat, carbs, protein, calories, amount, unit);
   }
 
-  static fromJson(jsonStr: string) {
+  static fromJson(jsonStr: string): NDBIngredient {
     const {
       ndbno, name, fat, carbs, protein, calories, amount, unit
     } = JSON.parse(jsonStr);
