@@ -1,4 +1,3 @@
-
 import { Ingredient, Meal } from '../classes';
 import * as React from 'react';
 import { thStyle, tdStyle, tableStyle } from '../style';
@@ -31,30 +30,8 @@ export class MealsComponent extends React.Component<
     this.ensureAtLeastOneMeal(nextProps.today);
   }
 
-  mealCell(text: string | number) {
-    return <th style={thStyle}>{text}</th>;
-  }
-
   ingredientCell(text: string | number) {
     return <td style={tdStyle}>{text}</td>;
-  }
-
-  makeMealRow(meal: Meal, mealIdx: number) {
-    return (
-      <tr key={meal.uid}>
-        {this.mealCell('Total')}
-        {this.mealCell('')}
-        {this.mealCell(meal.fat)}
-        {this.mealCell(meal.carbs)}
-        {this.mealCell(meal.protein)}
-        {this.mealCell(meal.calories)}
-        <th>
-          <button onClick={() => this.props.handleDeleteMealClick(mealIdx)}>
-            Delete Meal
-          </button>
-        </th>
-      </tr>
-    );
   }
 
   makeFoodRow(food: Ingredient, mealIdx: number) {
@@ -73,6 +50,28 @@ export class MealsComponent extends React.Component<
         </td>
       </tr>
 
+    );
+  }
+
+  mealCell(text: string | number) {
+    return <th style={thStyle}>{text}</th>;
+  }
+
+  makeMealRow(meal: Meal, mealIdx: number) {
+    return (
+      <tr key={meal.uid}>
+        {this.mealCell('Total')}
+        {this.mealCell('')}
+        {this.mealCell(meal.fat)}
+        {this.mealCell(meal.carbs)}
+        {this.mealCell(meal.protein)}
+        {this.mealCell(meal.calories)}
+        <th>
+          <button onClick={() => this.props.handleDeleteMealClick(mealIdx)}>
+            Delete Meal
+          </button>
+        </th>
+      </tr>
     );
   }
 

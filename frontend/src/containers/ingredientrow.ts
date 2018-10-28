@@ -1,6 +1,6 @@
 import { IngredientRow } from '../components/ingredientrow';
 import { actions, Actions } from '../actions/';
-import { StoreState } from '../types/index';
+import { StoreState, TopBitDisplay } from '../types/index';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { Ingredient } from '../classes';
@@ -13,11 +13,14 @@ function mapStateToProps(state: StoreState) {
 
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
-    onTrackClick: (ingredient: Ingredient) => {
-      dispatch(actions.addFoodToMeal(ingredient));
-    },
-    onAddToRecipeClick: (ingredient: Ingredient) => {
-      dispatch(actions.addFoodToRecipe(ingredient));
+    // TODO: What is the approved react/redux way to condition 
+    //       the dispatch on state?
+    onTrackClick: (ingredient: Ingredient, topbitDisplay: TopBitDisplay) => {
+      if (topbitDisplay === TopBitDisplay.CREATE_RECIPE) {
+        dispatch(actions.addFoodToRecipe(ingredient));
+      } else if (topbitDisplay === TopBitDisplay.MEALS) {
+        dispatch(actions.addFoodToMeal(ingredient));
+      }
     }
   };
 }

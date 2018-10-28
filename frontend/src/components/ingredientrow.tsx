@@ -5,7 +5,7 @@ import { TopBitDisplay } from '../types';
 interface IngredientRowProps {
   item: Ingredient;
   topbitDisplay: TopBitDisplay;
-  onTrackClick: (ingredientable: Ingredient) => void;
+  onTrackClick: (ingredient: Ingredient, topbitDisplay: TopBitDisplay) => void;
 }
 
 interface IngredientRowState { 
@@ -23,6 +23,11 @@ export class IngredientRow extends React.Component<
     };
   }
 
+  buttonText() {
+    // TODO probably should be determined here
+    return this.props.topbitDisplay === TopBitDisplay.CREATE_RECIPE ? 'Add to recipe' : 'Add to meal';
+  }
+
   handleAmount(event: React.ChangeEvent<HTMLInputElement>) {
     const amount = Number(event.target.value);
     if (!isNaN(amount)) {
@@ -35,24 +40,24 @@ export class IngredientRow extends React.Component<
   handleTrackClick() {
     // hack to get around submitting the same twice putting same key in meals list
     const ingred = scaleFood(this.state.scaledIngredient, this.state.scaledIngredient.amount);
-    this.props.onTrackClick(ingred);
+    this.props.onTrackClick(ingred, this.props.topbitDisplay);
   }
 
   render() {
     return (
-      <tr>
-        <td>{this.state.scaledIngredient.name}</td>
-        <td>{this.state.scaledIngredient.fat}</td>
-        <td>{this.state.scaledIngredient.carbs}</td>
-        <td>{this.state.scaledIngredient.protein}</td>
-        <td>{this.state.scaledIngredient.calories}</td>
-        <td>
+      <tr key={this.props.item.uid}>
+        <td key="name">{this.state.scaledIngredient.name}</td>
+        <td key="fat">{this.state.scaledIngredient.fat}</td>
+        <td key="carbs">{this.state.scaledIngredient.carbs}</td>
+        <td key="protein">{this.state.scaledIngredient.protein}</td>
+        <td key="calories">{this.state.scaledIngredient.calories}</td>
+        <td key="amount">
           <input type="number" value={this.state.scaledIngredient.amount} onChange={(e) => this.handleAmount(e)} />
         </td>
-        <td>{this.state.scaledIngredient.unit}</td>
-        <td>
+        <td key="unit">{this.state.scaledIngredient.unit}</td>
+        <td key="button">
           <button onClick={() => this.handleTrackClick()}>
-            Track
+            {this.buttonText()}
           </button>
         </td>
       </tr >

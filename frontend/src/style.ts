@@ -5,10 +5,10 @@ export const tableStyle: React.CSSProperties = {
     'border': '1px solid black'
 };
 
-export const thStyle: React.CSSProperties = {
+export const tdStyle: React.CSSProperties = {
     'border': '1px solid black'
 };
 
-export const tdStyle: React.CSSProperties = {
+export const thStyle: React.CSSProperties = {
     'border': '1px solid black'
 };
