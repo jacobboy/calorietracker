@@ -41,40 +41,23 @@ export interface Quantifiable extends Named {
   readonly unit: FOOD_UNIT;
 }
 
-/**
- * Ingredient ids for food in the NDB are a function of the ndbno
- */
-export abstract class NDBable implements NDBed, UIDed {
-  constructor(public ndbno: string) { /* noop */ }
-  get uid() { return ndbnoId(this.ndbno); }
-}
-
-// similar to Food, but should be allowed to be reused
-// in Java the difference would be that Ingredient would override equals
-// so that identical Ingredients evaluated as equal
 export interface Ingredient extends Nutritional, Quantifiable, UIDed { }
 
-// similar to Ingredient, but identical Foods should not necessarily be
-// allowed to be shared
-export interface Food extends Nutritional, Quantifiable {
-  uid: string;
-}
-
-export interface FoodCombo extends Nutritional {
-  readonly foods: Food[];
-  withFood(food: Food): FoodCombo;
-  withoutFood(food: Food): FoodCombo;
+interface FoodCombo extends Nutritional {
+  readonly foods: Ingredient[];
+  withFood(Ingredient: Ingredient): FoodCombo;
+  withoutFood(Ingredient: Ingredient): FoodCombo;
 }
 
 /*
  * Like Recipe, but can't be subdivided
  */
 export interface Meal extends FoodCombo, UIDed {
-  withFood(food: Food): Meal;
-  withoutFood(food: Food): Meal;
+  withFood(food: Ingredient): Meal;
+  withoutFood(food: Ingredient): Meal;
 }
 
-export class NDBIngredient extends NDBable implements Ingredient {
+class NDBIngredient implements NDBed, Ingredient {
   readonly ndbno: string;
   readonly name: string;
   readonly fat: number;
@@ -83,6 +66,7 @@ export class NDBIngredient extends NDBable implements Ingredient {
   readonly calories: number;
   readonly amount: number;
   readonly unit: FOOD_UNIT;
+  readonly uid: string;
 
   static fromReport(report: Report): NDBIngredient {
     const ndbno = report.food.ndbno;
@@ -123,7 +107,7 @@ export class NDBIngredient extends NDBable implements Ingredient {
     ndbno: string, name: string, fat: number, carbs: number,
     protein: number, calories: number, amount: number, unit: FOOD_UNIT
   ) {
-    super(ndbno);
+    this.ndbno = ndbno;
     this.name = name;
     this.fat = fat;
     this.carbs = carbs;
@@ -131,6 +115,7 @@ export class NDBIngredient extends NDBable implements Ingredient {
     this.calories = calories;
     this.amount = amount;
     this.unit = unit;
+    this.uid = ndbnoId(this.ndbno);
   }
 }
 
@@ -165,47 +150,7 @@ export class CustomIngredient implements Ingredient {
   ) { /* noop */ }
 }
 
-// class ScaledFood implements Food {
-//   readonly uid: string;
-//   readonly food: Nutritional & Quantifiable;
-//   readonly amount: number;
-
-//   constructor(food: Nutritional & Quantifiable, amount: number) {
-//     this.uid = uuid.v4();
-//     this.food = food;
-//     this.amount = amount;
-//   }
-
-//   get name() { return this.food.name; }
-
-//   get unit() { return this.food.unit; }
-
-//   get calories(): number {
-//     return scaleQuantity(
-//       this.food.calories, this.food.amount, this.amount
-//     );
-//   }
-
-//   get protein() {
-//     return scaleQuantity(
-//       this.food.protein, this.food.amount, this.amount
-//     );
-//   }
-
-//   get fat() {
-//     return scaleQuantity(
-//       this.food.fat, this.food.amount, this.amount
-//     );
-//   }
-
-//   get carbs() {
-//     return scaleQuantity(
-//       this.food.carbs, this.food.amount, this.amount
-//     );
-//   }
-// }
-
-class ScaledFood implements Food {
+class ScaledFood implements Ingredient {
   readonly uid: string;
   readonly food: Nutritional & Quantifiable;
   readonly amount: number;
@@ -229,11 +174,11 @@ class ScaledFood implements Food {
   }
 }
 
-class MealImpl implements FoodCombo, UIDed {
+class MealImpl implements Meal {
   readonly uid: string;
-  readonly foods: Food[];
+  readonly foods: Ingredient[];
 
-  constructor(foods: Food[]) {
+  constructor(foods: Ingredient[]) {
     this.uid = mealId();
     this.foods = foods;
   }
@@ -242,15 +187,15 @@ class MealImpl implements FoodCombo, UIDed {
   get protein() { return this.foods.reduce((l, r) => l + r.protein, 0); }
   get fat() { return this.foods.reduce((l, r) => l + r.fat, 0); }
   get carbs() { return this.foods.reduce((l, r) => l + r.carbs, 0); }
-  withFood(food: Food): Meal { return new MealImpl([...this.foods, food]); }
-  withoutFood(food: Food): Meal {
+  withFood(food: Ingredient): Meal { return new MealImpl([...this.foods, food]); }
+  withoutFood(food: Ingredient): Meal {
     return new MealImpl(this.foods.filter(f => f !== food));
   }
 }
 
-export class Recipe implements Meal, Quantifiable {
+export class Recipe implements FoodCombo, Quantifiable, UIDed {
 
-  static new(name: string, foods: Food[], amount?: number, unit?: FOOD_UNIT) {
+  static new(name: string, foods: Ingredient[], amount?: number, unit?: FOOD_UNIT) {
     const uid = recipeId();
     const calories = foods.reduce((l, r) => l + r.calories, 0);
     const protein = foods.reduce((l, r) => l + r.protein, 0);
@@ -281,17 +226,17 @@ export class Recipe implements Meal, Quantifiable {
     );
   }
 
-  withFood(food: Food): Recipe {
+  withFood(food: Ingredient): Recipe {
     return Recipe.new(this.name, [...this.foods, food]);
   }
-  withoutFood(food: Food): Recipe {
+  withoutFood(food: Ingredient): Recipe {
     return Recipe.new(this.name, this.foods.filter(f => f !== food));
   }
 
   private constructor(
     readonly uid: string,
     readonly name: string,
-    readonly foods: Food[],
+    readonly foods: Ingredient[],
     readonly fat: number,
     readonly carbs: number,
     readonly protein: number,
@@ -303,7 +248,7 @@ export class Recipe implements Meal, Quantifiable {
 
 export function scaleFood(
   ingredient: Nutritional & Quantifiable, amount: number
-): Food {
+): Ingredient {
   return new ScaledFood(ingredient, amount);
 }
 
@@ -326,13 +271,13 @@ export function ingredientFromReport(report: Report): Ingredient {
 }
 
 export function makeRecipe(
-  name: string, foods: Food[], amount?: number, unit?: FOOD_UNIT
+  name: string, foods: Ingredient[], amount?: number, unit?: FOOD_UNIT
 ): Recipe {
   const recipe = Recipe.new(name, foods, amount, unit);
   saveRecipe(recipe);
   return recipe;
 }
 
-export function meal(foods: Food[]): Meal {
+export function meal(foods: Ingredient[]): Meal {
   return new MealImpl(foods);
 }

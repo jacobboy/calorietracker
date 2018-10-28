@@ -1,4 +1,4 @@
-import { Meal, Ingredient, Recipe, Named, NDBable } from '../classes';
+import { Meal, Ingredient, Recipe, Named, NDBed } from '../classes';
 import { DataSource } from '../ndbapi';
 import { 
   getAllCustomIngredients, 
@@ -15,7 +15,7 @@ interface SavedState {
 interface SearchState {
   searchString: string;
   dataSource: DataSource;
-  items: (NDBable & Named)[];
+  items: (NDBed & Named)[];
 }
 
 interface TrackingState {
@@ -24,37 +24,19 @@ interface TrackingState {
 }
 
 export enum TopBitDisplay {
-  MEALS, CREATE_INGREDIENT
+  MEALS, CREATE_INGREDIENT, CREATE_RECIPE
 }
 
 export enum Modals {
   NONE, TRACKING, INGREDIENT, RECIPE
 }
 
-// um could really do this with just the enum, do i need this whole class?
-export class ModalState {
-  constructor(
-    readonly isOpen: boolean = false,
-    private readonly openModal: Modals = Modals.NONE
-  ) { /* noop */ }
-
-  openTrackingModal(): ModalState { return new ModalState(true, Modals.TRACKING); }
-  openIngredientModal(): ModalState { return new ModalState(true, Modals.INGREDIENT); }
-  openRecipeModal(): ModalState { return new ModalState(true, Modals.RECIPE); }
-  open(): ModalState { return new ModalState(true, Modals.NONE); }
-  close(): ModalState { return new ModalState(false, Modals.NONE); }
-
-  get isTracking(): boolean { return this.openModal === Modals.TRACKING; }
-  get isIngredient(): boolean { return this.openModal === Modals.INGREDIENT; }
-  get isRecipe(): boolean { return this.openModal === Modals.RECIPE; }
-}
-
 export class TopBitState {
   display: TopBitDisplay;
+  recipe: Ingredient[];
 }
 
 export interface StoreState {
-  modals: ModalState;
   topbit: TopBitState;
   search: SearchState;
   tracking: TrackingState;
@@ -63,8 +45,10 @@ export interface StoreState {
 }
 
 export const initialState: StoreState = {
-  modals: new ModalState(),
-  topbit: { display: TopBitDisplay.MEALS },
+  topbit: { 
+    display: TopBitDisplay.MEALS,
+    recipe: []
+  },
   search: {
     searchString: '',
     dataSource: DataSource.SR,

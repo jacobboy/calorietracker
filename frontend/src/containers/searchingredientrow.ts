@@ -4,7 +4,7 @@ import { StoreState } from '../types/index';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { NDBed } from '../classes';
-import { getNDBIngredient } from '../lookup';
+import { getIngredient } from '../lookup';
 
 function mapStateToProps(state: StoreState) {
   return {};
@@ -13,7 +13,7 @@ function mapStateToProps(state: StoreState) {
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
     onSaveClick: (ndbed: NDBed) => {
-      getNDBIngredient(ndbed).then((ingred) => dispatch(actions.saveIngredient(ingred)));
+      getIngredient(ndbed).then((ingred) => dispatch(actions.saveIngredient(ingred)));
     }
   };
 }

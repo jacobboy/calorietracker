@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { Ingredient, scaleFood } from '../classes';
+import { TopBitDisplay } from '../types';
 
 interface IngredientRowProps {
   item: Ingredient;
+  topbitDisplay: TopBitDisplay;
   onTrackClick: (ingredientable: Ingredient) => void;
 }
 

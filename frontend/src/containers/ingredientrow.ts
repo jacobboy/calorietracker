@@ -6,13 +6,18 @@ import { Dispatch } from 'redux';
 import { Ingredient } from '../classes';
 
 function mapStateToProps(state: StoreState) {
-  return {};
+  return {
+    topbitDisplay: state.topbit.display
+  };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
     onTrackClick: (ingredient: Ingredient) => {
       dispatch(actions.addFoodToMeal(ingredient));
+    },
+    onAddToRecipeClick: (ingredient: Ingredient) => {
+      dispatch(actions.addFoodToRecipe(ingredient));
     }
   };
 }

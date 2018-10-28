@@ -1,56 +1,18 @@
-import { Food, Meal } from '../classes';
+
+import { Ingredient, Meal } from '../classes';
 import * as React from 'react';
-/* import TrackedFood from '../containers/trackedfood';*/
-
-/* interface MealComponentProps {
- *   meal: Meal;
- *   idx: number;
- *   handleDeleteMeal: () => void;
- *   thStyle: React.CSSProperties;
- * }*/
-
-/* function MealComponent(props: MealComponentProps) {
- *   return (
- *     <div>
- *       <th style={props.thStyle}>Total</th>
- *       <th style={props.thStyle}>{props.meal.fat}</th>
- *       <th style={props.thStyle}>{props.meal.protein}</th>
- *       <th style={props.thStyle}>{props.meal.carbs}</th>
- *       <th style={props.thStyle}>{props.meal.calories}</th>
- *       <th><button onClick={props.handleDeleteMeal}>Delete Meal</button></th>
- *
- *       {
- *         props.meal.foods.map((food: Food, mealIdx: number) => {
- *           return <TrackedFood key={food.id} food={food} mealIdx={mealIdx} />;
- *         })
- *       }
- *     </div>
- *   );
- * }*/
+import { thStyle, tdStyle, tableStyle } from '../style';
 
 interface MealsComponentProps {
   today: Meal[];
   handleAddMealClick: () => void;
   handleDeleteMealClick: (mealIdx: number) => void;
-  handleRemoveFoodClick: (mealIdx: number, food: Food) => void;
+  handleRemoveFoodClick: (mealIdx: number, food: Ingredient) => void;
 }
 
 export class MealsComponent extends React.Component<
   MealsComponentProps, {}
   > {
-  tableStyle: React.CSSProperties = {
-    'borderCollapse': 'collapse',
-    'border': '1px solid black'
-  };
-
-  thStyle: React.CSSProperties = {
-    'border': '1px solid black'
-  };
-
-  tdStyle: React.CSSProperties = {
-    'border': '1px solid black'
-  };
-
   constructor(props: MealsComponentProps) {
     super(props);
   }
@@ -69,27 +31,23 @@ export class MealsComponent extends React.Component<
     this.ensureAtLeastOneMeal(nextProps.today);
   }
 
-  /* renderMeal(meal: Meal, idx: number) {
-   *   return (
-   *     <MealComponent
-   *       key={meal.id}
-   *       meal={meal}
-   *       idx={idx}
-   *       handleDeleteMeal={() => this.props.handleDeleteMeal(idx)}
-   *       thStyle={this.thStyle}
-   *     />
-   *   );
-   * }*/
+  mealCell(text: string | number) {
+    return <th style={thStyle}>{text}</th>;
+  }
+
+  ingredientCell(text: string | number) {
+    return <td style={tdStyle}>{text}</td>;
+  }
 
   makeMealRow(meal: Meal, mealIdx: number) {
     return (
       <tr key={meal.uid}>
-        <th style={this.thStyle}>Total</th>
-        <th style={this.thStyle} />
-        <th style={this.thStyle}>{meal.fat}</th>
-        <th style={this.thStyle}>{meal.carbs}</th>
-        <th style={this.thStyle}>{meal.protein}</th>
-        <th style={this.thStyle}>{meal.calories}</th>
+        {this.mealCell('Total')}
+        {this.mealCell('')}
+        {this.mealCell(meal.fat)}
+        {this.mealCell(meal.carbs)}
+        {this.mealCell(meal.protein)}
+        {this.mealCell(meal.calories)}
         <th>
           <button onClick={() => this.props.handleDeleteMealClick(mealIdx)}>
             Delete Meal
@@ -99,16 +57,16 @@ export class MealsComponent extends React.Component<
     );
   }
 
-  makeFoodRow(food: Food, mealIdx: number) {
+  makeFoodRow(food: Ingredient, mealIdx: number) {
     return (
       <tr key={food.uid}>
-        <td style={this.tdStyle}>{food.name}</td>
-        <td style={this.tdStyle}>{food.amount}</td>
-        <td style={this.tdStyle}>{food.fat}</td>
-        <td style={this.tdStyle}>{food.carbs}</td>
-        <td style={this.tdStyle}>{food.protein}</td>
-        <td style={this.tdStyle}>{food.calories}</td>
-        <td style={this.tdStyle}>
+        {this.ingredientCell(food.name)}
+        {this.ingredientCell(food.amount)}
+        {this.ingredientCell(food.fat)}
+        {this.ingredientCell(food.carbs)}
+        {this.ingredientCell(food.protein)}
+        {this.ingredientCell(food.calories)}
+        <td style={tdStyle}>
           <button onClick={() => this.props.handleRemoveFoodClick(mealIdx, food)}>
             Remove
           </button>
@@ -124,6 +82,7 @@ export class MealsComponent extends React.Component<
       let meal: Meal = this.props.today[mealIdx];
       for (let food of meal.foods) {
         rows.push(this.makeFoodRow(food, mealIdx));
+
       }
       rows.push(this.makeMealRow(meal, mealIdx));
     }
@@ -133,31 +92,31 @@ export class MealsComponent extends React.Component<
   render() {
     return (
       <div>
-        <table style={this.tableStyle}>
+        <table style={tableStyle}>
           <tbody>
             <tr>
-              <th style={this.thStyle} />
-              <th style={this.thStyle}>Amount</th>
-              <th style={this.thStyle}>Fat</th>
-              <th style={this.thStyle}>Carbs</th>
-              <th style={this.thStyle}>Protein</th>
-              <th style={this.thStyle}>Calories</th>
-              <th style={this.thStyle} />
+              <th style={thStyle} />
+              <th style={thStyle}>Amount</th>
+              <th style={thStyle}>Fat</th>
+              <th style={thStyle}>Carbs</th>
+              <th style={thStyle}>Protein</th>
+              <th style={thStyle}>Calories</th>
+              <th style={thStyle} />
             </tr>
             {this.renderRows()}
             <tr>
-              <th style={this.thStyle}>Day Total</th>
-              <th style={this.thStyle} />
-              <th style={this.thStyle}>
+              <th style={thStyle}>Day Total</th>
+              <th style={thStyle} />
+              <th style={thStyle}>
                 {this.props.today.reduce((l, r) => l + r.fat, 0)}
               </th>
-              <th style={this.thStyle}>
+              <th style={thStyle}>
                 {this.props.today.reduce((l, r) => l + r.carbs, 0)}
               </th>
-              <th style={this.thStyle}>
+              <th style={thStyle}>
                 {this.props.today.reduce((l, r) => l + r.protein, 0)}
               </th>
-              <th style={this.thStyle}>
+              <th style={thStyle}>
                 {this.props.today.reduce((l, r) => l + r.calories, 0)}
               </th>
             </tr>

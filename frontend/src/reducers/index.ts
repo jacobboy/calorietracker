@@ -1,9 +1,11 @@
 import { Actions } from '../actions';
-import { StoreState } from '../types/index';
+import { StoreState, TopBitDisplay } from '../types/index';
 import {
   CREATE_INGREDIENT_TOGGLE,
   CREATE_INGREDIENT_SUBMIT,
   CREATE_RECIPE_OPEN,
+  ADD_FOOD_TO_RECIPE,
+  REMOVE_FOOD_FROM_RECIPE,
   CREATE_RECIPE_SUBMIT,
   SELECT_DATASOURCE,
   FOODSEARCH_INPUT,
@@ -16,7 +18,7 @@ import {
   SAVE_INGREDIENT
 } from '../constants/index';
 import { dropElement, replaceElement } from '../datautil';
-import { meal, Food, Meal } from '../classes';
+import { meal, Ingredient, Meal } from '../classes';
 
 function mealIdxOrLast(state: StoreState, mealIdx?: number) {
   return mealIdx || (state.today.length - 1);
@@ -24,7 +26,7 @@ function mealIdxOrLast(state: StoreState, mealIdx?: number) {
 
 function addFoodToMeal(
   state: StoreState,
-  payload: { mealIdx?: number, food: Food }
+  payload: { mealIdx?: number, food: Ingredient }
 ): StoreState {
   const idx = mealIdxOrLast(state, payload.mealIdx);
   const newMeal: Meal = state.today[idx].withFood(payload.food);
@@ -34,7 +36,7 @@ function addFoodToMeal(
 
 function removeFoodFromMeal(
   state: StoreState,
-  payload: { mealIdx: number, food: Food }
+  payload: { mealIdx: number, food: Ingredient }
 ) {
   const idx = mealIdxOrLast(state, payload.mealIdx);
   const newMeal = state.today[idx].withoutFood(payload.food);
@@ -86,7 +88,10 @@ export function reducer(state: StoreState, action: Actions): StoreState {
     case CREATE_INGREDIENT_TOGGLE:
       return {
         ...state,
-        topbit: {display: action.payload},
+        topbit: {
+          ...state.topbit,
+          display: action.payload
+        }
       };
     case CREATE_INGREDIENT_SUBMIT:
       return {
@@ -99,11 +104,34 @@ export function reducer(state: StoreState, action: Actions): StoreState {
     case CREATE_RECIPE_OPEN:
       return {
         ...state,
-        modals: state.modals.openRecipeModal(),
+        topbit: {
+          ...state.topbit,
+          display: TopBitDisplay.CREATE_RECIPE
+        }
+      };
+    case ADD_FOOD_TO_RECIPE:
+      return {
+        ...state,
+        topbit: {
+          ...state.topbit,
+          recipe: state.topbit.recipe.concat(action.payload)
+        }
+      };
+    case REMOVE_FOOD_FROM_RECIPE:
+      return {
+        ...state,
+        topbit: {
+          ...state.topbit,
+          recipe: dropElement(state.topbit.recipe, action.payload)
+        }
       };
     case CREATE_RECIPE_SUBMIT:
       return {
         ...state,
+        topbit: {
+          ...state.topbit,
+          recipe: []
+        },
         saved: {
           ...state.saved,
           recipes: state.saved.recipes.concat(action.payload)

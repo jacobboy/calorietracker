@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Named, NDBed, Ingredient } from '../classes';
-import { getNDBIngredient } from '../lookup';
+import { getIngredient } from '../lookup';
 
 interface SearchIngredientRowProps {
   item: NDBed & Named;
@@ -21,7 +21,7 @@ export class SearchIngredientRow extends React.Component<
   }
 
   handleDetailsClick() {
-    getNDBIngredient(this.props.item).then((ingred) => this.setState({ingred}));
+    getIngredient(this.props.item).then((ingred) => this.setState({ingred}));
   }
 
   render() {

@@ -1,5 +1,5 @@
 import { Report } from '../ndbapi/classes';
-import { Ingredient, CustomIngredient, NDBIngredient, Recipe } from '../classes';
+import { Ingredient, CustomIngredient, Recipe, ingredientFromReport } from '../classes';
 
 function getKey(keyType: string) {
   return (id: string) => keyType + '::' + id;
@@ -27,7 +27,7 @@ export function loadReport(ndbno: string): Report | null {
   return loadReportFromKey(key);
 }
 
-export function loadReportFromKey(key: string): Report | null {
+function loadReportFromKey(key: string): Report | null {
   const reportStr: string | null = window.localStorage.getItem(key);
   if (reportStr !== null) {
     console.log('Retrieved ' + key + ' from window storage');
@@ -80,7 +80,7 @@ export function getAllStoredIngredients(): Ingredient[] {
     if (key !== null && isNdbKey(key)) {
       const report = loadReportFromKey(key);
       if (report !== null) {
-        ingreds.push(NDBIngredient.fromReport(report));
+        ingreds.push(ingredientFromReport(report));
       }
     }
   }

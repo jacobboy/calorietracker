@@ -1,11 +1,12 @@
+
 import * as React from 'react';
-import { Food } from '../classes';
+import { Ingredient } from '../classes';
 
 export function TrackedFoodRow(
   props: {
     mealIdx: number,
-    food: Food,
-    handleRemoveClick: (mealIdx: number, food: Food) => void
+    food: Ingredient,
+    handleRemoveClick: (mealIdx: number, food: Ingredient) => void
   }
 ) {
   let tdStyle: React.CSSProperties = {

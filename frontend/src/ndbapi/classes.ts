@@ -1,6 +1,6 @@
-import { Named, NDBable } from '../classes';
+import { Named, NDBed } from '../classes';
 
-export class IngredientSearchItem extends NDBable implements Named {
+export class IngredientSearchItem implements Named, NDBed {
 
   static fromSearchListItem(item: SearchListItem) {
     return new IngredientSearchItem(
@@ -18,7 +18,7 @@ export class IngredientSearchItem extends NDBable implements Named {
     readonly group: string,
     readonly name: string,
     readonly ds: string
-  ) { super(ndbno); }
+  ) { /*noop*/ }
 }
 
 export class SearchListItem {

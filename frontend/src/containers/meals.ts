@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { StoreState } from '../types';
 import { MealsComponent } from '../components/meals';
 import { actions, Actions } from '../actions';
-import { Food } from '../classes';
+import { Ingredient } from '../classes';
 import { Dispatch } from 'redux';
 
 function mapStateToProps(state: StoreState) {
@@ -15,7 +15,7 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
     handleDeleteMealClick: (mealIdx: number) => {
       dispatch(actions.removeMeal(mealIdx));
     },
-    handleRemoveFoodClick: (mealIdx: number, food: Food) => {
+    handleRemoveFoodClick: (mealIdx: number, food: Ingredient) => {
       dispatch(actions.removeFoodFromMeal(mealIdx, food));
     },
   };
