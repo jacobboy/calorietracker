@@ -1,75 +1,75 @@
-import { Ingredient } from '../classes';
+import { Ingredient, FOOD_UNIT } from '../classes';
 import * as React from 'react';
-import { tdStyle, thStyle } from '../style';
+import { thStyle, tableStyle } from '../style';
+import { IngredientsTable } from './ingredientstable';
 
 interface CreateRecipeInputProps {
   recipe: Ingredient[];
   handleRemoveFoodClick: (foodIdx: number) => void;
+  handleSaveRecipeClick: (name: string, foods: Ingredient[], amount?: number, unit?: FOOD_UNIT) => void;
+}
+
+interface CreateRecipeInputState {
+    name: string;
+    amount: number;
+    unit: FOOD_UNIT;
 }
 
 export class CreateRecipeInput extends React.Component<
-  CreateRecipeInputProps, {}
+  CreateRecipeInputProps, CreateRecipeInputState
   > {
 
   constructor(props: CreateRecipeInputProps) {
     super(props);
+    this.state = {
+        name: 'My Bitchin\' Recipe',
+        amount: 100,
+        unit: FOOD_UNIT.g
+    };
   }
 
-  ingredientCell(text: string | number) {
-    return <td style={tdStyle}>{text}</td>;
-  }  
-
-  makeFoodRow(food: Ingredient, foodIdx: number) {
-    return (
-      <tr key={food.uid}>
-        {this.ingredientCell(food.name)}
-        {this.ingredientCell(food.amount)}
-        {this.ingredientCell(food.fat)}
-        {this.ingredientCell(food.carbs)}
-        {this.ingredientCell(food.protein)}
-        {this.ingredientCell(food.calories)}
-        <td style={tdStyle}>
-          <button onClick={() => this.props.handleRemoveFoodClick(foodIdx)}>
-            Remove
-          </button>
-        </td>
-      </tr>
-
-    );
-  }
-
-  mealCell(text: string | number) {
+  headerCell(text: string) {
     return <th style={thStyle}>{text}</th>;
   }
 
-  makeTotalRow(recipe: Ingredient[]) {
+  headerRow() {
     return (
       <tr>
-        {this.mealCell('Total')}
-        {this.mealCell('')}
-        {this.mealCell(recipe.reduce((l, r) => l + r.fat, 0))}
-        {this.mealCell(recipe.reduce((l, r) => l + r.carbs, 0))}
-        {this.mealCell(recipe.reduce((l, r) => l + r.protein, 0))}
-        {this.mealCell(recipe.reduce((l, r) => l + r.calories, 0))}
-        <th/>
+        {this.headerCell('')}
+        {this.headerCell('Amount')}
+        {this.headerCell('Fat')}
+        {this.headerCell('Carbs')}
+        {this.headerCell('Protein')}
+        {this.headerCell('Calories')}
+        {this.headerCell('')}
       </tr>
     );
-  }  
+  }
 
-  renderRows() {
-    const rows = [];
-    for (let foodIdx = 0; foodIdx < this.props.recipe.length; foodIdx++) {
-      let food = this.props.recipe[foodIdx];      
-      rows.push(this.makeFoodRow(food, foodIdx));
-
-    }
-    rows.push(this.makeTotalRow(this.props.recipe));
-    return rows;
-  }  
+  onSaveRecipeClick() {
+      if (this.props.recipe.length > 0) {
+        this.props.handleSaveRecipeClick(
+            this.state.name, this.props.recipe, this.state.amount, this.state.unit
+        );
+      }
+  }
 
   render() {
     return (
-      this.renderRows()
-    );
-  }
+        <div>
+          <table style={tableStyle}>
+            <tbody>
+              {this.headerRow()}
+              <IngredientsTable 
+                 foods={this.props.recipe}
+                 handleRemoveClick={this.props.handleRemoveFoodClick}
+              />
+            </tbody>
+          </table>
+          <button onClick={() => this.onSaveRecipeClick()} >
+            Save Recipe
+          </button>
+        </div>
+      );
+    }  
 }

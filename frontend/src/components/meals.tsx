@@ -1,6 +1,7 @@
 import { Ingredient, Meal } from '../classes';
 import * as React from 'react';
 import { thStyle, tdStyle, tableStyle } from '../style';
+import { IngredientsTable } from './ingredientstable';
 
 interface MealsComponentProps {
   today: Meal[];
@@ -78,14 +79,37 @@ export class MealsComponent extends React.Component<
   renderRows() {
     const rows = [];
     for (let mealIdx = 0; mealIdx < this.props.today.length; mealIdx++) {
-      let meal: Meal = this.props.today[mealIdx];
-      for (let food of meal.foods) {
-        rows.push(this.makeFoodRow(food, mealIdx));
-
-      }
-      rows.push(this.makeMealRow(meal, mealIdx));
+      let meal: Meal = this.props.today[mealIdx];      
+      const removeHandler = (foodIdx: number) => {
+        this.props.handleRemoveFoodClick(mealIdx, meal.foods[foodIdx]);
+      };  
+      let row = (
+        <IngredientsTable 
+          foods={meal.foods}
+          handleRemoveClick={removeHandler}
+        />
+      );
+      rows.push(row);
     }
     return rows;
+  }
+
+  headerCell(text: string) {
+    return <th style={thStyle}>{text}</th>;
+  }
+
+  headerRow() {
+    return (
+      <tr>
+        {this.headerCell('')}
+        {this.headerCell('Amount')}
+        {this.headerCell('Fat')}
+        {this.headerCell('Carbs')}
+        {this.headerCell('Protein')}
+        {this.headerCell('Calories')}
+        {this.headerCell('')}
+      </tr>
+    );
   }
 
   render() {
@@ -93,15 +117,7 @@ export class MealsComponent extends React.Component<
       <div>
         <table style={tableStyle}>
           <tbody>
-            <tr>
-              <th style={thStyle} />
-              <th style={thStyle}>Amount</th>
-              <th style={thStyle}>Fat</th>
-              <th style={thStyle}>Carbs</th>
-              <th style={thStyle}>Protein</th>
-              <th style={thStyle}>Calories</th>
-              <th style={thStyle} />
-            </tr>
+            {this.headerRow()}
             {this.renderRows()}
             <tr>
               <th style={thStyle}>Day Total</th>
