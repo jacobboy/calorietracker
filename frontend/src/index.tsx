@@ -5,17 +5,7 @@ import { Provider } from 'react-redux';
 import registerServiceWorker from './registerServiceWorker';
 import { reducer } from './reducers/index';
 import { initialState } from './types/index';
-import SearchComponent from './containers/search';
-import TopBitComponent from './containers/topbit';
-
-function App() {
-  return (
-    <div>
-      <TopBitComponent />
-      <SearchComponent />
-    </div>
-  );
-}
+import App from './app';
 
 const store = createStore(reducer, initialState);
 ReactDOM.render(
