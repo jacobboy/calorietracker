@@ -5,6 +5,7 @@ import { tdStyle, thStyle } from '../style';
 interface IngredientsTableProps {
   foods: Ingredient[];
   handleRemoveClick: (foodIdx: number) => void;
+  handleDeleteClick: () => void;
 }
 
 export class IngredientsTable extends React.Component<
@@ -29,7 +30,10 @@ export class IngredientsTable extends React.Component<
         {this.ingredientCell(food.protein)}
         {this.ingredientCell(food.calories)}
         <td style={tdStyle}>
-          <button onClick={() => this.props.handleRemoveClick(foodIdx)}>
+          <button 
+            id={'removeFood_' + foodIdx.toString()}
+            onClick={() => this.props.handleRemoveClick(foodIdx)}
+          >
             Remove
           </button>
         </td>
@@ -51,7 +55,14 @@ export class IngredientsTable extends React.Component<
         {this.mealCell(recipe.reduce((l, r) => l + r.carbs, 0))}
         {this.mealCell(recipe.reduce((l, r) => l + r.protein, 0))}
         {this.mealCell(recipe.reduce((l, r) => l + r.calories, 0))}
-        <th/>
+        <th>
+          <button 
+            id={'deleteMeal'}
+            onClick={() => this.props.handleDeleteClick()}
+          >
+            Remove
+          </button>
+        </th>
       </tr>
     );
   }  

@@ -18,18 +18,12 @@ describe('When the meals component is selected', () => {
     });
 
   it('should submit the ingredient click', () => {
-    wrapper.find('#createIngredient').simulate(
-      'click', 
-      {preventDefault() { /**/ }}
-    );
+    wrapper.find('#createIngredient').simulate('click');
     expect(mockIngedientToggle.mock.calls.length).toBe(1);
     expect(mockIngedientToggle.mock.calls[0][0]).toBe(TopBitDisplay.CREATE_INGREDIENT);
   });
   it('should submit the recipe click', () => {
-    wrapper.find('#createRecipe').simulate(
-      'click', 
-      {preventDefault() { /**/ }}
-    );
+    wrapper.find('#createRecipe').simulate('click');
     expect(mockIngedientToggle.mock.calls.length).toBe(1);
     expect(mockIngedientToggle.mock.calls[0][0]).toBe(TopBitDisplay.CREATE_RECIPE);
   });

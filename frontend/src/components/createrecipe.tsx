@@ -63,6 +63,7 @@ export class CreateRecipeInput extends React.Component<
               <IngredientsTable 
                  foods={this.props.recipe}
                  handleRemoveClick={this.props.handleRemoveFoodClick}
+                 handleDeleteClick={() => null}
               />
             </tbody>
           </table>

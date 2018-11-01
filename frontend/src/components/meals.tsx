@@ -1,6 +1,6 @@
 import { Ingredient, Meal } from '../classes';
 import * as React from 'react';
-import { thStyle, tdStyle, tableStyle } from '../style';
+import { thStyle, tableStyle } from '../style';
 import { IngredientsTable } from './ingredientstable';
 
 interface MealsComponentProps {
@@ -31,63 +31,21 @@ export class MealsComponent extends React.Component<
     this.ensureAtLeastOneMeal(nextProps.today);
   }
 
-  ingredientCell(text: string | number) {
-    return <td style={tdStyle}>{text}</td>;
-  }
-
-  makeFoodRow(food: Ingredient, mealIdx: number) {
-    return (
-      <tr key={food.uid}>
-        {this.ingredientCell(food.name)}
-        {this.ingredientCell(food.amount)}
-        {this.ingredientCell(food.fat)}
-        {this.ingredientCell(food.carbs)}
-        {this.ingredientCell(food.protein)}
-        {this.ingredientCell(food.calories)}
-        <td style={tdStyle}>
-          <button onClick={() => this.props.handleRemoveFoodClick(mealIdx, food)}>
-            Remove
-          </button>
-        </td>
-      </tr>
-
-    );
-  }
-
-  mealCell(text: string | number) {
-    return <th style={thStyle}>{text}</th>;
-  }
-
-  makeMealRow(meal: Meal, mealIdx: number) {
-    return (
-      <tr key={meal.uid}>
-      
-        {this.mealCell('Total')}
-        {this.mealCell('')}
-        {this.mealCell(meal.fat)}
-        {this.mealCell(meal.carbs)}
-        {this.mealCell(meal.protein)}
-        {this.mealCell(meal.calories)}
-        <th>
-          <button onClick={() => this.props.handleDeleteMealClick(mealIdx)}>
-            Delete Meal
-          </button>
-        </th>
-      </tr>
-    );
-  }
-
   renderRows() {
     const rows = [];
     for (let mealIdx = 0; mealIdx < this.props.today.length; mealIdx++) {
-      let meal: Meal = this.props.today[mealIdx];      
+      const meal: Meal = this.props.today[mealIdx];      
       const removeHandler = (foodIdx: number) => {
         this.props.handleRemoveFoodClick(mealIdx, meal.foods[foodIdx]);
       };  
+      const deleteHandler = () => {
+        this.props.handleDeleteMealClick(mealIdx);
+      };
       let row = (
         <IngredientsTable 
           foods={meal.foods}
           handleRemoveClick={removeHandler}
+          handleDeleteClick={deleteHandler}
         />
       );
       rows.push(row);
@@ -139,6 +97,7 @@ export class MealsComponent extends React.Component<
           </tbody>
         </table>
         <button
+          id="addMeal"
           onClick={() => this.props.handleAddMealClick()}
         >
           Add Meal
