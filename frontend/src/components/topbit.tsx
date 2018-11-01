@@ -16,10 +16,16 @@ export const TopBitComponent = (props: TopBitProps) => {
         component = <MealsComponent />;
         button = (
             <div>
-                <button onClick={() => props.onIngredientToggle(TopBitDisplay.CREATE_INGREDIENT)}>
+                <button 
+                  id="createIngredient" 
+                  onClick={() => props.onIngredientToggle(TopBitDisplay.CREATE_INGREDIENT)}
+                >
                     Create hell of Ingredient
                 </button>
-                <button onClick={() => props.onIngredientToggle(TopBitDisplay.CREATE_RECIPE)}>
+                <button
+                  id="cancel" 
+                  onClick={() => props.onIngredientToggle(TopBitDisplay.CREATE_RECIPE)}
+                >
                     Create much Recipe
                 </button> 
             </div>
@@ -28,10 +34,16 @@ export const TopBitComponent = (props: TopBitProps) => {
         component = <CreateIngredientInput/>;
         button = (
             <div>
-                <button onClick={() => props.onIngredientToggle(TopBitDisplay.MEALS)}>
+                <button 
+                  id="cancel" 
+                  onClick={() => props.onIngredientToggle(TopBitDisplay.MEALS)}
+                >
                     Cancel                
                 </button>
-                <button onClick={() => props.onIngredientToggle(TopBitDisplay.CREATE_RECIPE)}>
+                <button 
+                  id="createRecipe" 
+                  onClick={() => props.onIngredientToggle(TopBitDisplay.CREATE_RECIPE)}
+                >
                     Create much Recipe
                 </button> 
             </div>
@@ -40,10 +52,16 @@ export const TopBitComponent = (props: TopBitProps) => {
         component = <CreateRecipeInput />; 
         button = (
             <div>
-                <button onClick={() => props.onIngredientToggle(TopBitDisplay.CREATE_INGREDIENT)}>
+                <button 
+                  id="createIngredient" 
+                  onClick={() => props.onIngredientToggle(TopBitDisplay.CREATE_INGREDIENT)}
+                >
                     Create hell of Ingredient
                 </button>
-                <button onClick={() => props.onIngredientToggle(TopBitDisplay.MEALS)}>
+                <button 
+                  id="cancel" 
+                  onClick={() => props.onIngredientToggle(TopBitDisplay.MEALS)}
+                >
                     Cancel                
                 </button>
             </div>

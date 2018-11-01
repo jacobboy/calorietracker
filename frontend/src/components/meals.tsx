@@ -61,6 +61,7 @@ export class MealsComponent extends React.Component<
   makeMealRow(meal: Meal, mealIdx: number) {
     return (
       <tr key={meal.uid}>
+      
         {this.mealCell('Total')}
         {this.mealCell('')}
         {this.mealCell(meal.fat)}
