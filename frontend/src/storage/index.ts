@@ -2,7 +2,8 @@ import { Report } from '../ndbapi/classes';
 import { Ingredient, CustomIngredient, Recipe, ingredientFromReport } from '../classes';
 
 function getKey(keyType: string) {
-  return (id: string) => keyType + '::' + id;
+  // was '::' but Enzyme didn't like that
+  return (id: string) => keyType + '_' + id;
 }
 
 function isKey(keyType: string) {

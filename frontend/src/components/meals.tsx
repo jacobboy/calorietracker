@@ -42,7 +42,8 @@ export class MealsComponent extends React.Component<
         this.props.handleDeleteMealClick(mealIdx);
       };
       let row = (
-        <IngredientsTable 
+        <IngredientsTable
+          key={'meal_table_' + meal.uid}
           foods={meal.foods}
           handleRemoveClick={removeHandler}
           handleDeleteClick={deleteHandler}

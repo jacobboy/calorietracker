@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { MealsComponent } from '../components/meals';
-import { shallow, ShallowWrapper } from 'enzyme';
-import { Meal, meal, Ingredient, makeIngredient, FOOD_UNIT } from 'src/classes';
+import { mount, ReactWrapper } from 'enzyme';
+import { Meal, meal, Ingredient, makeIngredient, FOOD_UNIT } from '../classes';
 
 function mockMeals(nMeals: number, nFoods: number): Meal[] {
     const meals: Meal[] = [];
@@ -25,8 +25,8 @@ function mockMeals(nMeals: number, nFoods: number): Meal[] {
 }
 
 describe('When the meals component is selected', () => {
-  // tslint:disable-next-line:no-any  
-  let wrapper: ShallowWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
+  // tslint:disable-next-line:no-any
+  let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
 
   let mockAddMeal: jest.Mock;
   let mockDeleteMeal: jest.Mock;
@@ -39,7 +39,7 @@ describe('When the meals component is selected', () => {
     mockDeleteMeal = jest.fn();
     mockRemoveFood = jest.fn();
 
-    wrapper = shallow(
+    wrapper = mount(
       <MealsComponent
         today={today}
         handleAddMealClick={mockAddMeal}
@@ -49,7 +49,19 @@ describe('When the meals component is selected', () => {
       );
     });
 
-  it('should submit the ingredient click', () => {
-    wrapper.find('#removeFood').simulate('click');
+  it('should submit the ingredient click on the first meal', () => {
+      const foodToRemove = today[0].foods[1];
+      wrapper.find('#removeFood_' + foodToRemove.uid).simulate('click');
+      expect(mockRemoveFood.mock.calls.length).toBe(1);
+      expect(mockRemoveFood.mock.calls[0][0]).toBe(1);
+      expect(mockRemoveFood.mock.calls[0][1]).toBe(foodToRemove);
+    });
+
+  it('should submit the ingredient click on the second meal', () => {
+    const foodToRemove = today[1].foods[1];
+    wrapper.find('#removeFood_' + foodToRemove.uid).simulate('click');
+    expect(mockRemoveFood.mock.calls.length).toBe(1);
+    expect(mockRemoveFood.mock.calls[0][0]).toBe(1);
+    expect(mockRemoveFood.mock.calls[0][1]).toBe(foodToRemove);
   });
 });
