@@ -259,10 +259,13 @@ export function makeIngredient(
   protein: number,
   calories: number,
   amount: number,
-  unit: FOOD_UNIT
+  unit: FOOD_UNIT,
+  persist: boolean = true
 ) {
   const ingred = CustomIngredient.new(name, fat, carbs, protein, calories, amount, unit);
-  saveIngredient(ingred);
+  if (persist) {
+    saveIngredient(ingred);
+  }
   return ingred;
 }
 

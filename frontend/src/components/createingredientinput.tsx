@@ -181,7 +181,7 @@ export class CreateIngredientInput extends React.Component<
                 value={this.state.unit}
                 onChange={(e) => this.handleUnitInput(e)} 
               >
-                {Object.keys(FOOD_UNIT).map((unit) => (<option>unit</option>))}
+                {Object.keys(FOOD_UNIT).map((unit) => (<option key={unit}>unit</option>))}
               </select>
             </label>
           </li>

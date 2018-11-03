@@ -1,12 +1,15 @@
-import * as React from 'react';
-import { MealsComponent } from '../components/meals';
-import { mount, ReactWrapper } from 'enzyme';
-import { Meal, meal, Ingredient, makeIngredient, FOOD_UNIT } from '../classes';
+import * as React from 'react'
+import { MealsComponent } from '../containers/meals'
+import { mount } from 'enzyme'
+import { meal, makeIngredient, FOOD_UNIT } from '../classes'
+import { createStore } from 'redux'
+import { reducer } from 'src/reducers'
+import { Provider } from 'react-redux'
 
-function mockMeals(nMeals: number, nFoods: number): Meal[] {
-    const meals: Meal[] = [];
+function mockMeals (nMeals, nFoods) {
+    const meals = [];
     for (let i = 0; i < nMeals; i++) {
-        const foods: Ingredient[] = [];
+        const foods = [];
         for (let j = 0; j < nFoods; j++) {
             const food = makeIngredient(
                 'ingredient_' + i.toString + j.toString(),
@@ -27,29 +30,26 @@ function mockMeals(nMeals: number, nFoods: number): Meal[] {
 
 describe('When the meals component is selected', () => {
   // tslint:disable-next-line:no-any
-  let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
+  let wrapper;
 
-  let mockAddMeal: jest.Mock;
-  let mockDeleteMeal: jest.Mock;
-  let mockRemoveFood: jest.Mock;
-  let today: Meal[];
+  let mockAddMeal;
+  let mockDeleteMeal;
+  let mockRemoveFood;
+  let today;
+  let store;
 
   const nMeals = 2;
   const nFoods = 2;
 
   beforeEach(() => {
     today = mockMeals(nMeals, nFoods);
-    mockAddMeal = jest.fn();
-    mockDeleteMeal = jest.fn();
-    mockRemoveFood = jest.fn();
+    let state = { today };
+    store = createStore(reducer, initialState);
 
     wrapper = mount(
-      <MealsComponent
-        today={today}
-        handleAddMealClick={mockAddMeal}
-        handleDeleteMealClick={mockDeleteMeal}
-        handleRemoveFoodClick={mockRemoveFood}
-      />    
+      <Provider store={store}>
+        <MealsComponent />    
+      </Provider>
       );
     });
 
@@ -65,14 +65,3 @@ describe('When the meals component is selected', () => {
     }
   }
 });
-
-/* 
-const store = createStore(reducer, initialState);
-ReactDOM.render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
-  document.getElementById('root') as HTMLElement
-);
-
-*/

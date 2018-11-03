@@ -23,7 +23,7 @@ export const TopBitComponent = (props: TopBitProps) => {
                     Create hell of Ingredient
                 </button>
                 <button
-                  id="createRecipe" 
+                  id="createRecipe"
                   onClick={() => props.onIngredientToggle(TopBitDisplay.CREATE_RECIPE)}
                 >
                     Create much Recipe
@@ -31,7 +31,7 @@ export const TopBitComponent = (props: TopBitProps) => {
             </div>
     );  
     } else if (props.display === TopBitDisplay.CREATE_INGREDIENT) {
-        component = <CreateIngredientInput/>;
+        component = <CreateIngredientInput />;
         button = (
             <div>
                 <button 
