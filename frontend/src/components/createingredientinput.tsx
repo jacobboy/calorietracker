@@ -60,51 +60,54 @@ export class CreateIngredientInput extends React.Component<
   } */  
 
   updateCalories(state: CreateIngredientInputState) {
-    console.log('updating calories');
     if (this.state.useCalculatedCalories) {
       const calories = state.fat * 9 + state.carbs * 4 + state.protein * 4;
+      console.log(`updating calories to ${calories}`);
       this.setState({ calories });
     }
   }
 
   handleFatInput(event: React.ChangeEvent<HTMLInputElement>) {
     const fat = Number(event.target.value);
+    console.log(`updating fat to ${fat}`);
     this.setState({ fat });
     this.updateCalories({ ...this.state, fat });
   }
 
   handleCarbsInput(event: React.ChangeEvent<HTMLInputElement>) {
     const carbs = Number(event.target.value);
+    console.log(`updating carbs to ${carbs}`);
     this.setState({ carbs });
     this.updateCalories({ ...this.state, carbs });
   }
 
   handleProteinInput(event: React.ChangeEvent<HTMLInputElement>) {
     const protein = Number(event.target.value);
+    console.log(`updating protein to ${protein}`);
     this.setState({ protein });
     this.updateCalories({ ...this.state, protein });
   }
 
   handleCaloriesInput(event: React.ChangeEvent<HTMLInputElement>) {
-    this.setState({
-      /* useCalculatedCalories: false,*/
-      calories: Number(event.target.value)
-    });
+    const calories = Number(event.target.value);
+    console.log(`updating calories to ${calories}`);
+    this.setState({ calories });
   }
 
   handleAmountInput(event: React.ChangeEvent<HTMLInputElement>) {
-    this.setState({
-      amount: Number(event.target.value)
-    });
+    const amount = Number(event.target.value);
+    console.log(`updating amount to ${amount}`);
+    this.setState({ amount });
   }
 
   handleUnitInput(event: React.ChangeEvent<HTMLSelectElement>) {
-    this.setState({
-      unit: FOOD_UNIT[event.target.value]
-    });
+    const unit = FOOD_UNIT[event.target.value];
+    console.log(`updating unit to ${unit}`);
+    this.setState({ unit });
   }
 
   handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    console.log('handling ingredient submit');
     event.preventDefault();
     const { name, fat, carbs, protein, calories, amount, unit } = this.state;
     this.props.handleSubmit(name, fat, carbs, protein, calories, amount, unit);
@@ -112,12 +115,13 @@ export class CreateIngredientInput extends React.Component<
 
   render() {
     return (
-      <form onSubmit={(e) => this.handleSubmit(e)}>
+      <form id="ingredientForm" onSubmit={(e) => this.handleSubmit(e)}>
         <ul>
           <li key="name">
             <label>
               Name:
               <input
+                id="nameInput"
                 type="text"
                 value={this.state.name || ''}
                 onChange={(e) => this.handleNameInput(e)}
@@ -128,6 +132,7 @@ export class CreateIngredientInput extends React.Component<
             <label>
               Fat:
               <input
+                id="fatInput"
                 type="number"
                 value={this.state.fat || ''}
                 onChange={(e) => this.handleFatInput(e)}
@@ -138,6 +143,7 @@ export class CreateIngredientInput extends React.Component<
             <label>
               Carbs:
               <input
+                id="carbsInput"
                 type="number"
                 value={this.state.carbs || ''}
                 onChange={(e) => this.handleCarbsInput(e)}
@@ -148,6 +154,7 @@ export class CreateIngredientInput extends React.Component<
             <label>
               Protein:
               <input
+                id="proteinInput"
                 type="number"
                 value={this.state.protein || ''}
                 onChange={(e) => this.handleProteinInput(e)}
@@ -158,6 +165,7 @@ export class CreateIngredientInput extends React.Component<
             <label>
               Calories:
               <input
+                id="caloriesInput"
                 type="number"
                 value={this.state.calories || ''}
                 onChange={(e) => this.handleCaloriesInput(e)}
@@ -168,6 +176,7 @@ export class CreateIngredientInput extends React.Component<
             <label>
               Amount:
               <input
+                id="amountInput"
                 type="number"
                 value={this.state.amount}
                 onChange={(e) => this.handleAmountInput(e)}
@@ -178,6 +187,7 @@ export class CreateIngredientInput extends React.Component<
             <label>
               Unit:
               <select
+                id="unitInput"
                 value={this.state.unit}
                 onChange={(e) => this.handleUnitInput(e)} 
               >
@@ -186,7 +196,7 @@ export class CreateIngredientInput extends React.Component<
             </label>
           </li>
           <li key="submit">
-            <input type="submit" value="Submit" />
+            <input id="submitIngredient" type="submit" value="Submit" />
           </li>
         </ul>
       </form>

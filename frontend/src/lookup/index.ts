@@ -9,7 +9,7 @@ function getReport(ndbno: string): Promise<Report> {
     return new Promise((resolve, reject) => resolve(localReport));
   } else {
     return queryReport(ndbno).then((report) => {
-      saveReport(ndbno, report);
+      saveReport(report);
       return report;
     });
   }
