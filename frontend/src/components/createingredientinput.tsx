@@ -57,7 +57,7 @@ export class CreateIngredientInput extends React.Component<
         this.setState({ calories });
       }
     };
-  } */  
+  } */
 
   updateCalories(state: CreateIngredientInputState) {
     if (this.state.useCalculatedCalories) {
@@ -176,7 +176,7 @@ export class CreateIngredientInput extends React.Component<
             <label>
               Amount:
               <input
-                id="amountInput"
+                id="createIngredientAmountInput"
                 type="number"
                 value={this.state.amount}
                 onChange={(e) => this.handleAmountInput(e)}
@@ -189,7 +189,7 @@ export class CreateIngredientInput extends React.Component<
               <select
                 id="unitInput"
                 value={this.state.unit}
-                onChange={(e) => this.handleUnitInput(e)} 
+                onChange={(e) => this.handleUnitInput(e)}
               >
                 {Object.keys(FOOD_UNIT).map((unit) => (<option key={unit}>unit</option>))}
               </select>

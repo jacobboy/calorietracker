@@ -7,14 +7,16 @@ import { Ingredient } from '../classes';
 
 function mapStateToProps(state: StoreState) {
   return {
-    topbitDisplay: state.topbit.display
+    topbitDisplay: state.topbit.display,
+    buttonText: state.topbit.display === TopBitDisplay.CREATE_RECIPE ? 'Add to recipe' : 'Add to meal'
   };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
-    // TODO: What is the approved react/redux way to condition 
+    // TODO: What is the approved react/redux way to condition
     //       the dispatch on state?
+    //       Or should it be the same action, and the reducer handles it differently?
     onTrackClick: (ingredient: Ingredient, topbitDisplay: TopBitDisplay) => {
       if (topbitDisplay === TopBitDisplay.CREATE_RECIPE) {
         dispatch(actions.addFoodToRecipe(ingredient));

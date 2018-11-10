@@ -53,6 +53,7 @@ interface FoodCombo extends Nutritional {
  * Like Recipe, but can't be subdivided
  */
 export interface Meal extends FoodCombo, UIDed {
+  foods: Ingredient[];  // TODO Shouldn't actually expose this
   withFood(food: Ingredient): Meal;
   withoutFood(food: Ingredient): Meal;
 }
@@ -119,7 +120,7 @@ class NDBIngredient implements NDBed, Ingredient {
   }
 }
 
-export class CustomIngredient implements Ingredient {
+class CustomIngredient implements Ingredient {
   static new(
     name: string, fat: number, carbs: number, protein: number,
     calories: number, amount: number, unit: FOOD_UNIT
@@ -245,6 +246,8 @@ export class Recipe implements FoodCombo, Quantifiable, UIDed {
     readonly unit: FOOD_UNIT
   ) { /* noop */ }
 }
+
+export const ingredientFromJson = CustomIngredient.fromJson;
 
 export function scaleFood(
   ingredient: Nutritional & Quantifiable, amount: number

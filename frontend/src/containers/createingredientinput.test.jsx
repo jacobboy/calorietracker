@@ -31,7 +31,7 @@ describe('When ingredient create button is clicked', () => {
     wrapper.find('#carbsInput').simulate('change', { target: { value: carbs } })
     wrapper.find('#proteinInput').simulate('change', { target: { value: protein } })
     wrapper.find('#caloriesInput').simulate('change', { target: { value: calories } })
-    wrapper.find('#amountInput').simulate('change', { target: { value: amount } })
+    wrapper.find('#createIngredientAmountInput').simulate('change', { target: { value: amount } })
     wrapper.find('#submitIngredient').simulate('submit')
 
     expect(mockSave.mock.calls.length).toBe(1)
@@ -40,5 +40,7 @@ describe('When ingredient create button is clicked', () => {
     const expectedIngred = makeIngredient('foo', fat, carbs, protein, calories, amount, FOOD_UNIT.g, false)
     expectedIngred.uid = foundIngred.uid
     expect(foundIngred).toEqual(expectedIngred)
+
+    expect(store.getState().saved.ingredients).toEqual([expectedIngred])
   })
 })

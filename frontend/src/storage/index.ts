@@ -1,5 +1,5 @@
 import { Report } from '../ndbapi/classes';
-import { Ingredient, CustomIngredient, Recipe, ingredientFromReport } from '../classes';
+import { Ingredient, Recipe, ingredientFromJson, ingredientFromReport } from '../classes';
 
 function getKey(keyType: string) {
   // was '::' but Enzyme didn't like that
@@ -48,7 +48,7 @@ export function loadIngredient(ingredientId: string): Ingredient {
   const ingredStr = window.localStorage.getItem(ingredientId);
   if (ingredStr !== null) {
     console.log('Retrieved ' + ingredientId + ' from window storage');
-    return CustomIngredient.fromJson(ingredStr);
+    return ingredientFromJson(ingredStr);
   } else {
     throw new Error('Ingredient ' + ingredientId + ' not found.');
   }
