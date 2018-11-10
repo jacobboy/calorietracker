@@ -48,12 +48,13 @@ export class CreateIngredientInput extends React.Component<
   }
 
   // TODO figure out how to do these macronutrient handlers programmatically
-  /* handleInput(macronutrient: string) {
+  /* handleInput(macronutrient: ('fat' | 'carbs' | 'protein')) {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = Number(event.target.value);
-      this.setState({macronutrient: value; });
+      const newState = { ...this.state, macronutrient: value };
+      this.setState(newState);
       if (this.state.useCalculatedCalories) {
-        const calories = state.fat * 9 + state.carbs * 4 + state.protein * 4;
+        const calories = this.state.fat * 9 + this.state.carbs * 4 + this.state.protein * 4;
         this.setState({ calories });
       }
     };
@@ -62,52 +63,45 @@ export class CreateIngredientInput extends React.Component<
   updateCalories(state: CreateIngredientInputState) {
     if (this.state.useCalculatedCalories) {
       const calories = state.fat * 9 + state.carbs * 4 + state.protein * 4;
-      console.log(`updating calories to ${calories}`);
       this.setState({ calories });
     }
   }
 
   handleFatInput(event: React.ChangeEvent<HTMLInputElement>) {
     const fat = Number(event.target.value);
-    console.log(`updating fat to ${fat}`);
     this.setState({ fat });
     this.updateCalories({ ...this.state, fat });
   }
 
   handleCarbsInput(event: React.ChangeEvent<HTMLInputElement>) {
     const carbs = Number(event.target.value);
-    console.log(`updating carbs to ${carbs}`);
     this.setState({ carbs });
     this.updateCalories({ ...this.state, carbs });
   }
 
   handleProteinInput(event: React.ChangeEvent<HTMLInputElement>) {
     const protein = Number(event.target.value);
-    console.log(`updating protein to ${protein}`);
     this.setState({ protein });
     this.updateCalories({ ...this.state, protein });
   }
 
   handleCaloriesInput(event: React.ChangeEvent<HTMLInputElement>) {
     const calories = Number(event.target.value);
-    console.log(`updating calories to ${calories}`);
     this.setState({ calories });
   }
 
   handleAmountInput(event: React.ChangeEvent<HTMLInputElement>) {
     const amount = Number(event.target.value);
-    console.log(`updating amount to ${amount}`);
     this.setState({ amount });
   }
 
   handleUnitInput(event: React.ChangeEvent<HTMLSelectElement>) {
     const unit = FOOD_UNIT[event.target.value];
-    console.log(`updating unit to ${unit}`);
     this.setState({ unit });
   }
 
   handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    console.log('handling ingredient submit');
+
     event.preventDefault();
     const { name, fat, carbs, protein, calories, amount, unit } = this.state;
     this.props.handleSubmit(name, fat, carbs, protein, calories, amount, unit);

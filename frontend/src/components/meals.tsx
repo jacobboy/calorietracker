@@ -34,10 +34,10 @@ export class MealsComponent extends React.Component<
   renderRows() {
     const rows = [];
     for (let mealIdx = 0; mealIdx < this.props.today.length; mealIdx++) {
-      const meal: Meal = this.props.today[mealIdx];      
-      const removeHandler = (foodIdx: number) => {
-        this.props.handleRemoveFoodClick(mealIdx, meal.foods[foodIdx]);
-      };  
+      const meal: Meal = this.props.today[mealIdx];
+      const removeHandler = (food: Ingredient) => {
+        this.props.handleRemoveFoodClick(mealIdx, food);
+      };
       const deleteHandler = () => {
         this.props.handleDeleteMealClick(mealIdx);
       };

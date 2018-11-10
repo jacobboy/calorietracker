@@ -3,6 +3,12 @@ import { ReportNutrient, Report } from './ndbapi/classes';
 import { scaleQuantity } from './transforms';
 import { saveIngredient, saveRecipe, getIngredientKey, getNdbKey, getRecipeKey, getMealKey } from './storage';
 
+export enum MACROS {
+  'fat' = 'fat',
+  'carbs' = 'carbs',
+  'protein' = 'protein'
+}
+
 const CALORIES_ID = '208';
 const PROTEIN_ID = '203';
 const FAT_ID = '204';
@@ -190,7 +196,12 @@ class MealImpl implements Meal {
   get carbs() { return this.foods.reduce((l, r) => l + r.carbs, 0); }
   withFood(food: Ingredient): Meal { return new MealImpl([...this.foods, food]); }
   withoutFood(food: Ingredient): Meal {
-    return new MealImpl(this.foods.filter(f => f !== food));
+    if (this.foods.find((f) => f === food) !== undefined) {
+      return new MealImpl(this.foods.filter(f => f !== food));
+    } else {
+      console.log(`Food not found: ${JSON.stringify(food)} in ${this.foods.map(f => f.uid)}`);
+      return this;
+    }
   }
 }
 

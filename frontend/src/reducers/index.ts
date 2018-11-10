@@ -21,7 +21,7 @@ import { dropElement, replaceElement } from '../datautil';
 import { meal, Ingredient, Meal } from '../classes';
 
 function mealIdxOrLast(state: StoreState, mealIdx?: number) {
-  return mealIdx || (state.today.length - 1);
+  return mealIdx === undefined ? (state.today.length - 1) : mealIdx;
 }
 
 function addFoodToMeal(
@@ -39,6 +39,7 @@ function removeFoodFromMeal(
   payload: { mealIdx: number, food: Ingredient }
 ) {
   const idx = mealIdxOrLast(state, payload.mealIdx);
+  // console.log(`removing food ${JSON.stringify(payload.food)} from meal ${idx}`);
   const newMeal = state.today[idx].withoutFood(payload.food);
   const today = replaceElement(state.today, idx, newMeal);
   return { ...state, today };

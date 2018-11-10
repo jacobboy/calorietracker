@@ -4,7 +4,7 @@ import { tdStyle, thStyle } from '../style';
 
 interface IngredientsTableProps {
   foods: Ingredient[];
-  handleRemoveClick: (foodIdx: number) => void;
+  handleRemoveClick: (food: Ingredient) => void;
   handleDeleteClick: () => void;
 }
 
@@ -18,9 +18,9 @@ export class IngredientsTable extends React.Component<
 
   ingredientCell(text: string | number) {
     return <td style={tdStyle}>{text}</td>;
-  }  
+  }
 
-  makeFoodRow(food: Ingredient, foodIdx: number) {
+  makeFoodRow(food: Ingredient) {
     return (
       <tr key={food.uid} id={'food_' + food.uid}>
         {this.ingredientCell(food.name)}
@@ -30,9 +30,9 @@ export class IngredientsTable extends React.Component<
         {this.ingredientCell(food.protein)}
         {this.ingredientCell(food.calories)}
         <td style={tdStyle}>
-          <button 
+          <button
             id={'removeFood_' + food.uid}
-            onClick={() => this.props.handleRemoveClick(foodIdx)}
+            onClick={() => this.props.handleRemoveClick(food)}
           >
             Remove
           </button>
@@ -56,7 +56,7 @@ export class IngredientsTable extends React.Component<
         {this.mealCell(recipe.reduce((l, r) => l + r.protein, 0))}
         {this.mealCell(recipe.reduce((l, r) => l + r.calories, 0))}
         <th>
-          <button 
+          <button
             id={'deleteMeal'}
             onClick={() => this.props.handleDeleteClick()}
           >
@@ -65,18 +65,16 @@ export class IngredientsTable extends React.Component<
         </th>
       </tr>
     );
-  }  
+  }
 
   renderRows() {
     const rows = [];
-    for (let foodIdx = 0; foodIdx < this.props.foods.length; foodIdx++) {
-      let food = this.props.foods[foodIdx];      
-      rows.push(this.makeFoodRow(food, foodIdx));
-
+    for (let food of this.props.foods) {
+      rows.push(this.makeFoodRow(food));
     }
     rows.push(this.makeTotalRow(this.props.foods));
     return rows;
-  }  
+  }
 
   render() {
     return (

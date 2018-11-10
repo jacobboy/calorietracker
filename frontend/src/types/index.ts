@@ -1,8 +1,8 @@
 import { Meal, Ingredient, Recipe, Named, NDBed } from '../classes';
 import { DataSource } from '../ndbapi';
-import { 
-  getAllCustomIngredients, 
-  getAllStoredIngredients, 
+import {
+  getAllCustomIngredients,
+  getAllStoredIngredients,
   getAllRecipes,
  } from '../storage';
 
@@ -44,8 +44,8 @@ export interface StoreState {
   saved: SavedState;
 }
 
-export const initialState: StoreState = {
-  topbit: { 
+export const emptyState: StoreState = {
+  topbit: {
     display: TopBitDisplay.MEALS,
     recipe: []
   },
@@ -60,6 +60,16 @@ export const initialState: StoreState = {
   },
   today: [],
   saved: {
+    ndbs: [],
+    ingredients: [],
+    recipes: []
+  }
+};
+
+export const initialState: StoreState = {
+  ...emptyState,
+  saved: {
+    ...emptyState.saved,
     ndbs: getAllStoredIngredients(),
     ingredients: getAllCustomIngredients(),
     recipes: getAllRecipes()
