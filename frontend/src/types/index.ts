@@ -33,7 +33,11 @@ export enum Modals {
 
 export class TopBitState {
   display: TopBitDisplay;
-  recipe: Ingredient[];
+  recipe: {
+    foods: Ingredient[],
+    /* amount: number,
+    unit: FOOD_UNIT */
+  };
 }
 
 export interface StoreState {
@@ -47,7 +51,11 @@ export interface StoreState {
 export const emptyState: StoreState = {
   topbit: {
     display: TopBitDisplay.MEALS,
-    recipe: []
+    recipe: {
+      foods: [],
+      /* amount: 100,
+      unit: FOOD_UNIT.g */
+    }
   },
   search: {
     searchString: '',

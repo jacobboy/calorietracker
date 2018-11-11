@@ -37,6 +37,7 @@ export class IngredientRow extends React.Component<
     // scale again here to get around hitting submit twice putting same key in meals list
     const ingred = scaleFood(this.props.item, this.state.scaledIngredient.amount);
     this.props.onTrackClick(ingred, this.props.topbitDisplay);
+    this.setState({ scaledIngredient: this.props.item });
   }
 
   render() {
@@ -47,8 +48,13 @@ export class IngredientRow extends React.Component<
         <td key="carbs">{this.state.scaledIngredient.carbs}</td>
         <td key="protein">{this.state.scaledIngredient.protein}</td>
         <td key="calories">{this.state.scaledIngredient.calories}</td>
-        <td id="trackFoodAmountInput" key="amount">
-          <input type="number" value={this.state.scaledIngredient.amount} onChange={(e) => this.handleAmount(e)} />
+        <td key="amount">
+          <input
+            id="trackFoodAmountInput"
+            type="number"
+            value={this.state.scaledIngredient.amount}
+            onChange={(e) => this.handleAmount(e)}
+          />
         </td>
         <td key="unit">{this.state.scaledIngredient.unit}</td>
         <td key="submit">

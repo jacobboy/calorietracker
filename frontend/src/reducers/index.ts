@@ -17,7 +17,7 @@ import {
   CHANGE_DAY,
   SAVE_INGREDIENT
 } from '../constants/index';
-import { dropElement, replaceElement } from '../datautil';
+import { dropIndex, replaceElement } from '../datautil';
 import { meal, Ingredient, Meal } from '../classes';
 
 function mealIdxOrLast(state: StoreState, mealIdx?: number) {
@@ -80,7 +80,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
     case REMOVE_MEAL:
       return {
         ...state,
-        today: dropElement(state.today, action.payload)
+        today: dropIndex(state.today, action.payload)
       };
     case ADD_FOOD_TO_MEAL:
       return addFoodToMeal(state, action.payload);
@@ -99,7 +99,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
         ...state,
         saved: {
           ...state.saved,
-          ingredients: state.saved.ingredients.concat(action.payload)
+          ingredients: [...state.saved.ingredients, action.payload]
         }
       };
     case CREATE_RECIPE_OPEN:
@@ -115,7 +115,10 @@ export function reducer(state: StoreState, action: Actions): StoreState {
         ...state,
         topbit: {
           ...state.topbit,
-          recipe: state.topbit.recipe.concat(action.payload)
+          recipe: {
+            ...state.topbit.recipe,
+            foods: [...state.topbit.recipe.foods, action.payload]
+          }
         }
       };
     case REMOVE_FOOD_FROM_RECIPE:
@@ -123,7 +126,10 @@ export function reducer(state: StoreState, action: Actions): StoreState {
         ...state,
         topbit: {
           ...state.topbit,
-          recipe: dropElement(state.topbit.recipe, action.payload)
+          recipe: {
+            ...state.topbit.recipe,
+            foods: state.topbit.recipe.foods.filter((f) => f !== action.payload)
+          }
         }
       };
     case CREATE_RECIPE_SUBMIT:
@@ -131,11 +137,11 @@ export function reducer(state: StoreState, action: Actions): StoreState {
         ...state,
         topbit: {
           ...state.topbit,
-          recipe: []
+          recipe: { ...state.topbit.recipe, foods: [] }
         },
         saved: {
           ...state.saved,
-          recipes: state.saved.recipes.concat(action.payload)
+          recipes: [...state.saved.recipes, action.payload]
         }
       };
     case SAVE_INGREDIENT:
@@ -143,7 +149,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
         ...state,
         saved: {
           ...state.saved,
-          ndbs: state.saved.ndbs.concat(action.payload)
+          ndbs: [...state.saved.ndbs, action.payload]
         }
       };
     case CHANGE_DAY:

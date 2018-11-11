@@ -63,6 +63,7 @@ export class MealsComponent extends React.Component<
       <tr>
         {this.headerCell('')}
         {this.headerCell('Amount')}
+        {this.headerCell('Unit')}
         {this.headerCell('Fat')}
         {this.headerCell('Carbs')}
         {this.headerCell('Protein')}
@@ -81,6 +82,7 @@ export class MealsComponent extends React.Component<
             {this.renderRows()}
             <tr>
               <th style={thStyle}>Day Total</th>
+              <th style={thStyle} />
               <th style={thStyle} />
               <th style={thStyle}>
                 {this.props.today.reduce((l, r) => l + r.fat, 0)}

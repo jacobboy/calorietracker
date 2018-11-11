@@ -31,7 +31,7 @@ interface ActionWithPayload<T extends string, P> extends Action<T> {
 function createAction<T extends string>(type: T): Action<T>;
 function createAction<T extends string, P>(type: T, payload: P): ActionWithPayload<T, P>;
 function createAction<T extends string, P>(type: T, payload?: P) {
-  console.log('Creating action: ' + type + '\nwith payload: \n' + JSON.stringify(payload));
+  // console.log('Creating action: ' + type + '\nwith payload: \n' + JSON.stringify(payload));
   // TODO was payload ?, but that failed with a payload of 0
   // is there a point to this check now?
   return payload !== undefined ? { type, payload } : { type };
@@ -56,11 +56,11 @@ function addFoodToRecipe(ingredient: Ingredient) {
   return createAction(ADD_FOOD_TO_RECIPE, ingredient);
 }
 
-function removeFoodFromRecipe(foodIdx: number) {
-  return createAction(REMOVE_FOOD_FROM_RECIPE, foodIdx);
+function removeFoodFromRecipe(food: Ingredient) {
+  return createAction(REMOVE_FOOD_FROM_RECIPE, food);
 }
 
-function createRecipe(
+function saveRecipe(
   name: string, foods: Ingredient[], amount?: number, unit?: FOOD_UNIT
 ) {
   const recipe = makeRecipe(name, foods, amount, unit);
@@ -93,7 +93,7 @@ export const actions = {
   createRecipeOpen: () => createAction(CREATE_RECIPE_OPEN),
   addFoodToRecipe: addFoodToRecipe,
   removeFoodFromRecipe: removeFoodFromRecipe,
-  createRecipeSubmit: createRecipe,
+  saveRecipe: saveRecipe,
   saveIngredient: saveIngredient,
   setDay: (day: Date) => createAction(CHANGE_DAY, day)
 };

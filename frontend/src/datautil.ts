@@ -1,4 +1,4 @@
-export function dropElement<T>(arr: Array<T>, idx: number): Array<T> {
+export function dropIndex<T>(arr: Array<T>, idx: number): Array<T> {
   return [...arr.slice(0, idx), ...arr.slice(idx + 1)];
 }
 

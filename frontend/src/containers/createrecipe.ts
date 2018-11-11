@@ -7,17 +7,17 @@ import { FOOD_UNIT, Ingredient } from '../classes';
 
 function mapStateToProps(state: StoreState) {
   return {
-    recipe: state.topbit.recipe
+    foods: state.topbit.recipe.foods
   };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
-    handleRemoveFoodClick: (foodIdx: number) => {
-      dispatch(actions.removeFoodFromRecipe(foodIdx));
+    handleRemoveFoodClick: (food: Ingredient) => {
+      dispatch(actions.removeFoodFromRecipe(food));
     },
     handleSaveRecipeClick: (name: string, foods: Ingredient[], amount?: number, unit?: FOOD_UNIT) => {
-        dispatch(actions.createRecipeSubmit(name, foods, amount, unit));
+        dispatch(actions.saveRecipe(name, foods, amount, unit));
     }
   };
 }

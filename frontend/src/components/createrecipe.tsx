@@ -4,8 +4,8 @@ import { thStyle, tableStyle } from '../style';
 import { IngredientsTable } from './ingredientstable';
 
 interface CreateRecipeInputProps {
-  recipe: Ingredient[];
-  handleRemoveFoodClick: (foodIdx: number) => void;
+  foods: Ingredient[];
+  handleRemoveFoodClick: (food: Ingredient) => void;
   handleSaveRecipeClick: (name: string, foods: Ingredient[], amount?: number, unit?: FOOD_UNIT) => void;
 }
 
@@ -37,6 +37,7 @@ export class CreateRecipeInput extends React.Component<
       <tr>
         {this.headerCell('')}
         {this.headerCell('Amount')}
+        {this.headerCell('Unit')}
         {this.headerCell('Fat')}
         {this.headerCell('Carbs')}
         {this.headerCell('Protein')}
@@ -47,30 +48,46 @@ export class CreateRecipeInput extends React.Component<
   }
 
   onSaveRecipeClick() {
-      if (this.props.recipe.length > 0) {
+      if (this.props.foods.length > 0) {
         this.props.handleSaveRecipeClick(
-            this.state.name, this.props.recipe, this.state.amount, this.state.unit
+            this.state.name, this.props.foods, this.state.amount, this.state.unit
         );
       }
   }
 
+  handleAmountInput(event: React.ChangeEvent<HTMLInputElement>) {
+    const amount = Number(event.target.value);
+    this.setState({ amount });
+  }
+
+  handleUnitInput(event: React.ChangeEvent<HTMLSelectElement>) {
+    const unit = FOOD_UNIT[event.target.value];
+    if (unit !== undefined) {
+      this.setState({ unit });
+    }
+  }
+
   render() {
     return (
-        <div>
-          <table style={tableStyle}>
-            <tbody>
-              {this.headerRow()}
-              <IngredientsTable 
-                 foods={this.props.recipe}
-                 handleRemoveClick={this.props.handleRemoveFoodClick}
-                 handleDeleteClick={() => null}
-              />
-            </tbody>
-          </table>
-          <button onClick={() => this.onSaveRecipeClick()} >
-            Save Recipe
-          </button>
-        </div>
-      );
-    }  
+      <div>
+        <table style={tableStyle}>
+          <tbody>
+            {this.headerRow()}
+            <IngredientsTable
+               foods={this.props.foods}
+               handleRemoveClick={this.props.handleRemoveFoodClick}
+               handleDeleteClick={() => null}
+               handleAmountInput={(e) => this.handleAmountInput(e)}
+               amount={this.state.amount}
+               handleUnitInput={(e) => this.handleUnitInput(e)}
+               unit={this.state.unit}
+            />
+          </tbody>
+        </table>
+        <button id="saveRecipe" onClick={() => this.onSaveRecipeClick()} >
+          Save Recipe
+        </button>
+      </div>
+    );
+  }
 }
