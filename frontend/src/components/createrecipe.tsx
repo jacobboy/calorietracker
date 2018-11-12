@@ -128,6 +128,7 @@ export class CreateRecipeInput extends React.Component<
           <input
             id="recipePortionInput"
             type="number"
+            // onFocus="this.value=''"
             value={this.state.portionSize}
             onChange={(e) => this.handlePortionSizeInput(e)}
           />

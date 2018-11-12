@@ -20,7 +20,8 @@ function recipeId() { return getRecipeKey(uuid.v4()); }
 function mealId() { return getMealKey(uuid.v4()); }
 
 export enum FOOD_UNIT {
-  'g' = 'g'
+  'g' = 'g',
+  'ml' = 'ml'
 }
 
 export interface Named {

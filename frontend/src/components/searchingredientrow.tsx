@@ -21,7 +21,7 @@ export class SearchIngredientRow extends React.Component<
   }
 
   handleDetailsClick() {
-    getIngredient(this.props.item).then((ingred) => this.setState({ingred}));
+    getIngredient(this.props.item, false).then((ingred) => this.setState({ ingred }));
   }
 
   render() {
@@ -58,6 +58,6 @@ export class SearchIngredientRow extends React.Component<
           </td>
         </tr >
       );
-    }    
+    }
   }
 }
