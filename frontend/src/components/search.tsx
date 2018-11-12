@@ -60,6 +60,7 @@ export class SearchComponent extends React.Component<
             Name:
             <input
               type="text"
+              placeholder="Search USDA Database"
               value={this.props.searchString || ''}
               onChange={(e) => this.handleSearchChange(e)}
             />
