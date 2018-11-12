@@ -5,7 +5,7 @@ import { mount } from 'enzyme';
 import { createStore, Store, AnyAction } from 'redux';
 import { reducer } from '../reducers';
 import { Provider } from 'react-redux';
-import { FOOD_UNIT, makeIngredient, meal, scaleFood, Ingredient, Meal } from '../classes';
+import { FOOD_UNIT, makeIngredient, meal, scaleFoodTo, Ingredient, Meal } from '../classes';
 import { TopBitDisplay, TopBitState, emptyState } from '../types';
 
 // TODO try these with foods already in the meal/recipe
@@ -40,7 +40,7 @@ describe('When the track food button is clicked', () => {
     );
     wrapper.find('#trackFoodSubmit').simulate('click');
 
-    const expectedIngred = scaleFood(thisIngred, newAmount);
+    const expectedIngred = scaleFoodTo(thisIngred, newAmount);
     expect(store.getState().today.length).toEqual(1);
     verifyIngredientList(
       store.getState().today[0].foods, [expectedIngred]
@@ -83,7 +83,7 @@ describe('When the track food button is clicked', () => {
     );
     wrapper.find('#trackFoodSubmit').simulate('click');
 
-    const expectedIngred = scaleFood(thisIngred, newAmount);
+    const expectedIngred = scaleFoodTo(thisIngred, newAmount);
     expect(store.getState().topbit.recipe.foods.length).toEqual(1);
     verifyIngredientList(store.getState().topbit.recipe.foods, [expectedIngred]);
   });

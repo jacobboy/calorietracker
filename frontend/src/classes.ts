@@ -36,15 +36,15 @@ export interface NDBed {
 }
 
 export interface Nutritional {
-  readonly protein: number;
   readonly fat: number;
   readonly carbs: number;
+  readonly protein: number;
   readonly calories: number;
 }
 
 export interface Quantifiable extends Named {
   readonly amount: number;
-  readonly unit: FOOD_UNIT;
+  readonly unit: string;
 }
 
 export interface Ingredient extends Nutritional, Quantifiable, UIDed { }
@@ -161,7 +161,7 @@ class ScaledFood implements Ingredient {
   readonly uid: string;
   readonly food: Nutritional & Quantifiable;
   readonly amount: number;
-  readonly unit: FOOD_UNIT;
+  readonly unit: string;
   readonly name: string;
   readonly fat: number;
   readonly carbs: number;
@@ -205,44 +205,41 @@ class MealImpl implements Meal {
   }
 }
 
-export class Recipe implements FoodCombo, Quantifiable, UIDed {
+export class Recipe implements UIDed {
 
-  static new(name: string, foods: Ingredient[], amount?: number, unit?: FOOD_UNIT) {
-    const uid = recipeId();
-    const calories = foods.reduce((l, r) => l + r.calories, 0);
-    const protein = foods.reduce((l, r) => l + r.protein, 0);
-    const fat = foods.reduce((l, r) => l + r.fat, 0);
-    const carbs = foods.reduce((l, r) => l + r.carbs, 0);
-    if (amount === undefined) {
-      amount = foods.reduce((l, r) => l + r.amount, 0);
-    }
+  static new(name: string, foods: Ingredient[], portionSize: number, totalSize?: number, unit?: string) {
     if (unit === undefined) {
-      const units: Set<FOOD_UNIT> = new Set(foods.map(f => f.unit));
+      const units = new Set(foods.map(f => f.unit));
       if (units.size !== 1) {
         // TODO propery way to handle this?
-        throw 'Not all foods are the same unit, unit must be provided';
+        throw `Food units must be the same if unit not provided, found ${Array.from(units).join(', ')}`;
       }
+      unit = foods[0].unit;
     }
+    if (totalSize === undefined) {
+      totalSize = foods.reduce((l, r) => l + r.amount, 0);
+    }
+    const portionRatio = portionSize / totalSize;
+
+    const calories = foods.reduce((l, r) => l + r.calories, 0) * portionRatio;
+    const protein = foods.reduce((l, r) => l + r.protein, 0) * portionRatio;
+    const fat = foods.reduce((l, r) => l + r.fat, 0) * portionRatio;
+    const carbs = foods.reduce((l, r) => l + r.carbs, 0) * portionRatio;
+
+    const uid = recipeId();
     return new Recipe(
       uid, name, foods, fat, carbs, protein,
-      calories, amount, unit || foods[0].unit
+      calories, portionSize, unit, portionRatio
     );
   }
 
   static fromJson(jsonStr: string): Recipe {
     const {
-      uid, name, foods, fat, carbs, protein, calories, amount, unit
+      uid, name, foods, fat, carbs, protein, calories, amount, unit, portionRatio
     } = JSON.parse(jsonStr);
     return new Recipe(
-      uid, name, foods, fat, carbs, protein, calories, amount, unit
+      uid, name, foods, fat, carbs, protein, calories, amount, unit, portionRatio
     );
-  }
-
-  withFood(food: Ingredient): Recipe {
-    return Recipe.new(this.name, [...this.foods, food]);
-  }
-  withoutFood(food: Ingredient): Recipe {
-    return Recipe.new(this.name, this.foods.filter(f => f !== food));
   }
 
   private constructor(
@@ -254,15 +251,23 @@ export class Recipe implements FoodCombo, Quantifiable, UIDed {
     readonly protein: number,
     readonly calories: number,
     readonly amount: number,
-    readonly unit: FOOD_UNIT
+    readonly unit: string,
+    readonly portionRatio: number,
   ) { /* noop */ }
 }
 
 export const ingredientFromJson = CustomIngredient.fromJson;
 
-export function scaleFood(
+export function scaleFoodTo(
   ingredient: Nutritional & Quantifiable, amount: number
 ): Ingredient {
+  return new ScaledFood(ingredient, amount);
+}
+
+export function scaleFoodBy(
+  ingredient: Nutritional & Quantifiable, ratio: number
+): Ingredient {
+  const amount = ingredient.amount * ratio;
   return new ScaledFood(ingredient, amount);
 }
 
@@ -276,7 +281,24 @@ export function makeIngredient(
   unit: FOOD_UNIT,
   persist: boolean = true
 ) {
-  const ingred = CustomIngredient.new(name, fat, carbs, protein, calories, amount, unit);
+  return makeScaledIngredient(name, fat, carbs, protein, calories, amount, amount, unit, persist);
+}
+
+export function makeScaledIngredient(
+  name: string,
+  fat: number,
+  carbs: number,
+  protein: number,
+  calories: number,
+  amount: number,
+  convertAmount: number,
+  unit: FOOD_UNIT,
+  persist: boolean = true
+) {
+  const [sFat, sCarbs, sProtein, sCalories] = [fat, carbs, protein, calories].map(
+    (m) => scaleQuantity(m, amount, convertAmount)
+  );
+  const ingred = CustomIngredient.new(name, sFat, sCarbs, sProtein, sCalories, convertAmount, unit);
   if (persist) {
     saveIngredient(ingred);
   }
@@ -288,9 +310,9 @@ export function ingredientFromReport(report: Report): Ingredient {
 }
 
 export function makeRecipe(
-  name: string, foods: Ingredient[], amount?: number, unit?: FOOD_UNIT
+  name: string, foods: Ingredient[], portionSize: number, totalSize?: number, unit?: string
 ): Recipe {
-  const recipe = Recipe.new(name, foods, amount, unit);
+  const recipe = Recipe.new(name, foods, portionSize, totalSize, unit);
   saveRecipe(recipe);
   return recipe;
 }

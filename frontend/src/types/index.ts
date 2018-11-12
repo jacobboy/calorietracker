@@ -6,19 +6,19 @@ import {
   getAllRecipes,
  } from '../storage';
 
-interface SavedState {
+export interface SavedState {
   ndbs: Ingredient[];
   ingredients: Ingredient[];
   recipes: Recipe[];
 }
 
-interface SearchState {
+export interface SearchState {
   searchString: string;
   dataSource: DataSource;
   items: (NDBed & Named)[];
 }
 
-interface TrackingState {
+export interface TrackingState {
   mealIdx?: number;
   ingredient?: Ingredient;
 }

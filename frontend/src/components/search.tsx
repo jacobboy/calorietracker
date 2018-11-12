@@ -70,7 +70,7 @@ export class SearchComponent extends React.Component<
         <table>
           <tbody>
             <tr>
-              <td>Name</td>              
+              <td>Name</td>
               <td>Fat</td>
               <td>Carbs</td>
               <td>Protein</td>

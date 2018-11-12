@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Ingredient, scaleFood } from '../classes';
+import { Ingredient, scaleFoodTo } from '../classes';
 import { TopBitDisplay } from '../types';
 
 interface IngredientRowProps {
@@ -28,14 +28,14 @@ export class IngredientRow extends React.Component<
     const amount = Number(event.target.value);
     if (!isNaN(amount)) {
       this.setState(
-        {scaledIngredient: scaleFood(this.props.item, amount)}
+        {scaledIngredient: scaleFoodTo(this.props.item, amount)}
       );
     }
   }
 
   handleTrackClick() {
     // scale again here to get around hitting submit twice putting same key in meals list
-    const ingred = scaleFood(this.props.item, this.state.scaledIngredient.amount);
+    const ingred = scaleFoodTo(this.props.item, this.state.scaledIngredient.amount);
     this.props.onTrackClick(ingred, this.props.topbitDisplay);
     this.setState({ scaledIngredient: this.props.item });
   }

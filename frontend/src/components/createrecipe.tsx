@@ -6,13 +6,18 @@ import { IngredientsTable } from './ingredientstable';
 interface CreateRecipeInputProps {
   foods: Ingredient[];
   handleRemoveFoodClick: (food: Ingredient) => void;
-  handleSaveRecipeClick: (name: string, foods: Ingredient[], amount?: number, unit?: FOOD_UNIT) => void;
+  handleSaveRecipeClick: (name: string,
+                          foods: Ingredient[],
+                          portionSize: number,
+                          totalSize: number,
+                          unit: string) => void;
 }
 
 interface CreateRecipeInputState {
     name: string;
-    amount: number;
     unit: FOOD_UNIT;
+    useCalculatedAmount: boolean;
+    totalSize?: number;
 }
 
 export class CreateRecipeInput extends React.Component<
@@ -23,9 +28,14 @@ export class CreateRecipeInput extends React.Component<
     super(props);
     this.state = {
         name: 'My Bitchin\' Recipe',
-        amount: 100,
-        unit: FOOD_UNIT.g
+        totalSize: undefined,
+        unit: FOOD_UNIT.g,
+        useCalculatedAmount: true
     };
+  }
+
+  getTotalSize() {
+    return this.state.totalSize || this.props.foods.reduce((l, r) => l + r.amount, 0);
   }
 
   headerCell(text: string) {
@@ -50,14 +60,14 @@ export class CreateRecipeInput extends React.Component<
   onSaveRecipeClick() {
       if (this.props.foods.length > 0) {
         this.props.handleSaveRecipeClick(
-            this.state.name, this.props.foods, this.state.amount, this.state.unit
+            this.state.name, this.props.foods, 100, this.getTotalSize(), this.state.unit
         );
       }
   }
 
   handleAmountInput(event: React.ChangeEvent<HTMLInputElement>) {
-    const amount = Number(event.target.value);
-    this.setState({ amount });
+    const totalSize = Number(event.target.value);
+    this.setState({ totalSize, useCalculatedAmount: false });
   }
 
   handleUnitInput(event: React.ChangeEvent<HTMLSelectElement>) {
@@ -78,7 +88,7 @@ export class CreateRecipeInput extends React.Component<
                handleRemoveClick={this.props.handleRemoveFoodClick}
                handleDeleteClick={() => null}
                handleAmountInput={(e) => this.handleAmountInput(e)}
-               amount={this.state.amount}
+               amount={this.getTotalSize()}
                handleUnitInput={(e) => this.handleUnitInput(e)}
                unit={this.state.unit}
             />

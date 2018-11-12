@@ -39,9 +39,19 @@ function loadReportFromKey(key: string): Report | null {
 }
 
 export function saveIngredient(ingredient: Ingredient): void {
-  const ingredStr = JSON.stringify(ingredient);
+  // const objKeys = ['uid', 'fat', 'carbs', 'protein', 'calories', 'amount', 'unit'];
+  const obj = {
+    uid: ingredient.uid,
+    fat: ingredient.fat,
+    carbs: ingredient.carbs,
+    protein: ingredient.protein,
+    calories: ingredient.calories,
+    amount: ingredient.amount,
+    unit: ingredient.unit,
+  };
+  const ingredStr = JSON.stringify(obj);
   window.localStorage.setItem(ingredient.uid, ingredStr);
-  console.log('Saved ingredient\n' + ingredStr);
+  // console.log('Saved ingredient\n' + ingredStr);
 }
 
 export function loadIngredient(ingredientId: string): Ingredient {
@@ -58,13 +68,13 @@ export function saveRecipe(recipe: Recipe): void {
   const key = recipe.uid;
   const recipeStr = JSON.stringify(recipe);
   window.localStorage.setItem(key, recipeStr);
-  console.log('Saved recipe\n' + recipeStr);
+  // console.log('Saved recipe\n' + recipeStr);
 }
 
 export function loadRecipe(recipeId: string): Recipe {
   const recipeStr = window.localStorage.getItem(recipeId);
   if (recipeStr !== null) {
-    console.log('Retrieved ' + recipeId + ' from window storage');
+    // console.log('Retrieved ' + recipeId + ' from window storage');
     return Recipe.fromJson(recipeStr);
   } else {
     throw new Error('Recipe ' + recipeId + ' not found.');

@@ -18,10 +18,11 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
       protein: number,
       calories: number,
       amount: number,
+      convertAmount: number,
       unit: FOOD_UNIT
     ) => {
       dispatch(actions.createIngredientSubmit(
-        name, fat, carbs, protein, calories, amount, unit
+        name, fat, carbs, protein, calories, amount, convertAmount, unit
       ));
       dispatch(actions.createIngredientToggle(TopBitDisplay.MEALS));
     }

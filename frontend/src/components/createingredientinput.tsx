@@ -9,6 +9,7 @@ interface CreateIngredientInputProps {
     protein: number,
     calories: number,
     amount: number,
+    convertAmount: number,
     unit: FOOD_UNIT
   ) => void;
 }
@@ -20,6 +21,7 @@ interface CreateIngredientInputState {
   protein: number;
   calories: number;
   amount: number;
+  convertAmount: number;
   unit: FOOD_UNIT;
   useCalculatedCalories: boolean;
 }
@@ -37,6 +39,7 @@ export class CreateIngredientInput extends React.Component<
       protein: 0,
       calories: 0,
       amount: 100,
+      convertAmount: 100,
       unit: FOOD_UNIT.g,
       useCalculatedCalories: true
     };
@@ -92,7 +95,12 @@ export class CreateIngredientInput extends React.Component<
 
   handleAmountInput(event: React.ChangeEvent<HTMLInputElement>) {
     const amount = Number(event.target.value);
-    this.setState({ amount });
+    this.setState({ amount, convertAmount: amount });
+  }
+
+  handleConvertAmountInput(event: React.ChangeEvent<HTMLInputElement>) {
+    const convertAmount = Number(event.target.value);
+    this.setState({ convertAmount });
   }
 
   handleUnitInput(event: React.ChangeEvent<HTMLSelectElement>) {
@@ -101,10 +109,9 @@ export class CreateIngredientInput extends React.Component<
   }
 
   handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-
     event.preventDefault();
-    const { name, fat, carbs, protein, calories, amount, unit } = this.state;
-    this.props.handleSubmit(name, fat, carbs, protein, calories, amount, unit);
+    const { name, fat, carbs, protein, calories, amount, convertAmount, unit } = this.state;
+    this.props.handleSubmit(name, fat, carbs, protein, calories, amount, convertAmount, unit);
   }
 
   render() {
@@ -166,14 +173,25 @@ export class CreateIngredientInput extends React.Component<
               />
             </label>
           </li>
-          <li key="amount">
+          <li key="">
             <label>
-              Amount:
+              Amount for given macros:
               <input
                 id="createIngredientAmountInput"
                 type="number"
                 value={this.state.amount}
                 onChange={(e) => this.handleAmountInput(e)}
+              />
+            </label>
+          </li>
+          <li key="amount">
+            <label>
+              Convert to amount:
+              <input
+                id="createIngredientConvertAmountInput"
+                type="number"
+                value={this.state.convertAmount}
+                onChange={(e) => this.handleConvertAmountInput(e)}
               />
             </label>
           </li>
@@ -185,7 +203,7 @@ export class CreateIngredientInput extends React.Component<
                 value={this.state.unit}
                 onChange={(e) => this.handleUnitInput(e)}
               >
-                {Object.keys(FOOD_UNIT).map((unit) => (<option key={unit}>unit</option>))}
+                {Object.keys(FOOD_UNIT).map((unit) => (<option key={unit}>{unit}</option>))}
               </select>
             </label>
           </li>

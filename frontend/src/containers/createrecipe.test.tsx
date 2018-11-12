@@ -60,10 +60,13 @@ describe('Recipes', () => {
   }
 
   it('can be created', () => {
-    const amount = 101;
+    const title = 'My Bitchin\' Recipe';
+    const portionSize = 100;
+    const totalSize = 101;
     const unit = FOOD_UNIT.g;
-    const createdRecipe = makeRecipe('My Bitchin\' Recipe', foods, amount, unit);
-    wrapper.find('#recipeAmountInput').simulate('change', {target: { value: amount }});
+    const createdRecipe = makeRecipe(title, foods, portionSize, totalSize, unit);
+
+    wrapper.find('#recipeAmountInput').simulate('change', {target: { value: totalSize }});
     wrapper.find('#recipeUnitInput').simulate('change', {target: { value: unit }});
     wrapper.find('#saveRecipe').simulate('click');
 
@@ -73,16 +76,24 @@ describe('Recipes', () => {
     const foundRecipe = store.getState().saved.recipes[0];
     expect(foundRecipe.foods.length).toBe(nFoods);
 
-    expect(foundRecipe.amount).toBe(amount);
-    expect(foundRecipe.unit).toBe(unit);
+    expect(foundRecipe.name).toEqual(createdRecipe.name);
+    expect(foundRecipe.fat).toEqual(createdRecipe.fat);
+    expect(foundRecipe.carbs).toEqual(createdRecipe.carbs);
+    expect(foundRecipe.protein).toEqual(createdRecipe.protein);
+    expect(foundRecipe.calories).toEqual(createdRecipe.calories);
+    expect(foundRecipe.amount).toEqual(createdRecipe.amount);
+    expect(foundRecipe.amount).toBe(createdRecipe.amount);
+    expect(foundRecipe.unit).toBe(createdRecipe.unit);
 
-    const checkAttributes = ['name', 'fat', 'carbs', 'protein', 'calories', 'amount'];
     for (let i = 0; i < foundRecipe.foods.length; i++) {
       let foundFood = foundRecipe.foods[i];
       let expectedFood = createdRecipe.foods[i];
-      for (let attr of checkAttributes) {
-        expect(foundFood[attr]).toEqual(expectedFood[attr]);
-      }
+      expect(foundFood.name).toEqual(expectedFood.name);
+      expect(foundFood.fat).toEqual(expectedFood.fat);
+      expect(foundFood.carbs).toEqual(expectedFood.carbs);
+      expect(foundFood.protein).toEqual(expectedFood.protein);
+      expect(foundFood.calories).toEqual(expectedFood.calories);
+      expect(foundFood.amount).toEqual(expectedFood.amount);
     }
   });
 });

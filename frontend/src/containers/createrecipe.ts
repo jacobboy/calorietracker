@@ -3,7 +3,7 @@ import { actions, Actions } from '../actions/';
 import { StoreState } from '../types/index';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { FOOD_UNIT, Ingredient } from '../classes';
+import { Ingredient } from '../classes';
 
 function mapStateToProps(state: StoreState) {
   return {
@@ -16,8 +16,10 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
     handleRemoveFoodClick: (food: Ingredient) => {
       dispatch(actions.removeFoodFromRecipe(food));
     },
-    handleSaveRecipeClick: (name: string, foods: Ingredient[], amount?: number, unit?: FOOD_UNIT) => {
-        dispatch(actions.saveRecipe(name, foods, amount, unit));
+    handleSaveRecipeClick: (
+      name: string, foods: Ingredient[], portionSize: number, totalSize: number, unit: string
+    ) => {
+        dispatch(actions.saveRecipe(name, foods, portionSize, totalSize, unit));
     }
   };
 }
