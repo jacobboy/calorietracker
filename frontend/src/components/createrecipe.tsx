@@ -18,6 +18,7 @@ interface CreateRecipeInputState {
     unit: FOOD_UNIT;
     useCalculatedAmount: boolean;
     totalSize?: number;
+    portionSize: number;
 }
 
 export class CreateRecipeInput extends React.Component<
@@ -30,7 +31,8 @@ export class CreateRecipeInput extends React.Component<
         name: `${currentDate()} Bitchin\' Recipe`,
         totalSize: undefined,
         unit: FOOD_UNIT.g,
-        useCalculatedAmount: true
+        useCalculatedAmount: true,
+        portionSize: 100
     };
   }
 
@@ -68,12 +70,12 @@ export class CreateRecipeInput extends React.Component<
   onSaveRecipeClick() {
       if (this.props.foods.length > 0) {
         this.props.handleSaveRecipeClick(
-            this.state.name, this.props.foods, 100, this.getTotalSize(false), this.state.unit
+            this.state.name, this.props.foods, this.state.portionSize, this.getTotalSize(false), this.state.unit
         );
       }
   }
 
-  handleNameChange(event: React.ChangeEvent<HTMLInputElement>) {
+  handleNameInput(event: React.ChangeEvent<HTMLInputElement>) {
     this.setState({ name: event.target.value });
   }
 
@@ -87,6 +89,11 @@ export class CreateRecipeInput extends React.Component<
     if (unit !== undefined) {
       this.setState({ unit });
     }
+  }
+
+  handlePortionSizeInput(event: React.ChangeEvent<HTMLInputElement>) {
+    const portionSize = Number(event.target.value);
+    this.setState({ portionSize });
   }
 
   render() {
@@ -107,15 +114,24 @@ export class CreateRecipeInput extends React.Component<
           </tbody>
         </table>
         <label>
-            Name:
-            <input
-              id="recipeNameInput"
-              type="text"
-              placeholder="Recipe name"
-              value={this.state.name || ''}
-              onChange={(e) => this.handleNameChange(e)}
-            />
-          </label>
+          Name:
+          <input
+            id="recipeNameInput"
+            type="text"
+            placeholder="Recipe name"
+            value={this.state.name || ''}
+            onChange={(e) => this.handleNameInput(e)}
+          />
+        </label>
+        <label>
+          Portion size:
+          <input
+            id="recipePortionInput"
+            type="number"
+            value={this.state.portionSize}
+            onChange={(e) => this.handlePortionSizeInput(e)}
+          />
+        </label>
         <button id="saveRecipe" onClick={() => this.onSaveRecipeClick()} >
           Save Recipe
         </button>

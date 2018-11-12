@@ -61,12 +61,13 @@ describe('Recipes', () => {
 
   it('can be created', () => {
     const title = 'The Recipe';
-    const portionSize = 100;
+    const portionSize = 300;
     const totalSize = 101;
     const unit = FOOD_UNIT.g;
     const createdRecipe = makeRecipe(title, foods, portionSize, totalSize, unit);
 
     wrapper.find('#recipeNameInput').simulate('change', {target: { value: title }});
+    wrapper.find('#recipePortionInput').simulate('change', {target: { value: portionSize }});
     wrapper.find('#recipeAmountInput').simulate('change', {target: { value: totalSize }});
     wrapper.find('#recipeUnitInput').simulate('change', {target: { value: unit }});
     wrapper.find('#saveRecipe').simulate('click');
