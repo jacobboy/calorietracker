@@ -1,0 +1,32 @@
+* component
+* container
+* constant
+* action
+* reducer
+* state
+
+* TODO percentages
+* TODO edit recipe
+* TODO copy recipe
+* TODO math in cells
+* TODO set default amount of NDBIngredient
+* TODO expanded detail view says save, not track
+* TODO link to USDA page
+* TODO view recipe
+
+* TODO search ingredient and save to custom ingredients
+** TODO Consider client vs server side - don't pull entire report, right?
+   eventually that will be server sided
+* TODO fix meal/recipe
+** convert meal to recipe
+** don't remove from meal by index?
+** Does FoodCombo need to exist? If so, Why doesn't IngredientTable use it? Represent Meal as Food[]?
+* TODO save date with custom ingredients
+* TODO search pagination
+* TODO unit conversion / options
+* TODO NDBIngredient amount hardcoded to 100
+* TODO rename ingredient row and/or ingredient table, they are unrelated
+* TODO convert window storage saves to promises
+* TODO find consistent solution to conversion/portion nomenclature
+* TODO Recipe and ingredient input validation
+** everything filled out
