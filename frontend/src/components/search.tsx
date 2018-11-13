@@ -65,6 +65,7 @@ export class SearchComponent extends React.Component<
               onChange={(e) => this.handleSearchChange(e)}
             />
           </label>
+
           <input type="submit" value="Submit" />
         </form>
         Ingredients:

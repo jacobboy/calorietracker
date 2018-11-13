@@ -1,18 +1,12 @@
-* component
-* container
-* constant
-* action
-* reducer
-* state
-
 * TODO percentages
-* TODO edit recipe
+* TODO view/edit recipe
 * TODO copy recipe
 * TODO math in cells
 * TODO set default amount of NDBIngredient
-* TODO expanded detail view says save, not track
-* TODO link to USDA page
-* TODO view recipe
+* TODO expanded detail view should say save, not track
+* TODO link to USDA page in search row
+* TODO add to non-latest meal
+
 
 * TODO search ingredient and save to custom ingredients
 ** TODO Consider client vs server side - don't pull entire report, right?
