@@ -1,7 +1,7 @@
 import { Ingredient, FOOD_UNIT } from '../classes';
 import * as React from 'react';
 import { thStyle, tableStyle } from '../style';
-import { IngredientsTable } from './ingredientstable';
+import { IngredientsTable, mealCell } from './ingredientstable';
 
 interface CreateRecipeInputProps {
   foods: Ingredient[];
@@ -96,6 +96,38 @@ export class CreateRecipeInput extends React.Component<
     this.setState({ portionSize });
   }
 
+  macroPortion(reducer: (sum: number, ingredient: Ingredient) => Number) {
+    if (this.getTotalSize(false)) {
+      return (
+        Number(this.props.foods.reduce(reducer, 0)) * this.state.portionSize / this.getTotalSize(false)
+      ).toFixed();
+    } else {
+      return 0;
+    }
+  }
+
+  portionRow() {
+    return (
+      <tr key="portionRow">
+        <th>Portion</th>
+        <th>
+          <input
+            id="recipePortionInput"
+            type="number"
+            // onFocus="this.value=''"
+            value={this.state.portionSize}
+            onChange={(e) => this.handlePortionSizeInput(e)}
+          />
+        </th>
+        {mealCell(this.state.unit, 'portionUnit')}
+        {mealCell(this.macroPortion((l, r) => l + r.fat), 'portionFat', 'portionFat')}
+        {mealCell(this.macroPortion((l, r) => l + r.carbs), 'portionCarbs', 'portionCarbs')}
+        {mealCell(this.macroPortion((l, r) => l + r.protein), 'portionProtein', 'portionProtein')}
+        {mealCell(this.macroPortion((l, r) => l + r.calories), 'portionCalories', 'portionCalories')}
+      </tr>
+    );
+  }
+
   render() {
     return (
       <div>
@@ -111,6 +143,7 @@ export class CreateRecipeInput extends React.Component<
                handleUnitInput={(e) => this.handleUnitInput(e)}
                unit={this.state.unit}
             />
+            {this.portionRow()}
           </tbody>
         </table>
         <label>
@@ -121,16 +154,6 @@ export class CreateRecipeInput extends React.Component<
             placeholder="Recipe name"
             value={this.state.name || ''}
             onChange={(e) => this.handleNameInput(e)}
-          />
-        </label>
-        <label>
-          Portion size:
-          <input
-            id="recipePortionInput"
-            type="number"
-            // onFocus="this.value=''"
-            value={this.state.portionSize}
-            onChange={(e) => this.handlePortionSizeInput(e)}
           />
         </label>
         <button id="saveRecipe" onClick={() => this.onSaveRecipeClick()} >

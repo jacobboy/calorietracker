@@ -1,6 +1,6 @@
-* TODO percentages
-* TODO view/edit recipe
 * TODO copy recipe
+* TODO view/edit recipe
+* TODO percentages
 * TODO math in cells
 * TODO set default amount of NDBIngredient
 * TODO expanded detail view should say save, not track
@@ -14,7 +14,8 @@
 * TODO fix meal/recipe
 ** convert meal to recipe
 ** don't remove from meal by index?
-** Does FoodCombo need to exist? If so, Why doesn't IngredientTable use it? Represent Meal as Food[]?
+** Does FoodCombo need to exist? If so, Why doesn't IngredientTable use it?
+   Represent Meal as Food[]?
 * TODO save date with custom ingredients
 * TODO search pagination
 * TODO unit conversion / options

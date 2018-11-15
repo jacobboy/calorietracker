@@ -85,16 +85,16 @@ export class MealsComponent extends React.Component<
               <th style={thStyle} />
               <th style={thStyle} />
               <th style={thStyle}>
-                {this.props.today.reduce((l, r) => l + r.fat, 0)}
+                {this.props.today.reduce((l, r) => l + r.fat, 0).toFixed()}
               </th>
               <th style={thStyle}>
-                {this.props.today.reduce((l, r) => l + r.carbs, 0)}
+                {this.props.today.reduce((l, r) => l + r.carbs, 0).toFixed()}
               </th>
               <th style={thStyle}>
-                {this.props.today.reduce((l, r) => l + r.protein, 0)}
+                {this.props.today.reduce((l, r) => l + r.protein, 0).toFixed()}
               </th>
               <th style={thStyle}>
-                {this.props.today.reduce((l, r) => l + r.calories, 0)}
+                {this.props.today.reduce((l, r) => l + r.calories, 0).toFixed()}
               </th>
             </tr>
           </tbody>

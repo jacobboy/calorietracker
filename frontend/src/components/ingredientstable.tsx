@@ -12,6 +12,28 @@ interface IngredientsTableProps {
   unit?: FOOD_UNIT;
 }
 
+export function ingredientCell(text: string | number, key?: string, id?: string) {
+  const opts: {key?: string, id?: string} = {};
+  if (key) {
+    opts.key = key;
+  }
+  if (id) {
+    opts.id = id;
+  }
+  return <td {...opts} style={tdStyle}>{text}</td>;
+}
+
+export function mealCell(text: string | number | JSX.Element, key?: string, id?: string) {
+  const opts: {key?: string, id?: string} = {};
+  if (key) {
+    opts.key = key;
+  }
+  if (id) {
+    opts.id = id;
+  }
+  return <th {...opts} style={thStyle}>{text}</th>;
+}
+
 export class IngredientsTable extends React.Component<
   IngredientsTableProps, {}
   > {
@@ -20,32 +42,16 @@ export class IngredientsTable extends React.Component<
     super(props);
   }
 
-  ingredientCell(text: string | number, key?: string) {
-    if (key === undefined) {
-      return <td style={tdStyle}>{text}</td>;
-    } else {
-      return <td key={key} style={tdStyle}>{text}</td>;
-    }
-  }
-
-  mealCell(text: string | number | JSX.Element, key?: string) {
-    if (key === undefined) {
-      return <th style={thStyle}>{text}</th>;
-    } else {
-      return <th key={key} style={thStyle}>{text}</th>;
-    }
-  }
-
   makeFoodRow(food: Ingredient) {
     return (
       <tr key={food.uid} id={'food_' + food.uid}>
-        {this.ingredientCell(food.name, 'name')}
-        {this.ingredientCell(food.amount, 'amount')}
-        {this.ingredientCell(food.unit, 'unit')}
-        {this.ingredientCell(food.fat, 'fat')}
-        {this.ingredientCell(food.carbs, 'carbs')}
-        {this.ingredientCell(food.protein, 'protein')}
-        {this.ingredientCell(food.calories, 'calories')}
+        {ingredientCell(food.name, 'name')}
+        {ingredientCell(food.amount, 'amount')}
+        {ingredientCell(food.unit, 'unit')}
+        {ingredientCell(food.fat, 'fat')}
+        {ingredientCell(food.carbs, 'carbs')}
+        {ingredientCell(food.protein, 'protein')}
+        {ingredientCell(food.calories, 'calories')}
         <td style={tdStyle}>
           <button
             id={'removeFood_' + food.uid}
@@ -59,7 +65,7 @@ export class IngredientsTable extends React.Component<
     );
   }
 
-  makeTotalRow(recipe: Ingredient[]) {
+  makeTotalRow(foods: Ingredient[]) {
     let amountCell;
     let unitCell;
     // TODO need to verify amount/unit is passed in if the handlers are
@@ -96,18 +102,15 @@ export class IngredientsTable extends React.Component<
     }
     return (
       <tr key="total">
-        {this.mealCell('Total', 'total')}
-        {this.mealCell(amountCell, 'amount')}
-        {this.mealCell(unitCell, 'unit')}
-        {this.mealCell(recipe.reduce((l, r) => l + r.fat, 0), 'fat')}
-        {this.mealCell(recipe.reduce((l, r) => l + r.carbs, 0), 'carbs')}
-        {this.mealCell(recipe.reduce((l, r) => l + r.protein, 0), 'protein')}
-        {this.mealCell(recipe.reduce((l, r) => l + r.calories, 0), 'calories')}
+        {mealCell('Total', 'total')}
+        {mealCell(amountCell, 'amount')}
+        {mealCell(unitCell, 'unit')}
+        {mealCell(foods.reduce((l, r) => l + r.fat, 0).toFixed(), 'fat')}
+        {mealCell(foods.reduce((l, r) => l + r.carbs, 0).toFixed(), 'carbs')}
+        {mealCell(foods.reduce((l, r) => l + r.protein, 0).toFixed(), 'protein')}
+        {mealCell(foods.reduce((l, r) => l + r.calories, 0).toFixed(), 'calories')}
         <th key="button">
-          <button
-            id={'deleteMeal'}
-            onClick={() => this.props.handleDeleteClick()}
-          >
+          <button id={'deleteMeal'} onClick={() => this.props.handleDeleteClick()}>
             Remove
           </button>
         </th>

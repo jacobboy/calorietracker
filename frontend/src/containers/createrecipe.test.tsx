@@ -59,6 +59,25 @@ describe('Recipes', () => {
     });
   }
 
+  it('can sum and display portions', () => {
+    /*  */
+    const title = 'The Recipe';
+    const portionSize = 300;
+    const totalSize = 101;
+    const unit = FOOD_UNIT.g;
+    const createdRecipe = makeRecipe(title, foods, portionSize, totalSize, unit);
+
+    wrapper.find('#recipeNameInput').simulate('change', {target: { value: title }});
+    wrapper.find('#recipePortionInput').simulate('change', {target: { value: portionSize }});
+    wrapper.find('#recipeAmountInput').simulate('change', {target: { value: totalSize }});
+    wrapper.find('#recipeUnitInput').simulate('change', {target: { value: unit }});
+
+    expect(wrapper.find('#portionFat').text()).toEqual(createdRecipe.fat.toFixed());
+    expect(wrapper.find('#portionCarbs').text()).toEqual(createdRecipe.carbs.toFixed());
+    expect(wrapper.find('#portionProtein').text()).toEqual(createdRecipe.protein.toFixed());
+    expect(wrapper.find('#portionCalories').text()).toEqual(createdRecipe.calories.toFixed());
+  });
+
   it('can be created', () => {
     const title = 'The Recipe';
     const portionSize = 300;
@@ -84,7 +103,6 @@ describe('Recipes', () => {
     expect(foundRecipe.protein).toEqual(createdRecipe.protein);
     expect(foundRecipe.calories).toEqual(createdRecipe.calories);
     expect(foundRecipe.amount).toEqual(createdRecipe.amount);
-    expect(foundRecipe.amount).toBe(createdRecipe.amount);
     expect(foundRecipe.unit).toBe(createdRecipe.unit);
 
     for (let i = 0; i < foundRecipe.foods.length; i++) {
