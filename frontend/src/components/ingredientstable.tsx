@@ -2,6 +2,10 @@ import { Ingredient, FOOD_UNIT } from '../classes';
 import * as React from 'react';
 import { tdStyle, thStyle } from '../style';
 
+export function headerCell(text: string) {
+  return <th style={thStyle}>{text}</th>;
+}
+
 export function ingredientCell(text: string | number | JSX.Element, key?: string, id?: string) {
   const opts: {key?: string, id?: string} = {};
   if (key) {
@@ -115,6 +119,21 @@ interface IngredientsTableProps {
 export class IngredientsTable extends React.Component<
   IngredientsTableProps, {}
   > {
+
+  static headerRow() {
+    return (
+      <tr>
+        {headerCell('')}
+        {headerCell('Amount')}
+        {headerCell('Unit')}
+        {headerCell('Fat')}
+        {headerCell('Carbs')}
+        {headerCell('Protein')}
+        {headerCell('Calories')}
+        {headerCell('')}
+      </tr>
+    );
+  }
 
   constructor(props: IngredientsTableProps) {
     super(props);

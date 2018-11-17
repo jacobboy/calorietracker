@@ -1,6 +1,6 @@
 import { Ingredient, FOOD_UNIT } from '../classes';
 import * as React from 'react';
-import { thStyle, tableStyle } from '../style';
+import { tableStyle } from '../style';
 import { IngredientsTable, mealCell } from './ingredientstable';
 
 interface CreateRecipeInputProps {
@@ -48,25 +48,6 @@ export class CreateRecipeInput extends React.Component<
     } else {
       return Number(this.state.totalSize || this.props.foods.reduce((l, r) => l + r.amount, 0));
     }
-  }
-
-  headerCell(text: string) {
-    return <th style={thStyle}>{text}</th>;
-  }
-
-  headerRow() {
-    return (
-      <tr>
-        {this.headerCell('')}
-        {this.headerCell('Amount')}
-        {this.headerCell('Unit')}
-        {this.headerCell('Fat')}
-        {this.headerCell('Carbs')}
-        {this.headerCell('Protein')}
-        {this.headerCell('Calories')}
-        {this.headerCell('')}
-      </tr>
-    );
   }
 
   onSaveRecipeClick() {
@@ -135,7 +116,7 @@ export class CreateRecipeInput extends React.Component<
       <div>
         <table style={tableStyle}>
           <tbody>
-            {this.headerRow()}
+            {IngredientsTable.headerRow()}
             <IngredientsTable
                foods={this.props.foods}
                handleFoodAmountChange={this.props.handleFoodAmountChange}

@@ -44,10 +44,10 @@ export class StoredIngredientRow extends React.Component<
     return (
       <tr key={this.props.item.uid}>
         <td key="name">{this.state.scaledIngredient.name}</td>
-        <td key="fat">{this.state.scaledIngredient.fat}</td>
-        <td key="carbs">{this.state.scaledIngredient.carbs}</td>
-        <td key="protein">{this.state.scaledIngredient.protein}</td>
-        <td key="calories">{this.state.scaledIngredient.calories}</td>
+        <td key="fat">{this.state.scaledIngredient.fat.toFixed()}</td>
+        <td key="carbs">{this.state.scaledIngredient.carbs.toFixed()}</td>
+        <td key="protein">{this.state.scaledIngredient.protein.toFixed()}</td>
+        <td key="calories">{this.state.scaledIngredient.calories.toFixed()}</td>
         <td key="amount">
           <input
             id="trackFoodAmountInput"

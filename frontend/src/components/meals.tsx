@@ -62,31 +62,12 @@ export class MealsComponent extends React.Component<
     return rows;
   }
 
-  headerCell(text: string) {
-    return <th style={thStyle}>{text}</th>;
-  }
-
-  headerRow() {
-    return (
-      <tr>
-        {this.headerCell('')}
-        {this.headerCell('Amount')}
-        {this.headerCell('Unit')}
-        {this.headerCell('Fat')}
-        {this.headerCell('Carbs')}
-        {this.headerCell('Protein')}
-        {this.headerCell('Calories')}
-        {this.headerCell('')}
-      </tr>
-    );
-  }
-
   render() {
     return (
       <div>
         <table style={tableStyle}>
           <tbody>
-            {this.headerRow()}
+            {IngredientsTable.headerRow()}
             {this.renderRows()}
             <tr>
               <th style={thStyle}>Day Total</th>
