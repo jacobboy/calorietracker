@@ -23,7 +23,7 @@ function fetchSearch(searchString: string, dataSource: DataSource): Promise<Sear
     body.ds = dataSource === DataSource.SR ? 'Standard Reference' : 'Branded Food Products';
   }
   const bodyStr = JSON.stringify(body);
-  console.log('Searching for\n' + bodyStr);
+  // console.log('Searching for\n' + bodyStr);
   return fetch(
     searchUrl(), {
       method: 'POST',
@@ -32,11 +32,11 @@ function fetchSearch(searchString: string, dataSource: DataSource): Promise<Sear
       credentials: 'omit'
     })
     .then((response) => {
-      console.log('Got response\n' + JSON.stringify(response));
+      // console.log('Got response\n' + JSON.stringify(response));
       return response.json();
     })
     .then((response) => {
-      console.log('Got response\n' + JSON.stringify(response));
+      // console.log('Got response\n' + JSON.stringify(response));
       if (response.errors) {
         return { item: [] };
       } else {
@@ -48,8 +48,8 @@ function fetchSearch(searchString: string, dataSource: DataSource): Promise<Sear
 export function queryReport(ndbno: string): Promise<Report> {
   const url = reportUrl();
   const body = JSON.stringify({ 'ndbno': ndbno, 'type': 'b' });
-  console.log('Getting ' + ndbno + ' from ' + url);
-  console.log(body);
+  // console.log('Getting ' + ndbno + ' from ' + url);
+  // console.log(body);
   return fetch(
     url, {
       method: 'POST',
@@ -64,14 +64,13 @@ export function queryReport(ndbno: string): Promise<Report> {
 export function searchFood(
   searchString: string,
   dataSource: DataSource): Promise<IngredientSearchItem[]> {
-  console.log('In searchFood');
   return fetchSearch(
     searchString,
     dataSource
   ).then(
     (searchList) => searchList.item.map(
       (sli) => {
-        console.log('Got search');
+        // console.log('Got search');
         return IngredientSearchItem.fromSearchListItem(sli);
       }
     ));

@@ -6,7 +6,13 @@ export const tableStyle: React.CSSProperties = {
 };
 
 export const tdStyle: React.CSSProperties = {
-    'border': '1px solid black'
+    'border': '1px solid black',
+    'overflow': 'hidden',
+    'textOverflow': 'ellipsis',
+    'whiteSpace': 'nowrap',
+    // TODO Is maxWidth valid here?
+    // how do i make this a percent?
+    'maxWidth': 500
 };
 
 export const thStyle: React.CSSProperties = {

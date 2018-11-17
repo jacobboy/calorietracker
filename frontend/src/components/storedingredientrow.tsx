@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Ingredient, scaleFoodTo } from '../classes';
 import { TopBitDisplay } from '../types';
+import { tdStyle } from 'src/style';
 
 interface IngredientRowProps {
   item: Ingredient;
@@ -43,26 +44,30 @@ export class StoredIngredientRow extends React.Component<
   render() {
     return (
       <tr key={this.props.item.uid}>
-        <td key="name">{this.state.scaledIngredient.name}</td>
-        <td key="fat">{this.state.scaledIngredient.fat.toFixed()}</td>
-        <td key="carbs">{this.state.scaledIngredient.carbs.toFixed()}</td>
-        <td key="protein">{this.state.scaledIngredient.protein.toFixed()}</td>
-        <td key="calories">{this.state.scaledIngredient.calories.toFixed()}</td>
-        <td key="amount">
+        {ingredientCell(this.state.scaledIngredient.name)}
+        {ingredientCell(this.state.scaledIngredient.fat.toFixed())}
+        {ingredientCell(this.state.scaledIngredient.carbs.toFixed())}
+        {ingredientCell(this.state.scaledIngredient.protein.toFixed())}
+        {ingredientCell(this.state.scaledIngredient.calories.toFixed())}
+        {ingredientCell((
           <input
             id="trackFoodAmountInput"
             type="number"
             value={this.state.scaledIngredient.amount}
             onChange={(e) => this.handleAmount(e)}
           />
-        </td>
-        <td key="unit">{this.state.scaledIngredient.unit}</td>
-        <td key="submit">
+         ))}
+        {ingredientCell(this.state.scaledIngredient.unit)}
+        {ingredientCell((
           <button id="trackFoodSubmit" onClick={() => this.handleTrackClick()}>
             {this.props.buttonText}
           </button>
-        </td>
-      </tr >
+         ))}
+      </tr>
     );
   }
+}
+
+function ingredientCell(contents: string | number | JSX.Element) {
+  return <td title={contents.toString()} style={tdStyle}>{contents}</td>;
 }

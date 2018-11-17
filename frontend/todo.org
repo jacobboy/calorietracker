@@ -20,6 +20,7 @@
 ** Recipe and ingredient input validation
 *** ensure every field has values
 ** delete ingredient/recipe
+** what other units can we get from the USDA
 
 * TODO Refactorings
 ** clean up scaleFood and ScaledIngredient usage

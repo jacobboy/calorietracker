@@ -3,6 +3,7 @@ import { Ingredient, Recipe, Named, NDBed } from '../classes';
 import SearchIngredientRow from '../containers/searchingredientrow';
 import { DataSource } from '../ndbapi';
 import StoredIngredientRow from '../containers/storedingredientrow';
+import { tableStyle, thStyle } from 'src/style';
 
 interface SearchComponentProps {
   searchString: string;
@@ -69,16 +70,16 @@ export class SearchComponent extends React.Component<
           <input type="submit" value="Submit" />
         </form>
         Ingredients:
-        <table>
+        <table style={tableStyle}>
           <tbody>
-            <tr>
-              <td>Name</td>
-              <td>Fat</td>
-              <td>Carbs</td>
-              <td>Protein</td>
-              <td>Calories</td>
-              <td>Amount</td>
-              <td>Unit</td>
+            <tr style={thStyle}>
+              <td style={thStyle}>Name</td>
+              <td style={thStyle}>Fat</td>
+              <td style={thStyle}>Carbs</td>
+              <td style={thStyle}>Protein</td>
+              <td style={thStyle}>Calories</td>
+              <td style={thStyle}>Amount</td>
+              <td style={thStyle}>Unit</td>
             </tr>
             {this.props.saved.ingredients.map(
               (item) => <StoredIngredientRow key={item.uid} item={item} />
@@ -89,16 +90,34 @@ export class SearchComponent extends React.Component<
           </tbody>
         </table>
         Recipes:
-        <table>
+        <table style={tableStyle}>
           <tbody>
+            <tr style={thStyle}>
+              <td style={thStyle}>Name</td>
+              <td style={thStyle}>Fat</td>
+              <td style={thStyle}>Carbs</td>
+              <td style={thStyle}>Protein</td>
+              <td style={thStyle}>Calories</td>
+              <td style={thStyle}>Amount</td>
+              <td style={thStyle}>Unit</td>
+            </tr>
             {this.props.saved.recipes.map(
               (item) => <StoredIngredientRow key={item.uid} item={item} />
             )}
           </tbody>
         </table>
         Search:
-        <table>
+        <table style={tableStyle}>
           <tbody>
+            <tr>
+              <td style={thStyle}>Name</td>
+              <td style={thStyle}>Fat</td>
+              <td style={thStyle}>Carbs</td>
+              <td style={thStyle}>Protein</td>
+              <td style={thStyle}>Calories</td>
+              <td style={thStyle}>Amount</td>
+              <td style={thStyle}>Unit</td>
+            </tr>
             {this.props.items.map(
               (item) => <SearchIngredientRow key={item.ndbno} item={item} />
             )}

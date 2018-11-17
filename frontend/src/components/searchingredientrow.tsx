@@ -1,6 +1,11 @@
 import * as React from 'react';
 import { Named, NDBed, Ingredient } from '../classes';
 import { getIngredient } from '../lookup';
+import { tdStyle } from 'src/style';
+
+function ingredientCell(contents: string | number) {
+  return <td title={contents.toString()} style={tdStyle}>{contents}</td>;
+}
 
 interface SearchIngredientRowProps {
   item: NDBed & Named;
@@ -28,13 +33,20 @@ export class SearchIngredientRow extends React.Component<
     if (this.state.ingred === undefined) {
       return (
         <tr>
-          <td>{this.props.item.name}</td>
-          <td>
+          {ingredientCell(this.props.item.name)}
+          {ingredientCell('')}
+          {ingredientCell('')}
+          {ingredientCell('')}
+          {ingredientCell('')}
+          {ingredientCell('')}
+          {ingredientCell('')}
+          {ingredientCell('')}
+          <td style={tdStyle}>
             <button onClick={() => this.handleDetailsClick()}>
               Show Details
             </button>
           </td>
-          <td>
+          <td style={tdStyle}>
             <button onClick={() => this.props.onSaveClick(this.props.item)}>
               Save
             </button>
@@ -44,14 +56,15 @@ export class SearchIngredientRow extends React.Component<
     } else {
       return (
         <tr>
-          <td>{this.props.item.name}</td>
-          <td>{this.state.ingred.fat}</td>
-          <td>{this.state.ingred.carbs}</td>
-          <td>{this.state.ingred.protein}</td>
-          <td>{this.state.ingred.calories}</td>
-          <td>{this.state.ingred.amount}</td>
-          <td>{this.state.ingred.unit}</td>
-          <td>
+          {ingredientCell(this.props.item.name)}
+          {ingredientCell(this.state.ingred.fat)}
+          {ingredientCell(this.state.ingred.carbs)}
+          {ingredientCell(this.state.ingred.protein)}
+          {ingredientCell(this.state.ingred.calories)}
+          {ingredientCell(this.state.ingred.amount)}
+          {ingredientCell(this.state.ingred.unit)}
+          <td style={tdStyle}/>
+          <td style={tdStyle}>
             <button onClick={() => this.props.onSaveClick(this.props.item)}>
               Save
             </button>

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { tdStyle, thStyle } from '../style';
 
 export function headerCell(text: string) {
-  return <th style={thStyle}>{text}</th>;
+  return <th title={text.toString()} style={thStyle}>{text}</th>;
 }
 
 export function ingredientCell(text: string | number | JSX.Element, key?: string, id?: string) {
@@ -14,7 +14,7 @@ export function ingredientCell(text: string | number | JSX.Element, key?: string
   if (id) {
     opts.id = id;
   }
-  return <td {...opts} style={tdStyle}>{text}</td>;
+  return <td {...opts} title={text.toString()} style={tdStyle}>{text}</td>;
 }
 
 export function mealCell(text: string | number | JSX.Element, key?: string, id?: string) {
@@ -25,7 +25,7 @@ export function mealCell(text: string | number | JSX.Element, key?: string, id?:
   if (id) {
     opts.id = id;
   }
-  return <th {...opts} style={thStyle}>{text}</th>;
+  return <th {...opts} title={text.toString()} style={thStyle}>{text}</th>;
 }
 
 interface IngredientRowProps {
