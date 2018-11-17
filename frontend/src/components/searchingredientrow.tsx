@@ -40,7 +40,6 @@ export class SearchIngredientRow extends React.Component<
           {ingredientCell('')}
           {ingredientCell('')}
           {ingredientCell('')}
-          {ingredientCell('')}
           <td style={tdStyle}>
             <button onClick={() => this.handleDetailsClick()}>
               Show Details
