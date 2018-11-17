@@ -1,3 +1,4 @@
+import * as client from '../client';
 import { Report } from '../ndbapi/classes';
 import { Ingredient, Recipe, ingredientFromJson, ingredientFromReport } from '../classes';
 
@@ -39,8 +40,9 @@ function loadReportFromKey(key: string): Report | null {
 }
 
 export function saveIngredient(ingredient: Ingredient): void {
-  // const objKeys = ['uid', 'fat', 'carbs', 'protein', 'calories', 'amount', 'unit'];
+  // TODO unify this with CustomIngredient to avoid drift?
   const obj = {
+    name: ingredient.name,
     uid: ingredient.uid,
     fat: ingredient.fat,
     carbs: ingredient.carbs,
@@ -49,9 +51,7 @@ export function saveIngredient(ingredient: Ingredient): void {
     amount: ingredient.amount,
     unit: ingredient.unit,
   };
-  const ingredStr = JSON.stringify(obj);
-  window.localStorage.setItem(ingredient.uid, ingredStr);
-  // console.log('Saved ingredient\n' + ingredStr);
+  client.sendIngredient(obj);
 }
 
 export function loadIngredient(ingredientId: string): Ingredient {

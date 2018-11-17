@@ -1,31 +1,36 @@
-* TODO copy recipe
-* TODO view/edit recipe
-* TODO percentages
-* TODO math in cells
-* TODO set default amount of NDBIngredient
-* TODO expanded detail view should say save, not track
-* TODO link to USDA page in search row
-* TODO add to non-latest meal
-* TODO clean up scaleFood and ScaledIngredient usage
-** IngredientRow stores a food and a scaledFood
-** StoredIngredientRow stores a food and a scaledFood
-
-
-* TODO search ingredient and save to custom ingredients
-** TODO Consider client vs server side - don't pull entire report, right?
-   eventually that will be server sided
-* TODO fix meal/recipe
+* TODO Features
+** copy recipe
+** view/edit recipe
+** macro percentages alongside totals
+** allow and evaluate math in cells, e.g. "=28*4"
+** set default amount of NDBIngredient
+*** wtf did i mean by this?  is return from USDA always 100?
+** expanded detail view should say save, not track
+** link to USDA page in search row
+** allow adding to non-latest meal
+** ingredient / recipe ordering
+** ingredient / recipe search/filter
 ** convert meal to recipe
+** save date with custom ingredients
+** search pagination
+** unit conversion / options
+** Recipe and ingredient input validation
+*** ensure every field has values
+
+* TODO Refactorings
+** clean up scaleFood and ScaledIngredient usage
+*** IngredientRow stores a food and a scaledFood
+*** StoredIngredientRow stores a food and a scaledFood
 ** don't remove from meal by index?
-** Does FoodCombo need to exist? If so, Why doesn't IngredientTable use it?
-   Represent Meal as Food[]?
-* TODO save date with custom ingredients
-* TODO search pagination
-* TODO unit conversion / options
-* TODO NDBIngredient amount hardcoded to 100
-* TODO ingredient table
-  had collision with IngredientRow, this name should be clarified
-* TODO convert window storage saves to promises
-* TODO find consistent solution to conversion/portion nomenclature
-* TODO Recipe and ingredient input validation
-** everything filled out
+*** Does FoodCombo need to exist? If so, Why doesn't IngredientTable use it?
+    Represent Meal as Food[]?
+** convert window storage saves to promises
+** find consistent solution to conversion/portion nomenclature
+
+* TODO figure out test issues
+** how to mock local storage?
+*** currently in setupTests, is this run before every suite?
+*** ConnectedComponents hit localStorage on load, how to avoid this?
+** will setting client.sendIngredient = jest.fn() affect other tests?
+** how to patch a function in a tsx file?
+*** using jsx files to avoid TS not letting me overwrite client.saveIngredient

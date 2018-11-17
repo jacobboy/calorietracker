@@ -4,8 +4,8 @@ import CreateIngredientInput from './createingredientinput'
 import { mount } from 'enzyme'
 import { createStore } from 'redux'
 import { reducer } from '../reducers'
-import * as storage from '../storage'
-import { FOOD_UNIT, makeIngredient, makeScaledIngredient } from '../classes'
+import * as classes from '../classes'
+import * as client from '../client'
 
 describe('When ingredient create button is clicked', () => {
   // tslint:disable-next-line:no-any
@@ -25,7 +25,7 @@ describe('When ingredient create button is clicked', () => {
   it(`creates the ingredient appropriately`, () => {
     const mockSave = jest.fn()
     // TODO will this affect other tests?
-    storage.saveIngredient = mockSave
+    client.sendIngredient = mockSave
     let [fat, carbs, protein, calories, amount] = [1, 2, 3, 4, 5]
 
     wrapper.find('#nameInput').simulate('change', { target: { value: 'foo' } })
@@ -39,16 +39,18 @@ describe('When ingredient create button is clicked', () => {
     expect(mockSave.mock.calls.length).toBe(1)
     expect(mockSave.mock.calls[0].length).toBe(1)
     const foundFood = mockSave.mock.calls[0][0]
-    const expectedFood = makeIngredient(
-      'foo', fat, carbs, protein, calories, amount, FOOD_UNIT.g, false
-    )
+    const expectedFood = {
+      name: 'foo',
+      uid: foundFood.uid, // how to mock uid creation?
+      fat,
+      carbs,
+      protein,
+      calories,
+      amount,
+      unit: classes.FOOD_UNIT.g
+    }
 
-    expect(foundFood.name).toEqual(expectedFood.name)
-    expect(foundFood.fat).toEqual(expectedFood.fat)
-    expect(foundFood.carbs).toEqual(expectedFood.carbs)
-    expect(foundFood.protein).toEqual(expectedFood.protein)
-    expect(foundFood.calories).toEqual(expectedFood.calories)
-    expect(foundFood.amount).toEqual(expectedFood.amount)
+    expect(foundFood).toEqual(expectedFood)
 
     verifyIngredientList(store.getState().saved.ingredients, [expectedFood])
   })
@@ -56,7 +58,7 @@ describe('When ingredient create button is clicked', () => {
   it(`scales the ingredient appropriately`, () => {
     const mockSave = jest.fn()
     // TODO will this affect other tests?
-    storage.saveIngredient = mockSave
+    client.sendIngredient = mockSave
     let [fat, carbs, protein, calories, amount, convertAmount] = [1, 2, 3, 4, 5, 1]
 
     wrapper.find('#nameInput').simulate('change', { target: { value: 'foo' } })
@@ -71,8 +73,8 @@ describe('When ingredient create button is clicked', () => {
     expect(mockSave.mock.calls.length).toBe(1)
     expect(mockSave.mock.calls[0].length).toBe(1)
     const foundFood = mockSave.mock.calls[0][0]
-    const expectedFood = makeScaledIngredient(
-      'foo', fat, carbs, protein, calories, amount, convertAmount, FOOD_UNIT.g, false
+    const expectedFood = classes.makeScaledIngredient(
+      'foo', fat, carbs, protein, calories, amount, convertAmount, classes.FOOD_UNIT.g, false
     )
 
     expect(foundFood.name).toEqual(expectedFood.name)
