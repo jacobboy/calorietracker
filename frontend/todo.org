@@ -1,6 +1,10 @@
 * TODO Features
+** Round recipe macros
+** Enter submits track
+** edit meals ingredients
 ** copy recipe
 ** view/edit recipe
+** edit ingredient name
 ** macro percentages alongside totals
 ** allow and evaluate math in cells, e.g. "=28*4"
 ** set default amount of NDBIngredient

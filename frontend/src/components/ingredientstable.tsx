@@ -27,35 +27,58 @@ export function mealCell(text: string | number | JSX.Element, key?: string, id?:
 interface IngredientRowProps {
   idx: number;
   food: Ingredient;
-  handleFoodAmountChange: (food: Ingredient, newAmount: number) => void;
   handleRemoveFoodClick: (food: Ingredient) => void;
+  handleFoodAmountChange?: (food: Ingredient, newAmount: number) => void;
 }
 
-class IngredientRow extends React.Component<IngredientRowProps, {amount: number}> {
+interface IngredientRowState {
+  amount: number;
+  handleFoodAmountChange: (food: Ingredient, newAmount: number) => void;
+}
+
+class IngredientRow extends React.Component<IngredientRowProps, IngredientRowState> {
   constructor(props: IngredientRowProps) {
     super(props);
-    this.state = {amount: this.props.food.amount};
+
+    // having this amount handling function in state is a weird hack to get around
+    // my being undecided about whether or not to implement ingredient amount editing
+    // in meals, so meals don't provide that function
+    let handleFoodAmountChange;
+    if (this.props.handleFoodAmountChange) {
+      handleFoodAmountChange = this.props.handleFoodAmountChange;
+    } else {
+      handleFoodAmountChange = (food: Ingredient, newAmount: number) => {/*  */};
+    }
+    this.state = {
+      amount: this.props.food.amount,
+      handleFoodAmountChange
+    };
   }
 
   handleFoodAmountChange(food: Ingredient, event: React.ChangeEvent<HTMLInputElement>) {
     const amount = Number(event.target.value);
     if (amount) {
       this.setState({ amount });
-      this.props.handleFoodAmountChange(food, amount);
+      this.state.handleFoodAmountChange(food, amount);
     } else {
       this.setState({ amount });
     }
   }
 
   render() {
-    const amountElement = (
-      <input
-        id={`foodAmountInput_${this.props.food.uid}`}
-        type="number"
-        value={this.state.amount || ''}
-        onChange={(e) => this.handleFoodAmountChange(this.props.food, e)}
-      />
-    );
+    let amountElement;
+    if (this.props.handleFoodAmountChange) {
+      amountElement = (
+        <input
+          id={`foodAmountInput_${this.props.food.uid}`}
+          type="number"
+          value={this.state.amount || ''}
+          onChange={(e) => this.handleFoodAmountChange(this.props.food, e)}
+        />
+      );
+    } else {
+      amountElement = this.state.amount;
+    }
     return (
       <tr key={`food_${this.props.idx}`} id={'food'}>
         {ingredientCell(this.props.food.name, 'name')}
@@ -80,7 +103,7 @@ class IngredientRow extends React.Component<IngredientRowProps, {amount: number}
 
 interface IngredientsTableProps {
   foods: Ingredient[];
-  handleFoodAmountChange: (food: Ingredient, newAmount: number) => void;
+  handleFoodAmountChange?: (food: Ingredient, newAmount: number) => void;
   handleRemoveFoodClick: (food: Ingredient) => void;
   handleDeleteAllClick: () => void;
   handleAmountAllInput?: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -100,11 +123,11 @@ export class IngredientsTable extends React.Component<
   makeTotalRow(foods: Ingredient[]) {
     let amountCell;
     let unitCell;
-    // TODO need to verify amount/unit is passed in if the handlers are
-    // really this whole thing is a mess, i'm not sure making this a reusable
-    // component works, between meals and recipes
+    // TODO need to verify amount/unit is passed in if their respective handlers are.
+    // really this whole thing is a mess, the fact that Meals doesn't pass in these handlers
+    // makes me doubt the viability of IngredientsTable as a reuseable component
     if (this.props.handleAmountAllInput !== undefined) {
-      // otherwise TS thinks this might be undefined, probably because
+      // otherwise TS thinks this might be undefined
       const handleAmountInput = this.props.handleAmountAllInput;
       amountCell = (
         <input

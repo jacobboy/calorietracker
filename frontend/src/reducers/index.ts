@@ -16,7 +16,8 @@ import {
   REMOVE_MEAL,
   CHANGE_DAY,
   SAVE_INGREDIENT,
-  REPLACE_FOOD_IN_RECIPE
+  REPLACE_FOOD_IN_RECIPE,
+  REPLACE_FOOD_IN_MEAL
 } from '../constants/index';
 import { dropIndex, replaceElement, replaceObject } from '../datautil';
 import { meal, Ingredient, Meal } from '../classes';
@@ -82,6 +83,12 @@ export function reducer(state: StoreState, action: Actions): StoreState {
       return {
         ...state,
         today: dropIndex(state.today, action.payload)
+      };
+    case REPLACE_FOOD_IN_MEAL:
+      // TODO implement this in order to alter meal ingredient amounts
+      // is that even something valuable?
+      return {
+        ...state
       };
     case ADD_FOOD_TO_MEAL:
       return addFoodToMeal(state, action.payload);

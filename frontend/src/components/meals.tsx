@@ -32,11 +32,11 @@ export class MealsComponent extends React.Component<
     this.ensureAtLeastOneMeal(nextProps.today);
   }
 
-  handleFoodAmountChange(mealIdx: number) {
+  /* handleFoodAmountChange(mealIdx: number) {
     return (food: Ingredient, newAmount: number)  => {
       return this.props.handleFoodAmountChange(mealIdx, food, newAmount);
     };
-  }
+  } */
 
   renderRows() {
     const rows = [];
@@ -52,7 +52,7 @@ export class MealsComponent extends React.Component<
         <IngredientsTable
           key={'meal_table_' + meal.uid}
           foods={meal.foods}
-          handleFoodAmountChange={this.handleFoodAmountChange(mealIdx)}
+          /* handleFoodAmountChange={this.handleFoodAmountChange(mealIdx)} */
           handleRemoveFoodClick={removeHandler}
           handleDeleteAllClick={deleteHandler}
         />
