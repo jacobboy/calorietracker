@@ -48,27 +48,6 @@ export class SearchComponent extends React.Component<
   render() {
     return (
       <div>
-        <form onSubmit={(e) => this.handleSubmit(e)} >
-          <select
-            value={this.props.dataSource}
-            onChange={(e) => this.handleSelectChange(e)}
-          >
-            <option value={DataSource.SR}>{DataSource[DataSource.SR]}</option>
-            <option value={DataSource.BL}>{DataSource[DataSource.BL]}</option>
-            <option value={DataSource.Any}>{DataSource[DataSource.Any]}</option>
-          </select>
-          <label>
-            Name:
-            <input
-              type="text"
-              placeholder="Search USDA Database"
-              value={this.props.searchString || ''}
-              onChange={(e) => this.handleSearchChange(e)}
-            />
-          </label>
-
-          <input type="submit" value="Submit" />
-        </form>
         Ingredients:
         <table style={tableStyle}>
           <tbody>
@@ -106,7 +85,26 @@ export class SearchComponent extends React.Component<
             )}
           </tbody>
         </table>
-        Search:
+        <form onSubmit={(e) => this.handleSubmit(e)} >
+          <label>
+            Search:
+            <input
+              type="text"
+              placeholder="Search USDA Database"
+              value={this.props.searchString || ''}
+              onChange={(e) => this.handleSearchChange(e)}
+            />
+          </label>
+          <select
+            value={this.props.dataSource}
+            onChange={(e) => this.handleSelectChange(e)}
+          >
+            <option value={DataSource.SR}>{DataSource[DataSource.SR]}</option>
+            <option value={DataSource.BL}>{DataSource[DataSource.BL]}</option>
+            <option value={DataSource.Any}>{DataSource[DataSource.Any]}</option>
+          </select>
+          <input type="submit" value="Submit" />
+        </form>
         <table style={tableStyle}>
           <tbody>
             <tr>

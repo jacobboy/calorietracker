@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Ingredient, scaleFoodTo } from '../classes';
 import { TopBitDisplay } from '../types';
-import { tdStyle } from 'src/style';
+import { tdStyle } from '../style';
 
 interface IngredientRowProps {
   item: Ingredient;
