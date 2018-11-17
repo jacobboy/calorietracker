@@ -5,7 +5,6 @@
 ** allow and evaluate math in cells, e.g. "=28*4"
 ** set default amount of NDBIngredient
 *** wtf did i mean by this?  is return from USDA always 100?
-** expanded detail view should say save, not track
 ** link to USDA page in search row
 ** allow adding to non-latest meal
 ** ingredient / recipe ordering
@@ -16,6 +15,7 @@
 ** unit conversion / options
 ** Recipe and ingredient input validation
 *** ensure every field has values
+** delete ingredient/recipe
 
 * TODO Refactorings
 ** clean up scaleFood and ScaledIngredient usage

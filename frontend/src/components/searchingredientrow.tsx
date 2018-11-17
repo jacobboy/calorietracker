@@ -53,7 +53,7 @@ export class SearchIngredientRow extends React.Component<
           <td>{this.state.ingred.unit}</td>
           <td>
             <button onClick={() => this.props.onSaveClick(this.props.item)}>
-              Track
+              Save
             </button>
           </td>
         </tr >
