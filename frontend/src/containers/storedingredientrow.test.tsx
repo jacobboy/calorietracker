@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as enzyme from 'enzyme';
-import IngredientRow from './ingredientrow';
+import StoredIngredientRow from './storedingredientrow';
 import { mount } from 'enzyme';
 import { createStore, Store, AnyAction } from 'redux';
 import { reducer } from '../reducers';
@@ -27,7 +27,7 @@ describe('When the track food button is clicked', () => {
     wrapper = mount(
       <Provider store={store}>
         <table><tbody>
-          <IngredientRow item={thisIngred} />
+          <StoredIngredientRow item={thisIngred} />
         </tbody></table>
       </Provider>
     );
@@ -70,7 +70,7 @@ describe('When the track food button is clicked', () => {
     wrapper = mount(
       <Provider store={store}>
         <table><tbody>
-          <IngredientRow item={thisIngred} />
+          <StoredIngredientRow item={thisIngred} />
         </tbody></table>
       </Provider>
     );

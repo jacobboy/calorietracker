@@ -1,5 +1,5 @@
-import { IngredientRow } from '../components/ingredientrow';
-import { actions, Actions } from '../actions/';
+import { StoredIngredientRow } from '../components/storedingredientrow';
+import { actions, Actions } from '../actions';
 import { StoreState, TopBitDisplay } from '../types/index';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -27,4 +27,4 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(IngredientRow);
+export default connect(mapStateToProps, mapDispatchToProps)(StoredIngredientRow);

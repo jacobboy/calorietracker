@@ -5,6 +5,7 @@ import { IngredientsTable } from './ingredientstable';
 
 interface MealsComponentProps {
   today: Meal[];
+  handleFoodAmountChange: (mealIdx: number, food: Ingredient, newAmount: number) => void;
   handleAddMealClick: () => void;
   handleDeleteMealClick: (mealIdx: number) => void;
   handleRemoveFoodClick: (mealIdx: number, food: Ingredient) => void;
@@ -31,6 +32,12 @@ export class MealsComponent extends React.Component<
     this.ensureAtLeastOneMeal(nextProps.today);
   }
 
+  handleFoodAmountChange(mealIdx: number) {
+    return (food: Ingredient, newAmount: number)  => {
+      return this.props.handleFoodAmountChange(mealIdx, food, newAmount);
+    };
+  }
+
   renderRows() {
     const rows = [];
     for (let mealIdx = 0; mealIdx < this.props.today.length; mealIdx++) {
@@ -45,8 +52,9 @@ export class MealsComponent extends React.Component<
         <IngredientsTable
           key={'meal_table_' + meal.uid}
           foods={meal.foods}
-          handleRemoveClick={removeHandler}
-          handleDeleteClick={deleteHandler}
+          handleFoodAmountChange={this.handleFoodAmountChange(mealIdx)}
+          handleRemoveFoodClick={removeHandler}
+          handleDeleteAllClick={deleteHandler}
         />
       );
       rows.push(row);

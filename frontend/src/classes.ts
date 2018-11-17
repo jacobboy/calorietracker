@@ -57,7 +57,7 @@ interface FoodCombo extends Nutritional {
 }
 
 /*
- * Like Recipe, but can't be subdivided
+ * Why is this separate from Recipe?
  */
 export interface Meal extends FoodCombo, UIDed {
   foods: Ingredient[];  // TODO Shouldn't actually expose this

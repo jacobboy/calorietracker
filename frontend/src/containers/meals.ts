@@ -11,6 +11,9 @@ function mapStateToProps(state: StoreState) {
 
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
+    handleFoodAmountChange: (mealIdx: number, food: Ingredient, newAmount: number) => {
+      dispatch(actions.changeMealFoodAmount(mealIdx, food, newAmount));
+    },
     handleAddMealClick: () => { dispatch(actions.addMeal()); },
     handleDeleteMealClick: (mealIdx: number) => {
       dispatch(actions.removeMeal(mealIdx));

@@ -5,6 +5,7 @@ import { IngredientsTable, mealCell } from './ingredientstable';
 
 interface CreateRecipeInputProps {
   foods: Ingredient[];
+  handleFoodAmountChange: (food: Ingredient, newAmount: number) => void;
   handleRemoveFoodClick: (food: Ingredient) => void;
   handleSaveRecipeClick: (name: string,
                           foods: Ingredient[],
@@ -15,6 +16,7 @@ interface CreateRecipeInputProps {
 
 interface CreateRecipeInputState {
     name: string;
+
     unit: FOOD_UNIT;
     useCalculatedAmount: boolean;
     totalSize?: number;
@@ -109,8 +111,8 @@ export class CreateRecipeInput extends React.Component<
   portionRow() {
     return (
       <tr key="portionRow">
-        <th>Portion</th>
-        <th>
+        <th key="portionTitle">Portion</th>
+        <th key="portionInput">
           <input
             id="recipePortionInput"
             type="number"
@@ -136,11 +138,12 @@ export class CreateRecipeInput extends React.Component<
             {this.headerRow()}
             <IngredientsTable
                foods={this.props.foods}
-               handleRemoveClick={this.props.handleRemoveFoodClick}
-               handleDeleteClick={() => null}
-               handleAmountInput={(e) => this.handleAmountInput(e)}
+               handleFoodAmountChange={this.props.handleFoodAmountChange}
+               handleRemoveFoodClick={this.props.handleRemoveFoodClick}
+               handleDeleteAllClick={() => null}
+               handleAmountAllInput={(e) => this.handleAmountInput(e)}
                amount={this.getTotalSize(true)}
-               handleUnitInput={(e) => this.handleUnitInput(e)}
+               handleUnitAllInput={(e) => this.handleUnitInput(e)}
                unit={this.state.unit}
             />
             {this.portionRow()}

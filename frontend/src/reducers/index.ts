@@ -15,9 +15,10 @@ import {
   ADD_MEAL,
   REMOVE_MEAL,
   CHANGE_DAY,
-  SAVE_INGREDIENT
+  SAVE_INGREDIENT,
+  REPLACE_FOOD_IN_RECIPE
 } from '../constants/index';
-import { dropIndex, replaceElement } from '../datautil';
+import { dropIndex, replaceElement, replaceObject } from '../datautil';
 import { meal, Ingredient, Meal } from '../classes';
 
 function mealIdxOrLast(state: StoreState, mealIdx?: number) {
@@ -108,6 +109,17 @@ export function reducer(state: StoreState, action: Actions): StoreState {
         topbit: {
           ...state.topbit,
           display: TopBitDisplay.CREATE_RECIPE
+        }
+      };
+    case REPLACE_FOOD_IN_RECIPE:
+      return {
+        ...state,
+        topbit: {
+          ...state.topbit,
+          recipe: {
+            ...state.topbit.recipe,
+            foods: replaceObject(state.topbit.recipe.foods, action.payload.from, action.payload.to)
+          }
         }
       };
     case ADD_FOOD_TO_RECIPE:

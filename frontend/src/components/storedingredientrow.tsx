@@ -13,7 +13,7 @@ interface IngredientRowState {
   scaledIngredient: Ingredient;
 }
 
-export class IngredientRow extends React.Component<
+export class StoredIngredientRow extends React.Component<
   IngredientRowProps, IngredientRowState
   > {
 

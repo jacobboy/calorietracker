@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Ingredient, Recipe, Named, NDBed } from '../classes';
 import SearchIngredientRow from '../containers/searchingredientrow';
 import { DataSource } from '../ndbapi';
-import IngredientRow from '../containers/ingredientrow';
+import StoredIngredientRow from '../containers/storedingredientrow';
 
 interface SearchComponentProps {
   searchString: string;
@@ -81,10 +81,10 @@ export class SearchComponent extends React.Component<
               <td>Unit</td>
             </tr>
             {this.props.saved.ingredients.map(
-              (item) => <IngredientRow key={item.uid} item={item} />
+              (item) => <StoredIngredientRow key={item.uid} item={item} />
             )}
             {this.props.saved.ndbs.map(
-              (item) => <IngredientRow key={item.uid} item={item} />
+              (item) => <StoredIngredientRow key={item.uid} item={item} />
             )}
           </tbody>
         </table>
@@ -92,7 +92,7 @@ export class SearchComponent extends React.Component<
         <table>
           <tbody>
             {this.props.saved.recipes.map(
-              (item) => <IngredientRow key={item.uid} item={item} />
+              (item) => <StoredIngredientRow key={item.uid} item={item} />
             )}
           </tbody>
         </table>

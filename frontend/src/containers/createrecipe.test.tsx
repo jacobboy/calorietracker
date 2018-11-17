@@ -2,7 +2,16 @@ import * as React from 'react';
 import * as enzyme from 'enzyme';
 import { mount } from 'enzyme';
 import { Provider } from 'react-redux';
-import { makeIngredient, FOOD_UNIT, Ingredient, Recipe, makeRecipe } from '../classes';
+import {
+  makeIngredient,
+  FOOD_UNIT,
+  Ingredient,
+  Recipe,
+  makeRecipe,
+  Nutritional,
+  Quantifiable,
+  scaleFoodTo
+} from '../classes';
 import { AnyAction, createStore, Store } from 'redux';
 import { reducer } from '../reducers';
 import CreateRecipeInput from '../containers/createrecipe';
@@ -97,23 +106,52 @@ describe('Recipes', () => {
     const foundRecipe = store.getState().saved.recipes[0];
     expect(foundRecipe.foods.length).toBe(nFoods);
 
-    expect(foundRecipe.name).toEqual(createdRecipe.name);
-    expect(foundRecipe.fat).toEqual(createdRecipe.fat);
-    expect(foundRecipe.carbs).toEqual(createdRecipe.carbs);
-    expect(foundRecipe.protein).toEqual(createdRecipe.protein);
-    expect(foundRecipe.calories).toEqual(createdRecipe.calories);
-    expect(foundRecipe.amount).toEqual(createdRecipe.amount);
-    expect(foundRecipe.unit).toBe(createdRecipe.unit);
+    checkRecipe(foundRecipe, createdRecipe);
+  });
 
-    for (let i = 0; i < foundRecipe.foods.length; i++) {
-      let foundFood = foundRecipe.foods[i];
-      let expectedFood = createdRecipe.foods[i];
-      expect(foundFood.name).toEqual(expectedFood.name);
-      expect(foundFood.fat).toEqual(expectedFood.fat);
-      expect(foundFood.carbs).toEqual(expectedFood.carbs);
-      expect(foundFood.protein).toEqual(expectedFood.protein);
-      expect(foundFood.calories).toEqual(expectedFood.calories);
-      expect(foundFood.amount).toEqual(expectedFood.amount);
-    }
+  it('can edit ingredient amounts before saving', () => {
+    const title = 'The Recipe';
+    const portionSize = 50;
+    const totalSize = 100;
+    const unit = FOOD_UNIT.g;
+    const newFood = scaleFoodTo(foods[1], foods[1].amount * 5);
+    const createdRecipe = makeRecipe(title, [foods[0], newFood], portionSize, totalSize, unit);
+
+    wrapper.find('#recipeNameInput').simulate('change', {target: { value: title }});
+    wrapper.find('#recipePortionInput').simulate('change', {target: { value: portionSize }});
+    wrapper.find('#recipeAmountInput').simulate('change', {target: { value: totalSize }});
+    wrapper.find('#recipeUnitInput').simulate('change', {target: { value: unit }});
+    wrapper.find(`#foodAmountInput_${foods[1].uid}`).simulate('change', {target: { value: newFood.amount }});
+
+    expect(wrapper.find('#portionFat').text()).toEqual(createdRecipe.fat.toFixed());
+    expect(wrapper.find('#portionCarbs').text()).toEqual(createdRecipe.carbs.toFixed());
+    expect(wrapper.find('#portionProtein').text()).toEqual(createdRecipe.protein.toFixed());
+    expect(wrapper.find('#portionCalories').text()).toEqual(createdRecipe.calories.toFixed());
+
+    wrapper.find('#saveRecipe').simulate('click');
+    const foundRecipe = store.getState().saved.recipes[0];
+    expect(foundRecipe.foods.length).toBe(nFoods);
+
+    checkRecipe(foundRecipe, createdRecipe);
   });
 });
+
+function checkRecipe(foundRecipe: Recipe, createdRecipe: Recipe) {
+  checkMacros(foundRecipe, createdRecipe);
+  for (let i = 0; i < foundRecipe.foods.length; i++) {
+    let foundFood = foundRecipe.foods[i];
+    let expectedFood = createdRecipe.foods[i];
+    checkMacros(foundFood, expectedFood);
+  }
+}
+
+function checkMacros(foundRecipe: (Nutritional & Quantifiable),
+                     createdRecipe: (Nutritional & Quantifiable)) {
+  expect(foundRecipe.name).toEqual(createdRecipe.name);
+  expect(foundRecipe.fat).toEqual(createdRecipe.fat);
+  expect(foundRecipe.carbs).toEqual(createdRecipe.carbs);
+  expect(foundRecipe.protein).toEqual(createdRecipe.protein);
+  expect(foundRecipe.calories).toEqual(createdRecipe.calories);
+  expect(foundRecipe.amount).toEqual(createdRecipe.amount);
+  expect(foundRecipe.unit).toBe(createdRecipe.unit);
+}

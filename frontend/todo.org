@@ -6,6 +6,9 @@
 * TODO expanded detail view should say save, not track
 * TODO link to USDA page in search row
 * TODO add to non-latest meal
+* TODO clean up scaleFood and ScaledIngredient usage
+** IngredientRow stores a food and a scaledFood
+** StoredIngredientRow stores a food and a scaledFood
 
 
 * TODO search ingredient and save to custom ingredients
@@ -20,7 +23,8 @@
 * TODO search pagination
 * TODO unit conversion / options
 * TODO NDBIngredient amount hardcoded to 100
-* TODO rename ingredient row and/or ingredient table, they are unrelated
+* TODO ingredient table
+  had collision with IngredientRow, this name should be clarified
 * TODO convert window storage saves to promises
 * TODO find consistent solution to conversion/portion nomenclature
 * TODO Recipe and ingredient input validation

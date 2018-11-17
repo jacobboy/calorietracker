@@ -29,6 +29,7 @@ describe('When the meals component is selected', () => {
   // tslint:disable-next-line:no-any
   let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
 
+  let mockFoodAmountChange: jest.Mock;
   let mockAddMeal: jest.Mock;
   let mockDeleteMeal: jest.Mock;
   let mockRemoveFood: jest.Mock;
@@ -46,10 +47,11 @@ describe('When the meals component is selected', () => {
     wrapper = mount(
       <MealsComponent
         today={today}
+        handleFoodAmountChange={mockFoodAmountChange}
         handleAddMealClick={mockAddMeal}
         handleDeleteMealClick={mockDeleteMeal}
         handleRemoveFoodClick={mockRemoveFood}
-      />    
+      />
       );
     });
 

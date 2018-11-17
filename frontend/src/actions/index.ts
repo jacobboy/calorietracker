@@ -1,9 +1,10 @@
-import { makeScaledIngredient, makeRecipe, FOOD_UNIT, Ingredient } from '../classes';
+import { makeScaledIngredient, makeRecipe, FOOD_UNIT, Ingredient, scaleFoodTo } from '../classes';
 import {
   CREATE_INGREDIENT_TOGGLE,
   CREATE_INGREDIENT_SUBMIT,
   CREATE_RECIPE_OPEN,
   ADD_FOOD_TO_RECIPE,
+  REPLACE_FOOD_IN_RECIPE,
   REMOVE_FOOD_FROM_RECIPE,
   CREATE_RECIPE_SUBMIT,
   SAVE_INGREDIENT,
@@ -12,6 +13,7 @@ import {
   FOODSEARCH_SUBMIT,
   ADD_FOOD_TO_MEAL,
   REMOVE_FOOD_FROM_MEAL,
+  REPLACE_FOOD_IN_MEAL,
   ADD_MEAL,
   REMOVE_MEAL,
   CHANGE_DAY
@@ -37,7 +39,7 @@ function createAction<T extends string, P>(type: T, payload?: P) {
   return payload !== undefined ? { type, payload } : { type };
 }
 
-function createIngredient(
+function createIngredientSubmit(
   name: string,
   fat: number,
   carbs: number,
@@ -51,6 +53,11 @@ function createIngredient(
     name, fat, carbs, protein, calories, amount, convertAmount, unit
   );
   return createAction(CREATE_INGREDIENT_SUBMIT, ingredient);
+}
+
+function changeRecipeFoodAmount(food: Ingredient, newAmount: number) {
+  const newFood = scaleFoodTo(food, newAmount);
+  return createAction(REPLACE_FOOD_IN_RECIPE, {from: food, to: newFood});
 }
 
 function addFoodToRecipe(ingredient: Ingredient) {
@@ -72,6 +79,11 @@ function saveIngredient(ingredient: Ingredient) {
   return createAction(SAVE_INGREDIENT, ingredient);
 }
 
+function changeMealFoodAmount(mealIdx: number, food: Ingredient, newAmount: number) {
+  const newFood = scaleFoodTo(food, newAmount);
+  return createAction(REPLACE_FOOD_IN_MEAL, {mealIdx, from: food, to: newFood});
+}
+
 // TODO should actions be UI-driven or business logic driven?
 // perhaps business-driven and have the containers perform business/ui mapping?
 export const actions = {
@@ -83,6 +95,7 @@ export const actions = {
     (items: IngredientSearchItem[]) => createAction(FOODSEARCH_SUBMIT, items),
   addMeal: () => createAction(ADD_MEAL),
   removeMeal: (mealIdx: number) => createAction(REMOVE_MEAL, mealIdx),
+  changeMealFoodAmount,
   addFoodToMeal:
     (food: Ingredient, mealIdx?: number) =>
       createAction(ADD_FOOD_TO_MEAL, { mealIdx, food }),
@@ -90,12 +103,13 @@ export const actions = {
     (mealIdx: number, food: Ingredient) =>
       createAction(REMOVE_FOOD_FROM_MEAL, { mealIdx, food }),
   createIngredientToggle: (destination: TopBitDisplay) => createAction(CREATE_INGREDIENT_TOGGLE, destination),
-  createIngredientSubmit: createIngredient,
+  createIngredientSubmit,
   createRecipeOpen: () => createAction(CREATE_RECIPE_OPEN),
-  addFoodToRecipe: addFoodToRecipe,
-  removeFoodFromRecipe: removeFoodFromRecipe,
-  saveRecipe: saveRecipe,
-  saveIngredient: saveIngredient,
+  changeRecipeFoodAmount,
+  addFoodToRecipe,
+  removeFoodFromRecipe,
+  saveRecipe,
+  saveIngredient,
   setDay: (day: Date) => createAction(CHANGE_DAY, day)
 };
 
