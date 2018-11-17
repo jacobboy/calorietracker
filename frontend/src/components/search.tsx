@@ -52,13 +52,13 @@ export class SearchComponent extends React.Component<
         <table style={tableStyle}>
           <tbody>
             <tr style={thStyle}>
-              <td style={thStyle}>Name</td>
-              <td style={thStyle}>Fat</td>
-              <td style={thStyle}>Carbs</td>
-              <td style={thStyle}>Protein</td>
-              <td style={thStyle}>Calories</td>
-              <td style={thStyle}>Amount</td>
-              <td style={thStyle}>Unit</td>
+              <th style={thStyle}>Name</th>
+              <th style={thStyle}>Fat</th>
+              <th style={thStyle}>Carbs</th>
+              <th style={thStyle}>Protein</th>
+              <th style={thStyle}>Calories</th>
+              <th style={thStyle}>Amount</th>
+              <th style={thStyle}>Unit</th>
             </tr>
             {this.props.saved.ingredients.map(
               (item) => <StoredIngredientRow key={item.uid} item={item} />
@@ -72,13 +72,13 @@ export class SearchComponent extends React.Component<
         <table style={tableStyle}>
           <tbody>
             <tr style={thStyle}>
-              <td style={thStyle}>Name</td>
-              <td style={thStyle}>Fat</td>
-              <td style={thStyle}>Carbs</td>
-              <td style={thStyle}>Protein</td>
-              <td style={thStyle}>Calories</td>
-              <td style={thStyle}>Amount</td>
-              <td style={thStyle}>Unit</td>
+              <th style={thStyle}>Name</th>
+              <th style={thStyle}>Fat</th>
+              <th style={thStyle}>Carbs</th>
+              <th style={thStyle}>Protein</th>
+              <th style={thStyle}>Calories</th>
+              <th style={thStyle}>Amount</th>
+              <th style={thStyle}>Unit</th>
             </tr>
             {this.props.saved.recipes.map(
               (item) => <StoredIngredientRow key={item.uid} item={item} />
@@ -108,13 +108,13 @@ export class SearchComponent extends React.Component<
         <table style={tableStyle}>
           <tbody>
             <tr>
-              <td style={thStyle}>Name</td>
-              <td style={thStyle}>Fat</td>
-              <td style={thStyle}>Carbs</td>
-              <td style={thStyle}>Protein</td>
-              <td style={thStyle}>Calories</td>
-              <td style={thStyle}>Amount</td>
-              <td style={thStyle}>Unit</td>
+              <th style={thStyle}>Name</th>
+              <th style={thStyle}>Fat</th>
+              <th style={thStyle}>Carbs</th>
+              <th style={thStyle}>Protein</th>
+              <th style={thStyle}>Calories</th>
+              <th style={thStyle}>Amount</th>
+              <th style={thStyle}>Unit</th>
             </tr>
             {this.props.items.map(
               (item) => <SearchIngredientRow key={item.ndbno} item={item} />
