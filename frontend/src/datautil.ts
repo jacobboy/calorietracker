@@ -13,3 +13,8 @@ export function replaceObject<T>(arr: Array<T>, oldObj: T, newObj: T) {
   }
   return arr.map(replace);
 }
+
+export function currentDate() {
+  const date = new Date();
+  return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().substring(2)}`;
+}

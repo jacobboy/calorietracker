@@ -17,7 +17,8 @@ import {
   CHANGE_DAY,
   SAVE_INGREDIENT,
   REPLACE_FOOD_IN_RECIPE,
-  REPLACE_FOOD_IN_MEAL
+  REPLACE_FOOD_IN_MEAL,
+  ADD_FOODS_TO_RECIPE
 } from '../constants/index';
 import { dropIndex, replaceElement, replaceObject } from '../datautil';
 import { meal, Ingredient, Meal } from '../classes';
@@ -137,6 +138,17 @@ export function reducer(state: StoreState, action: Actions): StoreState {
           recipe: {
             ...state.topbit.recipe,
             foods: [...state.topbit.recipe.foods, action.payload]
+          }
+        }
+      };
+    case ADD_FOODS_TO_RECIPE:
+      return {
+        ...state,
+        topbit: {
+          ...state.topbit,
+          recipe: {
+            ...state.topbit.recipe,
+            foods: [...state.topbit.recipe.foods, ...action.payload]
           }
         }
       };

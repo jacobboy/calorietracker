@@ -4,6 +4,7 @@ import {
   CREATE_INGREDIENT_SUBMIT,
   CREATE_RECIPE_OPEN,
   ADD_FOOD_TO_RECIPE,
+  ADD_FOODS_TO_RECIPE,
   REPLACE_FOOD_IN_RECIPE,
   REMOVE_FOOD_FROM_RECIPE,
   CREATE_RECIPE_SUBMIT,
@@ -64,6 +65,10 @@ function addFoodToRecipe(ingredient: Ingredient) {
   return createAction(ADD_FOOD_TO_RECIPE, ingredient);
 }
 
+function addFoodsToRecipe(ingredients: Ingredient[]) {
+  return createAction(ADD_FOODS_TO_RECIPE, ingredients);
+}
+
 function removeFoodFromRecipe(food: Ingredient) {
   return createAction(REMOVE_FOOD_FROM_RECIPE, food);
 }
@@ -107,6 +112,7 @@ export const actions = {
   createRecipeOpen: () => createAction(CREATE_RECIPE_OPEN),
   changeRecipeFoodAmount,
   addFoodToRecipe,
+  addFoodsToRecipe,
   removeFoodFromRecipe,
   saveRecipe,
   saveIngredient,

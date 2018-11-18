@@ -3,22 +3,23 @@ import { Ingredient, scaleFoodTo } from '../classes';
 import { TopBitDisplay } from '../types';
 import { tdStyle } from '../style';
 
-interface IngredientRowProps {
-  item: Ingredient;
+interface IngredientRowProps<T extends Ingredient> {
+  item: T;
   topbitDisplay: TopBitDisplay;
   buttonText: String;
   onTrackClick: (ingredient: Ingredient, topbitDisplay: TopBitDisplay) => void;
+  onCopyClick?: (item: T) => void;
 }
 
 interface IngredientRowState {
   scaledIngredient: Ingredient;
 }
 
-export class StoredIngredientRow extends React.Component<
-  IngredientRowProps, IngredientRowState
+export class StoredIngredientRow<T extends Ingredient> extends React.Component<
+  IngredientRowProps<T>, IngredientRowState
   > {
 
-  constructor(props: IngredientRowProps) {
+  constructor(props: IngredientRowProps<T>) {
     super(props);
     this.state = {
       scaledIngredient: this.props.item
@@ -41,7 +42,26 @@ export class StoredIngredientRow extends React.Component<
     this.setState({ scaledIngredient: this.props.item });
   }
 
+  handleCopyClick() {
+    if (this.props.onCopyClick) {
+      this.props.onCopyClick(this.props.item);
+    }
+  }
+
   render() {
+    let copyCell: JSX.Element | null;
+    if (this.props.onCopyClick !== undefined) {
+      copyCell = ingredientCell(
+        <button
+          id={`copy_${this.props.item.uid}`}
+          onClick={() => this.handleCopyClick()}
+        >
+          Copy
+        </button>
+      );
+    } else {
+      copyCell = null;  // this has gotta be bad form, right?
+    }
     return (
       <tr key={this.props.item.uid}>
         {ingredientCell(this.state.scaledIngredient.name)}
@@ -63,11 +83,13 @@ export class StoredIngredientRow extends React.Component<
             {this.props.buttonText}
           </button>
          ))}
+         {copyCell}
       </tr>
     );
   }
 }
 
 function ingredientCell(contents: string | number | JSX.Element) {
-  return <td title={contents.toString()} style={tdStyle}>{contents}</td>;
+  const opts = { title: contents.toString(), style: tdStyle};
+  return <td {...opts}>{contents}</td>;
 }

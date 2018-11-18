@@ -1,15 +1,15 @@
 import * as React from 'react';
-import { Ingredient, Recipe, Named, NDBed } from '../classes';
+import { Named, NDBed } from '../classes';
 import SearchIngredientRow from '../containers/searchingredientrow';
 import { DataSource } from '../ndbapi';
-import StoredIngredientRow from '../containers/storedingredientrow';
+import StoredIngredients from '../containers/storedingredients';
+import StoredRecipes from '../containers/storedrecipes';
 import { tableStyle, thStyle } from 'src/style';
 
 interface SearchComponentProps {
   searchString: string;
   dataSource: DataSource;
   items: (NDBed & Named)[];
-  saved: { ndbs: Ingredient[], ingredients: Ingredient[], recipes: Recipe[] };
   onDataSourceSelect: (ds: DataSource) => void;
   onFoodSearchInput: (searchString: string) => void;
   onFoodSearchSubmit: (searchString: string, ds: DataSource) => void;
@@ -48,43 +48,8 @@ export class SearchComponent extends React.Component<
   render() {
     return (
       <div>
-        Ingredients:
-        <table style={tableStyle}>
-          <tbody>
-            <tr style={thStyle}>
-              <th style={thStyle}>Name</th>
-              <th style={thStyle}>Fat</th>
-              <th style={thStyle}>Carbs</th>
-              <th style={thStyle}>Protein</th>
-              <th style={thStyle}>Calories</th>
-              <th style={thStyle}>Amount</th>
-              <th style={thStyle}>Unit</th>
-            </tr>
-            {this.props.saved.ingredients.map(
-              (item) => <StoredIngredientRow key={item.uid} item={item} />
-            )}
-            {this.props.saved.ndbs.map(
-              (item) => <StoredIngredientRow key={item.uid} item={item} />
-            )}
-          </tbody>
-        </table>
-        Recipes:
-        <table style={tableStyle}>
-          <tbody>
-            <tr style={thStyle}>
-              <th style={thStyle}>Name</th>
-              <th style={thStyle}>Fat</th>
-              <th style={thStyle}>Carbs</th>
-              <th style={thStyle}>Protein</th>
-              <th style={thStyle}>Calories</th>
-              <th style={thStyle}>Amount</th>
-              <th style={thStyle}>Unit</th>
-            </tr>
-            {this.props.saved.recipes.map(
-              (item) => <StoredIngredientRow key={item.uid} item={item} />
-            )}
-          </tbody>
-        </table>
+        <StoredIngredients />
+        <StoredRecipes />
         <form onSubmit={(e) => this.handleSubmit(e)} >
           <label>
             Search:
@@ -95,14 +60,17 @@ export class SearchComponent extends React.Component<
               onChange={(e) => this.handleSearchChange(e)}
             />
           </label>
-          <select
-            value={this.props.dataSource}
-            onChange={(e) => this.handleSelectChange(e)}
-          >
-            <option value={DataSource.SR}>{DataSource[DataSource.SR]}</option>
-            <option value={DataSource.BL}>{DataSource[DataSource.BL]}</option>
-            <option value={DataSource.Any}>{DataSource[DataSource.Any]}</option>
-          </select>
+          <label>
+            Datasource:
+            <select
+              value={this.props.dataSource}
+              onChange={(e) => this.handleSelectChange(e)}
+            >
+              <option value={DataSource.SR}>Non-branded</option>
+              <option value={DataSource.BL}>Branded</option>
+              <option value={DataSource.Any}>All</option>
+            </select>
+          </label>
           <input type="submit" value="Submit" />
         </form>
         <table style={tableStyle}>

@@ -2,6 +2,7 @@ import { Ingredient, FOOD_UNIT } from '../classes';
 import * as React from 'react';
 import { tableStyle } from '../style';
 import { IngredientsTable, mealCell } from './ingredientstable';
+import { currentDate } from '../datautil';
 
 interface CreateRecipeInputProps {
   foods: Ingredient[];
@@ -16,11 +17,20 @@ interface CreateRecipeInputProps {
 
 interface CreateRecipeInputState {
     name: string;
-
     unit: FOOD_UNIT;
     useCalculatedAmount: boolean;
     totalSize?: number;
     portionSize: number;
+}
+
+function emptyState() {
+  return {
+    name: `${currentDate()} Bitchin\' Recipe`,
+    totalSize: undefined,
+    unit: FOOD_UNIT.g,
+    useCalculatedAmount: true,
+    portionSize: 100
+  };
 }
 
 export class CreateRecipeInput extends React.Component<
@@ -29,13 +39,7 @@ export class CreateRecipeInput extends React.Component<
 
   constructor(props: CreateRecipeInputProps) {
     super(props);
-    this.state = {
-        name: `${currentDate()} Bitchin\' Recipe`,
-        totalSize: undefined,
-        unit: FOOD_UNIT.g,
-        useCalculatedAmount: true,
-        portionSize: 100
-    };
+    this.state = emptyState();
   }
 
   getTotalSize(allowZero: boolean) {
@@ -56,6 +60,7 @@ export class CreateRecipeInput extends React.Component<
             this.state.name, this.props.foods, this.state.portionSize, this.getTotalSize(false), this.state.unit
         );
       }
+      this.setState(emptyState());
   }
 
   handleNameInput(event: React.ChangeEvent<HTMLInputElement>) {
@@ -146,9 +151,4 @@ export class CreateRecipeInput extends React.Component<
       </div>
     );
   }
-}
-
-function currentDate() {
-  const date = new Date();
-  return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
 }

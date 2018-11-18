@@ -206,7 +206,16 @@ class MealImpl implements Meal {
   }
 }
 
-export class Recipe implements UIDed {
+export class Recipe implements Ingredient {
+
+  static copy(recipe: Recipe) {
+    const uid = recipeId();
+    return new Recipe(
+      uid, `${recipe.name}'s Bitchin' Copy` , recipe.foods, recipe.fat,
+      recipe.carbs, recipe.protein, recipe.calories, recipe.amount,
+      recipe.unit, recipe.portionRatio
+    );
+  }
 
   static new(name: string, foods: Ingredient[], portionSize: number, totalSize?: number, unit?: string) {
     if (unit === undefined) {

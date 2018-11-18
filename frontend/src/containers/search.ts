@@ -8,15 +8,7 @@ import { StoreState } from '../types/index';
 function mapStateToProps(state: StoreState) {
   return {
     ...state.search,
-    saved: state.saved
-    // ingredients: state.created.ingredients,
-    // recipes: state.created.recipes
   };
-  // return {
-  //   value: state.search.value,
-  //   dataSource: state.search.dataSource,
-  //   items: state.search.items
-  // };
 }
 
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
