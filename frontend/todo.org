@@ -6,6 +6,7 @@
    > 111 |   })[0].value;
      112 | }
    because apparently not all reports come back with all macros included
+** Can't create two ingredients with the same name?
 * TODO Features
 ** Pressing enter submits track ingredient
 ** delete recipe / ingredient
