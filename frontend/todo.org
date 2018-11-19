@@ -1,10 +1,16 @@
+* TODO Bugs
+** Searching for quaker steel oats and clicking more details results in TypeError
+     108 | private static findNutrient(nutrients: ReportNutrient[], nutrientId: string): string {
+     109 |   return nutrients.filter(function(nutrient: ReportNutrient) {
+     110 |     return nutrient.nutrient_id === nutrientId;
+   > 111 |   })[0].value;
+     112 | }
+   because apparently not all reports come back with all macros included
 * TODO Features
-** Round recipe macros
-** Enter submits track
-** edit meals ingredients
-** copy recipe
-** view/edit recipe
+** Pressing enter submits track ingredient
+** delete recipe / ingredient
 ** edit ingredient name
+** scale search row to see if it matches your food before saving
 ** macro percentages alongside totals
 ** allow and evaluate math in cells, e.g. "=28*4"
 ** set default amount of NDBIngredient
@@ -21,6 +27,7 @@
 *** ensure every field has values
 ** delete ingredient/recipe
 ** what other units can we get from the USDA
+** edit meals ingredients
 
 * TODO Refactorings
 ** clean up scaleFood and ScaledIngredient usage

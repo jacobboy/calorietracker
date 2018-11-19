@@ -40,6 +40,7 @@ function fetchSearch(searchString: string, dataSource: DataSource): Promise<Sear
       if (response.errors) {
         return { item: [] };
       } else {
+        // TODO Filter these for only responses containing all macros?
         return response.list;
       }
     });
