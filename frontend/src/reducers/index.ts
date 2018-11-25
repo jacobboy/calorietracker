@@ -108,7 +108,9 @@ export function reducer(state: StoreState, action: Actions): StoreState {
         ...state,
         saved: {
           ...state.saved,
-          ingredients: [...state.saved.ingredients, action.payload]
+          ingredients: [...state.saved.ingredients, action.payload].sort(
+            (l, r) => l.name < r.name ? -1 : 1
+          )
         }
       };
     case CREATE_RECIPE_OPEN:

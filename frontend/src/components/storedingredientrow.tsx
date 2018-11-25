@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Ingredient, scaleFoodTo } from '../classes';
 import { TopBitDisplay } from '../types';
 import { tdStyle } from '../style';
+import { toTitleCase } from '../datautil';
 
 interface IngredientRowProps<T extends Ingredient> {
   item: T;
@@ -64,7 +65,7 @@ export class StoredIngredientRow<T extends Ingredient> extends React.Component<
     }
     return (
       <tr key={this.props.item.uid}>
-        {ingredientCell(this.state.scaledIngredient.name)}
+        {ingredientCell(toTitleCase(this.state.scaledIngredient.name))}
         {ingredientCell(this.state.scaledIngredient.fat.toFixed())}
         {ingredientCell(this.state.scaledIngredient.carbs.toFixed())}
         {ingredientCell(this.state.scaledIngredient.protein.toFixed())}

@@ -92,7 +92,7 @@ export function getAllStoredIngredients(): Ingredient[] {
       }
     }
   }
-  return ingreds;
+  return ingreds.sort( (l, r) => l.name < r.name ? -1 : 1 );
 }
 
 export function getAllCustomIngredients(): Ingredient[] {
@@ -103,7 +103,7 @@ export function getAllCustomIngredients(): Ingredient[] {
       ingreds.push(loadIngredient(key));
     }
   }
-  return ingreds;
+  return ingreds.sort( (l, r) => l.name < r.name ? -1 : 1 );
 }
 
 export function getAllRecipes(): Recipe[] {
@@ -114,5 +114,5 @@ export function getAllRecipes(): Recipe[] {
       recipes.push(loadRecipe(key));
     }
   }
-  return recipes;
+  return recipes.sort( (l, r) => l.name < r.name ? -1 : 1 );
 }

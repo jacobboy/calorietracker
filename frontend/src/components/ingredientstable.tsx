@@ -1,6 +1,7 @@
 import { Ingredient, FOOD_UNIT } from '../classes';
 import * as React from 'react';
 import { tdStyle, thStyle } from '../style';
+import { toTitleCase } from '../datautil';
 
 export function headerCell(text: string) {
   return <th title={text.toString()} style={thStyle}>{text}</th>;
@@ -85,7 +86,7 @@ class IngredientRow extends React.Component<IngredientRowProps, IngredientRowSta
     }
     return (
       <tr key={`food_${this.props.idx}`} id={'food'}>
-        {ingredientCell(this.props.food.name, 'name')}
+        {ingredientCell(toTitleCase(this.props.food.name), 'name')}
         {ingredientCell(amountElement, `amount`, 'amount')}
         {ingredientCell(this.props.food.unit, 'unit')}
         {ingredientCell(this.props.food.fat, 'fat')}

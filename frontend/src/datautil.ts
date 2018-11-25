@@ -18,3 +18,11 @@ export function currentDate() {
   const date = new Date();
   return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear().toString().substring(2)}`;
 }
+
+export function toTitleCase(str: string) {
+  const strs = str.toLowerCase().split(' ');
+  for (var i = 0; i < strs.length; i++) {
+    strs[i] = strs[i].charAt(0).toUpperCase() + strs[i].slice(1);
+  }
+  return strs.join(' ');
+}

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Named, NDBed, Ingredient } from '../classes';
 import { getIngredient } from '../lookup';
 import { tdStyle } from 'src/style';
+import { toTitleCase } from 'src/datautil';
 
 function ingredientCell(contents: string | number) {
   return <td title={contents.toString()} style={tdStyle}>{contents}</td>;
@@ -33,7 +34,7 @@ export class SearchIngredientRow extends React.Component<
     if (this.state.ingred === undefined) {
       return (
         <tr>
-          {ingredientCell(this.props.item.name)}
+          {ingredientCell(toTitleCase(this.props.item.name))}
           {ingredientCell('')}
           {ingredientCell('')}
           {ingredientCell('')}
@@ -55,7 +56,7 @@ export class SearchIngredientRow extends React.Component<
     } else {
       return (
         <tr>
-          {ingredientCell(this.props.item.name)}
+          {ingredientCell(toTitleCase(this.props.item.name))}
           {ingredientCell(this.state.ingred.fat)}
           {ingredientCell(this.state.ingred.carbs)}
           {ingredientCell(this.state.ingred.protein)}
