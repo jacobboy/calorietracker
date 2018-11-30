@@ -36,7 +36,7 @@ describe('The stored ingredient component', () => {
 
   beforeEach(() => {
     foods = mockIngredients(2);
-    recipe = Recipe.new('Test recipe 2', foods, 100);
+    recipe = Recipe.new('Test Recipe 2', foods, 100);
 
     let state = {
       topbit: {
@@ -47,7 +47,7 @@ describe('The stored ingredient component', () => {
       },
       saved: {
         recipes: [
-          Recipe.new('Test recipe 1', [foods[1]], 12), // just to have more than one
+          Recipe.new('Test Recipe 1', [foods[1]], 12), // just to have more than one
           recipe
         ]
       }
@@ -56,7 +56,7 @@ describe('The stored ingredient component', () => {
 
     wrapper = mount(
       <Provider store={store}>
-        <StoredRecipes />
+        <StoredRecipes searchText={'2'}/>
       </Provider>
     );
 
@@ -64,5 +64,9 @@ describe('The stored ingredient component', () => {
   it('adds recipes to the state on add recipe click', () => {
     wrapper.find(`#copy_${recipe.uid}`).simulate('click');
     expect(store.getState().topbit.recipe.foods).toEqual(recipe.foods);
+  });
+  it('only displays recipes that match the search criteria', () => {
+    expect(wrapper.html().indexOf('Test Recipe 2')).toBeGreaterThan(-1);
+    expect(wrapper.html().indexOf('Test Recipe 1')).toEqual(-1);
   });
 });

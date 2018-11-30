@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { Named, NDBed } from '../classes';
-import SearchIngredientRow from '../containers/searchingredientrow';
+import { SearchIngredientRow } from '../components/searchingredientrow';
+import SearchIngredientRowContainer from '../containers/searchingredientrow';
 import { DataSource } from '../ndbapi';
 import StoredIngredients from '../containers/storedingredients';
 import StoredRecipes from '../containers/storedrecipes';
-import { tableStyle, thStyle } from 'src/style';
+import { tableStyle } from 'src/style';
 
 interface SearchComponentProps {
   searchString: string;
@@ -48,8 +49,6 @@ export class SearchComponent extends React.Component<
   render() {
     return (
       <div>
-        <StoredIngredients />
-        <StoredRecipes />
         <form onSubmit={(e) => this.handleSubmit(e)} >
           <label>
             Search:
@@ -73,19 +72,14 @@ export class SearchComponent extends React.Component<
           </label>
           <input type="submit" value="Submit" />
         </form>
+        <StoredIngredients searchText={this.props.searchString || ''}/>
+        <StoredRecipes searchText={this.props.searchString || ''}/>
+        USDA:
         <table style={tableStyle}>
           <tbody>
-            <tr>
-              <th style={thStyle}>Name</th>
-              <th style={thStyle}>Fat</th>
-              <th style={thStyle}>Carbs</th>
-              <th style={thStyle}>Protein</th>
-              <th style={thStyle}>Calories</th>
-              <th style={thStyle}>Amount</th>
-              <th style={thStyle}>Unit</th>
-            </tr>
+            {SearchIngredientRow.HEADER}
             {this.props.items.map(
-              (item) => <SearchIngredientRow key={item.ndbno} item={item} />
+              (item) => <SearchIngredientRowContainer key={item.ndbno} item={item} />
             )}
           </tbody>
         </table>

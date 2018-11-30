@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Named, NDBed, Ingredient } from '../classes';
 import { getIngredient } from '../lookup';
-import { tdStyle } from 'src/style';
+import { tdStyle, thStyle } from 'src/style';
 import { toTitleCase } from 'src/datautil';
 
 function ingredientCell(contents: string | number) {
@@ -20,6 +20,18 @@ interface SearchIngredientRowState {
 export class SearchIngredientRow extends React.Component<
   SearchIngredientRowProps, SearchIngredientRowState
   > {
+
+    static HEADER = (
+      <tr style={thStyle}>
+        <th style={thStyle}>Name</th>
+        <th style={thStyle}>Amount</th>
+        <th style={thStyle}>Unit</th>
+        <th style={thStyle}>Fat</th>
+        <th style={thStyle}>Carbs</th>
+        <th style={thStyle}>Protein</th>
+        <th style={thStyle}>Calories</th>
+      </tr>
+    );
 
   constructor(props: SearchIngredientRowProps) {
     super(props);
@@ -57,12 +69,12 @@ export class SearchIngredientRow extends React.Component<
       return (
         <tr>
           {ingredientCell(toTitleCase(this.props.item.name))}
+          {ingredientCell(this.state.ingred.amount)}
+          {ingredientCell(this.state.ingred.unit)}
           {ingredientCell(this.state.ingred.fat)}
           {ingredientCell(this.state.ingred.carbs)}
           {ingredientCell(this.state.ingred.protein)}
           {ingredientCell(this.state.ingred.calories)}
-          {ingredientCell(this.state.ingred.amount)}
-          {ingredientCell(this.state.ingred.unit)}
           <td style={tdStyle}/>
           <td style={tdStyle}>
             <button onClick={() => this.props.onSaveClick(this.props.item)}>

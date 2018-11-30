@@ -1,6 +1,6 @@
 import * as client from '../client';
 import { Report } from '../ndbapi/classes';
-import { Ingredient, Recipe, ingredientFromJson, ingredientFromReport } from '../classes';
+import { Ingredient, Recipe, ingredientFromJson, ingredientFromReport, Meal } from '../classes';
 
 function getKey(keyType: string) {
   // was '::' but Enzyme didn't like that
@@ -80,6 +80,18 @@ export function loadRecipe(recipeId: string): Recipe {
     throw new Error('Recipe ' + recipeId + ' not found.');
   }
 }
+
+export function saveMeal(meal: Meal) {
+  const key = meal.uid;
+  const mealStr = JSON.stringify(meal);
+  window.localStorage.setItem(key, mealStr);
+}
+
+export function saveDay(date: string, meals: Meal[]) {
+  window.localStorage.setItem(date, JSON.stringify(meals));
+}
+
+/* export function loadDay(date) */
 
 export function getAllStoredIngredients(): Ingredient[] {
   const ingreds: Ingredient[] = [];

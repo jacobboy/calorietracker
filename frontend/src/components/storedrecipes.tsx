@@ -1,12 +1,23 @@
 import * as React from 'react';
 import { Recipe } from '../classes';
-import { thStyle, tableStyle } from '../style';
-import StoredIngredientRow from '../containers/storedingredientrow';
+import { tableStyle } from '../style';
+/* TODO pretty sure the below is definitely not how to import both */
+import { StoredIngredientRow } from '../components/storedingredientrow';
+import StoredIngredientRowContainer from '../containers/storedingredientrow';
 
 type StoredRecipesProps = {
   recipes: Recipe[];
   onCopyRecipeClick: (recipe: Recipe) => void;
+  searchText: string;
 };
+
+function findRecipes(recipes: Recipe[], searchText: string) {
+  if (searchText) {
+    return recipes.filter((recipe) => recipe.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1);
+  } else {
+    return recipes;
+  }
+}
 
 export function StoredRecipes(props: StoredRecipesProps) {
   return (
@@ -14,17 +25,9 @@ export function StoredRecipes(props: StoredRecipesProps) {
     Recipes:
     <table style={tableStyle}>
       <tbody>
-        <tr style={thStyle}>
-          <th style={thStyle}>Name</th>
-          <th style={thStyle}>Fat</th>
-          <th style={thStyle}>Carbs</th>
-          <th style={thStyle}>Protein</th>
-          <th style={thStyle}>Calories</th>
-          <th style={thStyle}>Amount</th>
-          <th style={thStyle}>Unit</th>
-        </tr >
-        {props.recipes.map(
-          (item) => <StoredIngredientRow key={item.uid} item={item} onCopyClick={props.onCopyRecipeClick} />
+        {StoredIngredientRow.HEADER}
+        {findRecipes(props.recipes, props.searchText).map(
+          (item) => <StoredIngredientRowContainer key={item.uid} item={item} onCopyClick={props.onCopyRecipeClick} />
         )}
       </tbody >
     </table >
