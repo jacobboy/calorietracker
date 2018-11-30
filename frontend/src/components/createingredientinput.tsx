@@ -51,41 +51,14 @@ export class CreateIngredientInput extends React.Component<
   }
 
   // TODO figure out how to do these macronutrient handlers programmatically
-  /* handleInput(macronutrient: ('fat' | 'carbs' | 'protein')) {
+  handleInput(macronutrient: ('fat' | 'carbs' | 'protein')) {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = Number(event.target.value);
-      const newState = { ...this.state, macronutrient: value };
+      var newState: CreateIngredientInputState = {...this.state};
+      newState[macronutrient] = value;
+      newState.calories = newState.fat * 9 + newState.carbs * 4 + newState.protein * 4;
       this.setState(newState);
-      if (this.state.useCalculatedCalories) {
-        const calories = this.state.fat * 9 + this.state.carbs * 4 + this.state.protein * 4;
-        this.setState({ calories });
-      }
     };
-  } */
-
-  updateCalories(state: CreateIngredientInputState) {
-    if (this.state.useCalculatedCalories) {
-      const calories = state.fat * 9 + state.carbs * 4 + state.protein * 4;
-      this.setState({ calories });
-    }
-  }
-
-  handleFatInput(event: React.ChangeEvent<HTMLInputElement>) {
-    const fat = Number(event.target.value);
-    this.setState({ fat });
-    this.updateCalories({ ...this.state, fat });
-  }
-
-  handleCarbsInput(event: React.ChangeEvent<HTMLInputElement>) {
-    const carbs = Number(event.target.value);
-    this.setState({ carbs });
-    this.updateCalories({ ...this.state, carbs });
-  }
-
-  handleProteinInput(event: React.ChangeEvent<HTMLInputElement>) {
-    const protein = Number(event.target.value);
-    this.setState({ protein });
-    this.updateCalories({ ...this.state, protein });
   }
 
   handleCaloriesInput(event: React.ChangeEvent<HTMLInputElement>) {
@@ -136,7 +109,7 @@ export class CreateIngredientInput extends React.Component<
                 id="fatInput"
                 type="number"
                 value={this.state.fat || ''}
-                onChange={(e) => this.handleFatInput(e)}
+                onChange={(e) => this.handleInput('fat')(e)}
               />
             </label>
           </li>
@@ -147,7 +120,7 @@ export class CreateIngredientInput extends React.Component<
                 id="carbsInput"
                 type="number"
                 value={this.state.carbs || ''}
-                onChange={(e) => this.handleCarbsInput(e)}
+                onChange={(e) => this.handleInput('carbs')(e)}
               />
             </label>
           </li>
@@ -158,7 +131,7 @@ export class CreateIngredientInput extends React.Component<
                 id="proteinInput"
                 type="number"
                 value={this.state.protein || ''}
-                onChange={(e) => this.handleProteinInput(e)}
+                onChange={(e) => this.handleInput('protein')(e)}
               />
             </label>
           </li>
