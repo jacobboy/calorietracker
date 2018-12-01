@@ -15,7 +15,6 @@
 ** allow and evaluate math in cells, e.g. "=28*4"
 ** set default amount of NDBIngredient
 *** wtf did i mean by this?  is return from USDA always 100?
-** link to USDA page in search row
 ** allow adding to non-latest meal
 ** convert meal to recipe
 ** save date with custom ingredients

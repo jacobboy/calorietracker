@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { Named, NDBed, Ingredient } from '../classes';
 import { getIngredient } from '../lookup';
-import { tdStyle, thStyle } from 'src/style';
+import { tdStyle, thStyle, searchLinkStyle } from 'src/style';
 import { toTitleCase } from 'src/datautil';
 
-function ingredientCell(contents: string | number) {
+function ingredientCell(contents: string | number | JSX.Element) {
   return <td title={contents.toString()} style={tdStyle}>{contents}</td>;
 }
 
@@ -46,10 +46,18 @@ export class SearchIngredientRow extends React.Component<
   }
 
   render() {
+    const link = (
+    <a
+      href={'https://ndb.nal.usda.gov/ndb/foods/show/' + this.props.item.ndbno}
+      style={searchLinkStyle}
+      target="_blank"
+    >
+      {toTitleCase(this.props.item.name)}
+    </a>);
     if (this.state.ingred === undefined) {
       return (
         <tr>
-          {ingredientCell(toTitleCase(this.props.item.name))}
+          {ingredientCell(link)}
           {ingredientCell('')}
           {ingredientCell('')}
           {ingredientCell('')}
@@ -74,7 +82,7 @@ export class SearchIngredientRow extends React.Component<
     } else {
       return (
         <tr>
-          {ingredientCell(toTitleCase(this.props.item.name))}
+          {ingredientCell(link)}
           {ingredientCell(this.state.ingred.amount)}
           {ingredientCell(this.state.ingred.unit)}
           {ingredientCell(this.state.ingred.fat.toFixed())}

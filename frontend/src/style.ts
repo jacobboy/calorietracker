@@ -18,3 +18,7 @@ export const tdStyle: React.CSSProperties = {
 export const thStyle: React.CSSProperties = {
     'border': '1px solid black'
 };
+
+export const searchLinkStyle: React.CSSProperties = {
+  'color': 'black'
+};
