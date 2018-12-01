@@ -4,6 +4,7 @@ import { tableStyle } from '../style';
 /* TODO pretty sure the below is definitely not how to import both */
 import { StoredIngredientRow } from '../components/storedingredientrow';
 import StoredIngredientRowContainer from '../containers/storedingredientrow';
+import { nameMatches } from 'src/datautil';
 
 type StoredIngredientsProps = {
   ingredients: Ingredient[];
@@ -12,11 +13,7 @@ type StoredIngredientsProps = {
 };
 
 function findIngredients(ingredients: Ingredient[], searchText: string) {
-  if (searchText) {
-    return ingredients.filter((ingred) => ingred.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1);
-  } else {
-    return ingredients;
-  }
+  return nameMatches(ingredients, searchText);
 }
 
 export function StoredIngredients(props: StoredIngredientsProps) {
@@ -27,10 +24,10 @@ export function StoredIngredients(props: StoredIngredientsProps) {
         <tbody>
           {StoredIngredientRow.HEADER}
           {findIngredients(props.ingredients, props.searchText).map(
-            (item) => <StoredIngredientRowContainer key={item.uid} item={item} />
+            item => <StoredIngredientRowContainer key={item.uid} item={item} />
           )}
           {findIngredients(props.ndbs, props.searchText).map(
-            (item) => <StoredIngredientRowContainer key={item.uid} item={item} />
+            item => <StoredIngredientRowContainer key={item.uid} item={item} />
           )}
         </tbody>
       </table>

@@ -4,6 +4,7 @@ import { tableStyle } from '../style';
 /* TODO pretty sure the below is definitely not how to import both */
 import { StoredIngredientRow } from '../components/storedingredientrow';
 import StoredIngredientRowContainer from '../containers/storedingredientrow';
+import { nameMatches } from '../datautil';
 
 type StoredRecipesProps = {
   recipes: Recipe[];
@@ -12,11 +13,7 @@ type StoredRecipesProps = {
 };
 
 function findRecipes(recipes: Recipe[], searchText: string) {
-  if (searchText) {
-    return recipes.filter((recipe) => recipe.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1);
-  } else {
-    return recipes;
-  }
+  return nameMatches(recipes, searchText);
 }
 
 export function StoredRecipes(props: StoredRecipesProps) {

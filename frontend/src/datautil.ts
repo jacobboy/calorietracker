@@ -1,3 +1,5 @@
+import { Named } from './classes';
+
 export function dropIndex<T>(arr: Array<T>, idx: number): Array<T> {
   return [...arr.slice(0, idx), ...arr.slice(idx + 1)];
 }
@@ -25,4 +27,17 @@ export function toTitleCase(str: string) {
     strs[i] = strs[i].charAt(0).toUpperCase() + strs[i].slice(1);
   }
   return strs.join(' ');
+}
+
+export function nameMatches<T extends Named>(nameds: T[], searchText: string) {
+  const filters = searchText.split(' ');
+  if (searchText) {
+    return nameds.filter(
+      ingred => filters.map(
+        filter => ingred.name.toLowerCase().indexOf(filter.toLowerCase()) > -1
+      ).every(x => x)
+    );
+  } else {
+    return nameds;
+  }
 }
