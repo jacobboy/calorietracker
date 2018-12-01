@@ -1,7 +1,15 @@
 import * as uuid from 'uuid';
 import { ReportNutrient, Report } from './ndbapi/classes';
 import { scaleQuantity, round } from './transforms';
-import { saveIngredient, saveRecipe, getIngredientKey, getNdbKey, getRecipeKey, getMealKey } from './storage';
+import {
+  saveIngredient,
+  saveRecipe,
+  getIngredientKey,
+  getNdbKey,
+  getRecipeKey,
+  getMealKey,
+  getDateKey
+} from './storage';
 
 export enum MACROS {
   'fat' = 'fat',
@@ -18,6 +26,7 @@ function ingredientId() { return getIngredientKey(uuid.v4()); }
 function ndbnoId(ndbno: string) { return getNdbKey(ndbno); }
 function recipeId() { return getRecipeKey(uuid.v4()); }
 function mealId() { return getMealKey(uuid.v4()); }
+/* function dateId(date: string) { return getDateKey(date); } */
 
 export enum FOOD_UNIT {
   'g' = 'g',
@@ -54,18 +63,12 @@ export abstract class Nutritional {
 }
 
 class NutritionalImpl extends Nutritional {
-  readonly fat: number;
-  readonly carbs: number;
-  readonly protein: number;
-  readonly calories: number;
-
-  constructor(fat: number, carbs: number, protein: number, calories: number) {
-    super();
-    this.fat = fat;
-    this.carbs = carbs;
-    this.protein = protein;
-    this.calories = calories;
-  }
+  constructor(
+    readonly fat: number,
+    readonly carbs: number,
+    readonly protein: number,
+    readonly calories: number
+  ) { super(); }
 }
 
 export interface Quantifiable extends Named {
@@ -80,7 +83,7 @@ export abstract class Ingredient extends Nutritional implements Quantifiable, UI
   readonly uid: string;
 }
 
-interface FoodCombo extends Nutritional {
+export interface FoodCombo extends Nutritional {
   readonly foods: Ingredient[];
   withFood(Ingredient: Ingredient): FoodCombo;
   withoutFood(Ingredient: Ingredient): FoodCombo;
@@ -297,6 +300,26 @@ export class Recipe extends Ingredient {
     readonly unit: string,
     readonly portionRatio: number,
   ) { super(); }
+}
+
+export class MealDate {
+  private readonly year: number;
+  private readonly month: number;
+  private readonly day: number;
+
+  static today() {
+    return new MealDate(new Date());
+  }
+
+  constructor(date: Date) {
+    this.year = date.getUTCFullYear();
+    this.month = date.getUTCMonth();
+    this.day = date.getUTCDay();
+   }
+
+   get id() {
+     return getDateKey(`${this.year}_${this.month}_${this.day}`);
+   }
 }
 
 export const ingredientFromJson = CustomIngredient.fromJson;

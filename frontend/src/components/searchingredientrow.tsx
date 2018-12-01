@@ -4,8 +4,9 @@ import { getIngredient } from '../lookup';
 import { tdStyle, thStyle, searchLinkStyle } from 'src/style';
 import { toTitleCase } from 'src/datautil';
 
-function ingredientCell(contents: string | number | JSX.Element) {
-  return <td title={contents.toString()} style={tdStyle}>{contents}</td>;
+function ingredientCell(contents: string | number | JSX.Element, title?: string) {
+  title = title || contents.toString();
+  return <td title={title} style={tdStyle}>{contents}</td>;
 }
 
 interface SearchIngredientRowProps {
@@ -57,7 +58,7 @@ export class SearchIngredientRow extends React.Component<
     if (this.state.ingred === undefined) {
       return (
         <tr>
-          {ingredientCell(link)}
+          {ingredientCell(link, this.props.item.name)}
           {ingredientCell('')}
           {ingredientCell('')}
           {ingredientCell('')}
@@ -82,7 +83,7 @@ export class SearchIngredientRow extends React.Component<
     } else {
       return (
         <tr>
-          {ingredientCell(link)}
+          {ingredientCell(link, this.props.item.name)}
           {ingredientCell(this.state.ingred.amount)}
           {ingredientCell(this.state.ingred.unit)}
           {ingredientCell(this.state.ingred.fat.toFixed())}

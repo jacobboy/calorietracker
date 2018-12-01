@@ -4,11 +4,33 @@ import { TopBitDisplay } from '../types';
 import { tdStyle, thStyle } from '../style';
 import { toTitleCase } from '../datautil';
 
+export const Header = (
+  <tr style={thStyle}>
+    <th style={thStyle}>Name</th>
+    <th style={thStyle}>Amount</th>
+    <th style={thStyle}>Unit</th>
+    <th style={thStyle}>Fat</th>
+    <th style={thStyle}>Fat%</th>
+    <th style={thStyle}>Carbs</th>
+    <th style={thStyle}>Carbs%</th>
+    <th style={thStyle}>Protein</th>
+    <th style={thStyle}>Protein%</th>
+    <th style={thStyle}>Calories</th>
+  </tr>
+);
+
 interface IngredientRowProps<T extends Ingredient> {
   item: T;
   topbitDisplay: TopBitDisplay;
-  buttonText: String;
-  onTrackClick: (ingredient: Ingredient, topbitDisplay: TopBitDisplay) => void;
+  // TODO This is a weird approach - sending in a list of display names of recipes/meals,
+  // and passing the index of that to the track handler to determine which recipe/meal to
+  // add an ingredient to
+  foodComboNames: string[];
+  onTrackClick: (
+    ingredient: Ingredient,
+    topbitDisplay: TopBitDisplay,
+    foodComboIdx: number
+  ) => void;
   onCopyClick?: (item: T) => void;
 }
 
@@ -19,21 +41,6 @@ interface IngredientRowState {
 export class StoredIngredientRow<T extends Ingredient> extends React.Component<
   IngredientRowProps<T>, IngredientRowState
   > {
-
-  static HEADER = (
-    <tr style={thStyle}>
-      <th style={thStyle}>Name</th>
-      <th style={thStyle}>Amount</th>
-      <th style={thStyle}>Unit</th>
-      <th style={thStyle}>Fat</th>
-      <th style={thStyle}>Fat%</th>
-      <th style={thStyle}>Carbs</th>
-      <th style={thStyle}>Carbs%</th>
-      <th style={thStyle}>Protein</th>
-      <th style={thStyle}>Protein%</th>
-      <th style={thStyle}>Calories</th>
-    </tr>
-  );
 
   constructor(props: IngredientRowProps<T>) {
     super(props);
@@ -51,11 +58,16 @@ export class StoredIngredientRow<T extends Ingredient> extends React.Component<
     }
   }
 
-  handleTrackFood() {
+  handleTrackFood(foodComboIdx: number, e?: React.FormEvent<HTMLFormElement>) {
     // scale again here to get around hitting submit twice putting same key in meals list
     const ingred = scaleFoodTo(this.props.item, this.state.scaledIngredient.amount);
-    this.props.onTrackClick(ingred, this.props.topbitDisplay);
+    this.props.onTrackClick(
+      ingred,
+      this.props.topbitDisplay,
+      foodComboIdx
+    );
     this.setState({ scaledIngredient: this.props.item });
+    if (e) { e.preventDefault(); }
   }
 
   handleCopyClick() {
@@ -78,15 +90,16 @@ export class StoredIngredientRow<T extends Ingredient> extends React.Component<
     } else {
       copyCell = null;  // this has gotta be bad form, right?
     }
-    const amountEnter = (e: React.FormEvent<HTMLFormElement>) => {
-      this.handleTrackFood();
-      e.preventDefault();
-    };
     return (
       <tr key={this.props.item.uid}>
         {ingredientCell(toTitleCase(this.state.scaledIngredient.name))}
         {ingredientCell((
-          <form onSubmit={(e) => amountEnter(e)} >
+          <form
+            id="trackFoodAmountForm"
+            onSubmit={
+              (e) => this.handleTrackFood(this.props.foodComboNames.length - 1, e)
+            }
+          >
             <input
               id="trackFoodAmountInput"
               type="number"
@@ -103,18 +116,34 @@ export class StoredIngredientRow<T extends Ingredient> extends React.Component<
         {ingredientCell(this.state.scaledIngredient.protein.toFixed())}
         {ingredientCell(this.state.scaledIngredient.proteinPct)}
         {ingredientCell(this.state.scaledIngredient.calories.toFixed())}
-        {ingredientCell((
-          <button id="trackFoodSubmit" tabIndex={-1} onClick={() => this.handleTrackFood()}>
-            {this.props.buttonText}
-          </button>
-         ))}
-         {copyCell}
+        <td title="Add to" style={tdStyle}>
+          Add to
+          {this.props.foodComboNames.map(
+              (name, idx) => trackButton(name, () => this.handleTrackFood(idx))
+            )
+          }
+        </td>
+        {copyCell}
       </tr>
     );
   }
 }
 
-function ingredientCell(contents: string | number | JSX.Element) {
+function trackButton(foodComboName: string, onClick: () => void) {
+  const id = foodComboName.replace(' ', '');
+  return (
+    <button
+      key={`trackFoodSubmit_${id}`}
+      id={`trackFoodSubmit_${id}`}
+      tabIndex={-1}
+      onClick={onClick}
+    >
+      {foodComboName}
+    </button>
+   );
+}
+
+function ingredientCell(contents: string | number | JSX.Element | JSX.Element[]) {
   const opts = { title: contents.toString(), style: tdStyle};
   return <td {...opts}>{contents}</td>;
 }

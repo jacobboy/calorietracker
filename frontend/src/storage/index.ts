@@ -1,6 +1,6 @@
 import * as client from '../client';
 import { Report } from '../ndbapi/classes';
-import { Ingredient, Recipe, ingredientFromJson, ingredientFromReport, Meal } from '../classes';
+import { Ingredient, Recipe, ingredientFromJson, ingredientFromReport, Meal, MealDate } from '../classes';
 
 function getKey(keyType: string) {
   // was '::' but Enzyme didn't like that
@@ -19,6 +19,8 @@ export const getRecipeKey = getKey('recipe');
 export const isRecipeKey = isKey('recipe');
 export const getMealKey = getKey('meal');
 export const isMealKey = isKey('meal');
+export const getDateKey = getKey('date');
+export const isDateKey = isKey('date');
 
 export function saveReport(report: Report): void {
   window.localStorage.setItem(getNdbKey(report.food.ndbno), JSON.stringify(report));
@@ -32,7 +34,7 @@ export function loadReport(ndbno: string): Report | null {
 function loadReportFromKey(key: string): Report | null {
   const reportStr: string | null = window.localStorage.getItem(key);
   if (reportStr !== null) {
-    console.log('Retrieved ' + key + ' from window storage');
+    /* console.log('Retrieved ' + key + ' from window storage'); */
     return JSON.parse(reportStr);
   } else {
     return null;
@@ -57,7 +59,7 @@ export function saveIngredient(ingredient: Ingredient): void {
 export function loadIngredient(ingredientId: string): Ingredient {
   const ingredStr = window.localStorage.getItem(ingredientId);
   if (ingredStr !== null) {
-    console.log('Retrieved ' + ingredientId + ' from window storage');
+    /* console.log('Retrieved ' + ingredientId + ' from window storage'); */
     return ingredientFromJson(ingredStr);
   } else {
     throw new Error('Ingredient ' + ingredientId + ' not found.');
@@ -81,17 +83,14 @@ export function loadRecipe(recipeId: string): Recipe {
   }
 }
 
-export function saveMeal(meal: Meal) {
-  const key = meal.uid;
-  const mealStr = JSON.stringify(meal);
-  window.localStorage.setItem(key, mealStr);
+export function saveDay(date: MealDate, meals: Meal[]) {
+  window.localStorage.setItem(date.id, JSON.stringify(meals));
 }
 
-export function saveDay(date: string, meals: Meal[]) {
-  window.localStorage.setItem(date, JSON.stringify(meals));
+export function loadDay(date: MealDate) {
+  const mealStr = window.localStorage.getItem(date.id) || '[]';
+  return JSON.parse(mealStr);
 }
-
-/* export function loadDay(date) */
 
 export function getAllStoredIngredients(): Ingredient[] {
   const ingreds: Ingredient[] = [];

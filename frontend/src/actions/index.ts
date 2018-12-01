@@ -1,4 +1,10 @@
-import { makeScaledIngredient, makeRecipe, FOOD_UNIT, Ingredient, scaleFoodTo } from '../classes';
+import {
+  makeScaledIngredient,
+  makeRecipe,
+  FOOD_UNIT,
+  Ingredient,
+  scaleFoodTo
+} from '../classes';
 import {
   CREATE_INGREDIENT_TOGGLE,
   CREATE_INGREDIENT_SUBMIT,
@@ -38,6 +44,10 @@ function createAction<T extends string, P>(type: T, payload?: P) {
   // TODO was payload ?, but that failed with a payload of 0
   // is there a point to this check now?
   return payload !== undefined ? { type, payload } : { type };
+}
+
+function addFoodToMeal(food: Ingredient, mealIdx: number) {
+  return createAction(ADD_FOOD_TO_MEAL, { mealIdx, food });
 }
 
 function createIngredientSubmit(
@@ -89,6 +99,10 @@ function changeMealFoodAmount(mealIdx: number, food: Ingredient, newAmount: numb
   return createAction(REPLACE_FOOD_IN_MEAL, {mealIdx, from: food, to: newFood});
 }
 
+/* function saveDay() {
+
+} */
+
 // TODO should actions be UI-driven or business logic driven?
 // perhaps business-driven and have the containers perform business/ui mapping?
 export const actions = {
@@ -101,9 +115,7 @@ export const actions = {
   addMeal: () => createAction(ADD_MEAL),
   removeMeal: (mealIdx: number) => createAction(REMOVE_MEAL, mealIdx),
   changeMealFoodAmount,
-  addFoodToMeal:
-    (food: Ingredient, mealIdx?: number) =>
-      createAction(ADD_FOOD_TO_MEAL, { mealIdx, food }),
+  addFoodToMeal,
   removeFoodFromMeal:
     (mealIdx: number, food: Ingredient) =>
       createAction(REMOVE_FOOD_FROM_MEAL, { mealIdx, food }),
@@ -116,7 +128,8 @@ export const actions = {
   removeFoodFromRecipe,
   saveRecipe,
   saveIngredient,
-  setDay: (day: Date) => createAction(CHANGE_DAY, day)
+  setDay: (day: Date) => createAction(CHANGE_DAY, day),
+  /* saveDay */
 };
 
 // tslint:disable-next-line:no-any

@@ -6,23 +6,27 @@
    > 111 |   })[0].value;
      112 | }
    because apparently not all reports come back with all macros included
+   Update: this one passes now, now heinz ketchup is broken
+           calories is missing
 ** Can't create two ingredients with the same name?
 
 * TODO Features
+** allow adding to non-latest meal
+** copy recipe uses previous amount as well
+** allow and evaluate math in cells, e.g. "=28*4"
+** simultaneously create multiple recipes
+** recent recipes / ingredients
 ** delete recipe / ingredient
 ** edit ingredient name
 ** scale search row to see if it matches your food before saving
-** allow and evaluate math in cells, e.g. "=28*4"
 ** set default amount of NDBIngredient
 *** wtf did i mean by this?  is return from USDA always 100?
-** allow adding to non-latest meal
 ** convert meal to recipe
 ** save date with custom ingredients
 ** search pagination
 ** unit conversion / options
 ** Recipe and ingredient input validation
 *** ensure every field has values
-** delete ingredient/recipe
 ** what other units can we get from the USDA
 ** edit meals ingredients
 

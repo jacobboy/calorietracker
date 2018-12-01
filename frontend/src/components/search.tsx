@@ -72,8 +72,8 @@ export class SearchComponent extends React.Component<
           </label>
           <input type="submit" value="Submit" />
         </form>
-        <StoredIngredients searchText={this.props.searchString || ''}/>
         <StoredRecipes searchText={this.props.searchString || ''}/>
+        <StoredIngredients searchText={this.props.searchString || ''}/>
         USDA:
         <table style={tableStyle}>
           <tbody>

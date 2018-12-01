@@ -30,6 +30,7 @@ export function toTitleCase(str: string) {
 }
 
 export function nameMatches<T extends Named>(nameds: T[], searchText: string) {
+  // TODO should this become a method on Named
   const filters = searchText.split(' ');
   if (searchText) {
     return nameds.filter(

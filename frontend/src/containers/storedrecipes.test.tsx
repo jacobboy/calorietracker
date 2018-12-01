@@ -40,7 +40,7 @@ describe('The stored ingredient component', () => {
 
     let state = {
       topbit: {
-        display: TopBitDisplay.MEALS,
+        display: TopBitDisplay.CREATE_RECIPE,
         recipe: {
           foods: []
         }

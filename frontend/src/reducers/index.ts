@@ -24,12 +24,12 @@ import { dropIndex, replaceElement, replaceObject } from '../datautil';
 import { meal, Ingredient, Meal } from '../classes';
 
 function mealIdxOrLast(state: StoreState, mealIdx?: number) {
-  return mealIdx === undefined ? (state.today.length - 1) : mealIdx;
+  return mealIdx === undefined ? state.today.length - 1 : mealIdx;
 }
 
 function addFoodToMeal(
   state: StoreState,
-  payload: { mealIdx?: number, food: Ingredient }
+  payload: { mealIdx?: number; food: Ingredient }
 ): StoreState {
   const idx = mealIdxOrLast(state, payload.mealIdx);
   const newMeal: Meal = state.today[idx].withFood(payload.food);
@@ -39,7 +39,7 @@ function addFoodToMeal(
 
 function removeFoodFromMeal(
   state: StoreState,
-  payload: { mealIdx: number, food: Ingredient }
+  payload: { mealIdx: number; food: Ingredient }
 ) {
   const idx = mealIdxOrLast(state, payload.mealIdx);
   // console.log(`removing food ${JSON.stringify(payload.food)} from meal ${idx}`);
@@ -109,7 +109,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
         saved: {
           ...state.saved,
           ingredients: [...state.saved.ingredients, action.payload].sort(
-            (l, r) => l.name < r.name ? -1 : 1
+            (l, r) => (l.name < r.name ? -1 : 1)
           )
         }
       };
@@ -128,7 +128,11 @@ export function reducer(state: StoreState, action: Actions): StoreState {
           ...state.topbit,
           recipe: {
             ...state.topbit.recipe,
-            foods: replaceObject(state.topbit.recipe.foods, action.payload.from, action.payload.to)
+            foods: replaceObject(
+              state.topbit.recipe.foods,
+              action.payload.from,
+              action.payload.to
+            )
           }
         }
       };
@@ -161,7 +165,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
           ...state.topbit,
           recipe: {
             ...state.topbit.recipe,
-            foods: state.topbit.recipe.foods.filter((f) => f !== action.payload)
+            foods: state.topbit.recipe.foods.filter(f => f !== action.payload)
           }
         }
       };

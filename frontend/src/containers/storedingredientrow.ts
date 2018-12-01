@@ -6,9 +6,16 @@ import { Dispatch } from 'redux';
 import { Ingredient } from '../classes';
 
 function mapStateToProps(state: StoreState) {
+  let foodComboNames: string[];
+  if (state.topbit.display === TopBitDisplay.CREATE_RECIPE) {
+    foodComboNames = ['recipe'];
+  } else {
+    foodComboNames = state.today.map((meal, idx) => `meal ${idx + 1}`);
+  }
+
   return {
     topbitDisplay: state.topbit.display,
-    buttonText: state.topbit.display === TopBitDisplay.CREATE_RECIPE ? 'Add to recipe' : 'Add to meal'
+    foodComboNames
   };
 }
 
@@ -17,11 +24,15 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
     // TODO: What is the approved react/redux way to condition
     //       the dispatch on state?
     //       Or should it be the same action, and the reducer handles it differently?
-    onTrackClick: (ingredient: Ingredient, topbitDisplay: TopBitDisplay) => {
+    onTrackClick: (
+      ingredient: Ingredient,
+      topbitDisplay: TopBitDisplay,
+      foodComboIdx: number
+    ) => {
       if (topbitDisplay === TopBitDisplay.CREATE_RECIPE) {
         dispatch(actions.addFoodToRecipe(ingredient));
       } else if (topbitDisplay === TopBitDisplay.MEALS) {
-        dispatch(actions.addFoodToMeal(ingredient));
+        dispatch(actions.addFoodToMeal(ingredient, foodComboIdx));
       }
     }
   };
