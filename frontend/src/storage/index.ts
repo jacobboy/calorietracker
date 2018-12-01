@@ -41,7 +41,7 @@ function loadReportFromKey(key: string): Report | null {
 
 export function saveIngredient(ingredient: Ingredient): void {
   // TODO unify this with CustomIngredient to avoid drift?
-  const obj = {
+  /* const obj = {
     name: ingredient.name,
     uid: ingredient.uid,
     fat: ingredient.fat,
@@ -50,8 +50,8 @@ export function saveIngredient(ingredient: Ingredient): void {
     calories: ingredient.calories,
     amount: ingredient.amount,
     unit: ingredient.unit,
-  };
-  client.sendIngredient(obj);
+  }; */
+  client.sendIngredient(ingredient);
 }
 
 export function loadIngredient(ingredientId: string): Ingredient {

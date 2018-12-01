@@ -26,8 +26,11 @@ export class StoredIngredientRow<T extends Ingredient> extends React.Component<
       <th style={thStyle}>Amount</th>
       <th style={thStyle}>Unit</th>
       <th style={thStyle}>Fat</th>
+      <th style={thStyle}>Fat%</th>
       <th style={thStyle}>Carbs</th>
+      <th style={thStyle}>Carbs%</th>
       <th style={thStyle}>Protein</th>
+      <th style={thStyle}>Protein%</th>
       <th style={thStyle}>Calories</th>
     </tr>
   );
@@ -94,11 +97,14 @@ export class StoredIngredientRow<T extends Ingredient> extends React.Component<
          ))}
         {ingredientCell(this.state.scaledIngredient.unit)}
         {ingredientCell(this.state.scaledIngredient.fat.toFixed())}
+        {ingredientCell(this.state.scaledIngredient.fatPct)}
         {ingredientCell(this.state.scaledIngredient.carbs.toFixed())}
+        {ingredientCell(this.state.scaledIngredient.carbsPct)}
         {ingredientCell(this.state.scaledIngredient.protein.toFixed())}
+        {ingredientCell(this.state.scaledIngredient.proteinPct)}
         {ingredientCell(this.state.scaledIngredient.calories.toFixed())}
         {ingredientCell((
-          <button id="trackFoodSubmit" onClick={() => this.handleTrackFood()}>
+          <button id="trackFoodSubmit" tabIndex={-1} onClick={() => this.handleTrackFood()}>
             {this.props.buttonText}
           </button>
          ))}

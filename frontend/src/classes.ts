@@ -1,6 +1,6 @@
 import * as uuid from 'uuid';
 import { ReportNutrient, Report } from './ndbapi/classes';
-import { scaleQuantity } from './transforms';
+import { scaleQuantity, round } from './transforms';
 import { saveIngredient, saveRecipe, getIngredientKey, getNdbKey, getRecipeKey, getMealKey } from './storage';
 
 export enum MACROS {
@@ -36,11 +36,36 @@ export interface NDBed {
   readonly ndbno: string;
 }
 
-export interface Nutritional {
+export abstract class Nutritional {
   readonly fat: number;
   readonly carbs: number;
   readonly protein: number;
   readonly calories: number;
+
+  get fatPct() {
+    return round(this.fat * 9 / this.calories, .01);
+  }
+  get carbsPct() {
+    return round(this.carbs * 4 / this.calories, .01);
+  }
+  get proteinPct() {
+    return round(this.protein * 4 / this.calories, .01);
+  }
+}
+
+class NutritionalImpl extends Nutritional {
+  readonly fat: number;
+  readonly carbs: number;
+  readonly protein: number;
+  readonly calories: number;
+
+  constructor(fat: number, carbs: number, protein: number, calories: number) {
+    super();
+    this.fat = fat;
+    this.carbs = carbs;
+    this.protein = protein;
+    this.calories = calories;
+  }
 }
 
 export interface Quantifiable extends Named {
@@ -48,7 +73,12 @@ export interface Quantifiable extends Named {
   readonly unit: string;
 }
 
-export interface Ingredient extends Nutritional, Quantifiable, UIDed { }
+export abstract class Ingredient extends Nutritional implements Quantifiable, UIDed {
+  readonly name: string;
+  readonly amount: number;
+  readonly unit: string;
+  readonly uid: string;
+}
 
 interface FoodCombo extends Nutritional {
   readonly foods: Ingredient[];
@@ -65,7 +95,7 @@ export interface Meal extends FoodCombo, UIDed {
   withoutFood(food: Ingredient): Meal;
 }
 
-class NDBIngredient implements NDBed, Ingredient {
+class NDBIngredient extends Ingredient implements NDBed {
   readonly ndbno: string;
   readonly name: string;
   readonly fat: number;
@@ -115,6 +145,7 @@ class NDBIngredient implements NDBed, Ingredient {
     ndbno: string, name: string, fat: number, carbs: number,
     protein: number, calories: number, amount: number, unit: FOOD_UNIT
   ) {
+    super();
     this.ndbno = ndbno;
     this.name = name;
     this.fat = fat;
@@ -127,7 +158,7 @@ class NDBIngredient implements NDBed, Ingredient {
   }
 }
 
-class CustomIngredient implements Ingredient {
+class CustomIngredient extends Ingredient {
   static new(
     name: string, fat: number, carbs: number, protein: number,
     calories: number, amount: number, unit: FOOD_UNIT
@@ -155,10 +186,10 @@ class CustomIngredient implements Ingredient {
     readonly calories: number,
     readonly amount: number,
     readonly unit: FOOD_UNIT,
-  ) { /* noop */ }
+  ) { super(); }
 }
 
-class ScaledFood implements Ingredient {
+class ScaledFood extends Ingredient {
   readonly uid: string;
   readonly food: Nutritional & Quantifiable;
   readonly amount: number;
@@ -170,6 +201,7 @@ class ScaledFood implements Ingredient {
   readonly calories: number;
 
   constructor(food: Nutritional & Quantifiable, amount: number) {
+    super();
     this.uid = uuid.v4();
     this.food = food;
     this.amount = amount;
@@ -182,11 +214,12 @@ class ScaledFood implements Ingredient {
   }
 }
 
-class MealImpl implements Meal {
+class MealImpl extends Ingredient implements Meal {
   readonly uid: string;
   readonly foods: Ingredient[];
 
   constructor(foods: Ingredient[]) {
+    super();
     this.uid = mealId();
     this.foods = foods;
   }
@@ -206,7 +239,7 @@ class MealImpl implements Meal {
   }
 }
 
-export class Recipe implements Ingredient {
+export class Recipe extends Ingredient {
 
   static copy(recipe: Recipe) {
     const uid = recipeId();
@@ -263,7 +296,7 @@ export class Recipe implements Ingredient {
     readonly amount: number,
     readonly unit: string,
     readonly portionRatio: number,
-  ) { /* noop */ }
+  ) { super(); }
 }
 
 export const ingredientFromJson = CustomIngredient.fromJson;
@@ -329,4 +362,12 @@ export function makeRecipe(
 
 export function meal(foods: Ingredient[]): Meal {
   return new MealImpl(foods);
+}
+
+export function macrosFromFoods<T extends Nutritional>(foods: T[]): Nutritional {
+  const calories = foods.reduce((l, r) => l + r.calories, 0);
+  const fat = foods.reduce((l, r) => l + r.fat, 0);
+  const carbs = foods.reduce((l, r) => l + r.carbs, 0);
+  const protein = foods.reduce((l, r) => l + r.protein, 0);
+  return new NutritionalImpl(fat, carbs, protein, calories);
 }

@@ -1,4 +1,4 @@
-import { Ingredient, FOOD_UNIT } from '../classes';
+import { Ingredient, FOOD_UNIT, macrosFromFoods } from '../classes';
 import * as React from 'react';
 import { tableStyle } from '../style';
 import { IngredientsTable, mealCell } from './ingredientstable';
@@ -84,10 +84,10 @@ export class CreateRecipeInput extends React.Component<
     this.setState({ portionSize });
   }
 
-  macroPortion(reducer: (sum: number, ingredient: Ingredient) => Number) {
+  macroPortion(macro: number) {
     if (this.getTotalSize(false)) {
       return (
-        Number(this.props.foods.reduce(reducer, 0)) * this.state.portionSize / this.getTotalSize(false)
+        macro * this.state.portionSize / this.getTotalSize(false)
       ).toFixed();
     } else {
       return 0;
@@ -95,6 +95,7 @@ export class CreateRecipeInput extends React.Component<
   }
 
   portionRow() {
+    const macros = macrosFromFoods(this.props.foods);
     return (
       <tr key="portionRow">
         <th key="portionTitle">Portion</th>
@@ -108,10 +109,13 @@ export class CreateRecipeInput extends React.Component<
           />
         </th>
         {mealCell(this.state.unit, 'portionUnit')}
-        {mealCell(this.macroPortion((l, r) => l + r.fat), 'portionFat', 'portionFat')}
-        {mealCell(this.macroPortion((l, r) => l + r.carbs), 'portionCarbs', 'portionCarbs')}
-        {mealCell(this.macroPortion((l, r) => l + r.protein), 'portionProtein', 'portionProtein')}
-        {mealCell(this.macroPortion((l, r) => l + r.calories), 'portionCalories', 'portionCalories')}
+        {mealCell(this.macroPortion(macros.fat), 'portionFat', 'portionFat')}
+        {mealCell(this.macroPortion(macros.fatPct), 'portionFatPct', 'portionFatPct')}
+        {mealCell(this.macroPortion(macros.carbs), 'portionCarbs', 'portionCarbs')}
+        {mealCell(this.macroPortion(macros.carbsPct), 'portionCarbsPct', 'portionCarbsPct')}
+        {mealCell(this.macroPortion(macros.protein), 'portionProtein', 'portionProtein')}
+        {mealCell(this.macroPortion(macros.proteinPct), 'portionProteinPct', 'portionProteinPct')}
+        {mealCell(this.macroPortion(macros.calories), 'portionCalories', 'portionCalories')}
       </tr>
     );
   }

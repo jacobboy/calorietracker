@@ -1,4 +1,4 @@
-import { Ingredient, FOOD_UNIT } from '../classes';
+import { Ingredient, FOOD_UNIT, macrosFromFoods } from '../classes';
 import * as React from 'react';
 import { tdStyle, thStyle } from '../style';
 import { toTitleCase } from '../datautil';
@@ -90,8 +90,11 @@ class IngredientRow extends React.Component<IngredientRowProps, IngredientRowSta
         {ingredientCell(amountElement, `amount`, 'amount')}
         {ingredientCell(this.props.food.unit, 'unit')}
         {ingredientCell(this.props.food.fat, 'fat')}
+        {ingredientCell(this.props.food.fatPct, 'fatPct')}
         {ingredientCell(this.props.food.carbs, 'carbs')}
+        {ingredientCell(this.props.food.carbsPct, 'carbsPct')}
         {ingredientCell(this.props.food.protein, 'protein')}
+        {ingredientCell(this.props.food.proteinPct, 'proteinPct')}
         {ingredientCell(this.props.food.calories, 'calories')}
         <td key={`button`} style={tdStyle}>
           <button
@@ -128,8 +131,11 @@ export class IngredientsTable extends React.Component<
         {headerCell('Amount')}
         {headerCell('Unit')}
         {headerCell('Fat')}
+        {headerCell('%Fat')}
         {headerCell('Carbs')}
+        {headerCell('%Carbs')}
         {headerCell('Protein')}
+        {headerCell('%Protein')}
         {headerCell('Calories')}
         {headerCell('')}
       </tr>
@@ -175,15 +181,21 @@ export class IngredientsTable extends React.Component<
     } else {
       unitCell = '';
     }
+
+    const macros = macrosFromFoods(foods);
+
     return (
       <tr key="totalRow">
         {mealCell('Total', 'total')}
         {mealCell(amountCell, 'amount')}
         {mealCell(unitCell, 'unit')}
-        {mealCell(foods.reduce((l, r) => l + r.fat, 0).toFixed(), 'fat')}
-        {mealCell(foods.reduce((l, r) => l + r.carbs, 0).toFixed(), 'carbs')}
-        {mealCell(foods.reduce((l, r) => l + r.protein, 0).toFixed(), 'protein')}
-        {mealCell(foods.reduce((l, r) => l + r.calories, 0).toFixed(), 'calories')}
+        {mealCell(macros.fat.toFixed(), 'fat')}
+        {mealCell(macros.fatPct, 'fatPct')}
+        {mealCell(macros.carbs.toFixed(), 'carbs')}
+        {mealCell(macros.carbsPct, 'carbsPct')}
+        {mealCell(macros.protein.toFixed(), 'protein')}
+        {mealCell(macros.proteinPct, 'proteinPct')}
+        {mealCell(macros.calories.toFixed(), 'calories')}
         <th key="button">
           <button id={'deleteAll'} onClick={() => this.props.handleDeleteAllClick()}>
             Remove

@@ -1,4 +1,4 @@
-import { Ingredient, Meal } from '../classes';
+import { Ingredient, Meal, macrosFromFoods } from '../classes';
 import * as React from 'react';
 import { thStyle, tableStyle } from '../style';
 import { IngredientsTable } from './ingredientstable';
@@ -63,6 +63,7 @@ export class MealsComponent extends React.Component<
   }
 
   render() {
+    const macros = macrosFromFoods(this.props.today);
     return (
       <div>
         <table style={tableStyle}>
@@ -73,18 +74,13 @@ export class MealsComponent extends React.Component<
               <th style={thStyle}>Day Total</th>
               <th style={thStyle} />
               <th style={thStyle} />
-              <th style={thStyle}>
-                {this.props.today.reduce((l, r) => l + r.fat, 0).toFixed()}
-              </th>
-              <th style={thStyle}>
-                {this.props.today.reduce((l, r) => l + r.carbs, 0).toFixed()}
-              </th>
-              <th style={thStyle}>
-                {this.props.today.reduce((l, r) => l + r.protein, 0).toFixed()}
-              </th>
-              <th style={thStyle}>
-                {this.props.today.reduce((l, r) => l + r.calories, 0).toFixed()}
-              </th>
+              <th style={thStyle}> {macros.fat.toFixed()} </th>
+              <th style={thStyle}> {macros.fatPct} </th>
+              <th style={thStyle}> {macros.carbs.toFixed()} </th>
+              <th style={thStyle}> {macros.carbsPct} </th>
+              <th style={thStyle}> {macros.protein.toFixed()} </th>
+              <th style={thStyle}> {macros.proteinPct} </th>
+              <th style={thStyle}> {macros.calories.toFixed()} </th>
             </tr>
           </tbody>
         </table>

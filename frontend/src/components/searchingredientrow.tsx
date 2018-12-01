@@ -27,8 +27,11 @@ export class SearchIngredientRow extends React.Component<
         <th style={thStyle}>Amount</th>
         <th style={thStyle}>Unit</th>
         <th style={thStyle}>Fat</th>
+        <th style={thStyle}>Fat%</th>
         <th style={thStyle}>Carbs</th>
+        <th style={thStyle}>Carbs%</th>
         <th style={thStyle}>Protein</th>
+        <th style={thStyle}>Protein%</th>
         <th style={thStyle}>Calories</th>
       </tr>
     );
@@ -53,6 +56,9 @@ export class SearchIngredientRow extends React.Component<
           {ingredientCell('')}
           {ingredientCell('')}
           {ingredientCell('')}
+          {ingredientCell('')}
+          {ingredientCell('')}
+          {ingredientCell('')}
           <td style={tdStyle}>
             <button onClick={() => this.handleDetailsClick()}>
               Show Details
@@ -71,9 +77,12 @@ export class SearchIngredientRow extends React.Component<
           {ingredientCell(toTitleCase(this.props.item.name))}
           {ingredientCell(this.state.ingred.amount)}
           {ingredientCell(this.state.ingred.unit)}
-          {ingredientCell(this.state.ingred.fat)}
-          {ingredientCell(this.state.ingred.carbs)}
-          {ingredientCell(this.state.ingred.protein)}
+          {ingredientCell(this.state.ingred.fat.toFixed())}
+          {ingredientCell(this.state.ingred.fatPct)}
+          {ingredientCell(this.state.ingred.carbs.toFixed())}
+          {ingredientCell(this.state.ingred.carbsPct)}
+          {ingredientCell(this.state.ingred.protein.toFixed())}
+          {ingredientCell(this.state.ingred.proteinPct)}
           {ingredientCell(this.state.ingred.calories)}
           <td style={tdStyle}/>
           <td style={tdStyle}>
