@@ -3,6 +3,7 @@ import { Ingredient, scaleFoodTo } from '../classes';
 import { TopBitDisplay } from '../types';
 import { tdStyle, thStyle } from '../style';
 import { toTitleCase } from '../datautil';
+import { MathInput } from './MathCell';
 
 export const Header = (
   <tr style={thStyle}>
@@ -40,7 +41,7 @@ interface IngredientRowState {
 
 export class StoredIngredientRow<T extends Ingredient> extends React.Component<
   IngredientRowProps<T>, IngredientRowState
-  > {
+> {
 
   constructor(props: IngredientRowProps<T>) {
     super(props);
@@ -49,13 +50,12 @@ export class StoredIngredientRow<T extends Ingredient> extends React.Component<
     };
   }
 
-  handleAmount(event: React.ChangeEvent<HTMLInputElement>) {
-    const amount = Number(event.target.value);
-    if (!isNaN(amount)) {
-      this.setState(
-        {scaledIngredient: scaleFoodTo(this.props.item, amount)}
-      );
-    }
+  handleAmount(amount: number) {
+    /* if (!isNaN(amount)) { */
+    this.setState(
+      {scaledIngredient: scaleFoodTo(this.props.item, amount)}
+    );
+    /* } */
   }
 
   handleTrackFood(foodComboIdx: number, e?: React.FormEvent<HTMLFormElement>) {
@@ -100,10 +100,13 @@ export class StoredIngredientRow<T extends Ingredient> extends React.Component<
               (e) => this.handleTrackFood(this.props.foodComboNames.length - 1, e)
             }
           >
-            <input
+            <MathInput
               id="trackFoodAmountInput"
-              type="number"
-              value={this.state.scaledIngredient.amount}
+              amountOverride={
+                this.state.scaledIngredient.amount === this.props.item.amount
+                ? this.state.scaledIngredient.amount.toString()
+                : undefined
+              }
               onChange={(e) => this.handleAmount(e)}
             />
           </form>
