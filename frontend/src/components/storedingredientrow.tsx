@@ -3,7 +3,7 @@ import { Ingredient, scaleFoodTo } from '../classes';
 import { TopBitDisplay } from '../types';
 import { tdStyle, thStyle } from '../style';
 import { toTitleCase } from '../datautil';
-import { MathInput } from './MathCell';
+import { MathInput } from './mathinput';
 
 export const Header = (
   <tr style={thStyle}>
@@ -40,9 +40,9 @@ interface IngredientRowState {
 }
 
 export class StoredIngredientRow<T extends Ingredient> extends React.Component<
-  IngredientRowProps<T>, IngredientRowState
+  IngredientRowProps<T>,
+  IngredientRowState
 > {
-
   constructor(props: IngredientRowProps<T>) {
     super(props);
     this.state = {
@@ -51,23 +51,20 @@ export class StoredIngredientRow<T extends Ingredient> extends React.Component<
   }
 
   handleAmount(amount: number) {
-    /* if (!isNaN(amount)) { */
-    this.setState(
-      {scaledIngredient: scaleFoodTo(this.props.item, amount)}
-    );
-    /* } */
+    this.setState({ scaledIngredient: scaleFoodTo(this.props.item, amount) });
   }
 
   handleTrackFood(foodComboIdx: number, e?: React.FormEvent<HTMLFormElement>) {
     // scale again here to get around hitting submit twice putting same key in meals list
-    const ingred = scaleFoodTo(this.props.item, this.state.scaledIngredient.amount);
-    this.props.onTrackClick(
-      ingred,
-      this.props.topbitDisplay,
-      foodComboIdx
+    const ingred = scaleFoodTo(
+      this.props.item,
+      this.state.scaledIngredient.amount
     );
+    this.props.onTrackClick(ingred, this.props.topbitDisplay, foodComboIdx);
     this.setState({ scaledIngredient: this.props.item });
-    if (e) { e.preventDefault(); }
+    if (e) {
+      e.preventDefault();
+    }
   }
 
   handleCopyClick() {
@@ -88,29 +85,26 @@ export class StoredIngredientRow<T extends Ingredient> extends React.Component<
         </button>
       );
     } else {
-      copyCell = null;  // this has gotta be bad form, right?
+      copyCell = null; // this has gotta be bad form, right?
     }
     return (
       <tr key={this.props.item.uid}>
         {ingredientCell(toTitleCase(this.state.scaledIngredient.name))}
-        {ingredientCell((
+        {ingredientCell(
           <form
-            id="trackFoodAmountForm"
-            onSubmit={
-              (e) => this.handleTrackFood(this.props.foodComboNames.length - 1, e)
+            id={`trackFoodAmountForm_${this.props.item.uid}`}
+            onSubmit={e =>
+              this.handleTrackFood(this.props.foodComboNames.length - 1, e)
             }
           >
             <MathInput
-              id="trackFoodAmountInput"
-              amountOverride={
-                this.state.scaledIngredient.amount === this.props.item.amount
-                ? this.state.scaledIngredient.amount.toString()
-                : undefined
-              }
-              onChange={(e) => this.handleAmount(e)}
+              id={`trackFoodAmountInput_${this.props.item.uid}`}
+              amount={this.state.scaledIngredient.amount.toString()}
+              onChange={e => this.handleAmount(e)}
             />
-          </form>
-         ))}
+          </form>,
+          'Amount input'
+        )}
         {ingredientCell(this.state.scaledIngredient.unit)}
         {ingredientCell(this.state.scaledIngredient.fat.toFixed())}
         {ingredientCell(this.state.scaledIngredient.fatPct)}
@@ -121,10 +115,9 @@ export class StoredIngredientRow<T extends Ingredient> extends React.Component<
         {ingredientCell(this.state.scaledIngredient.calories.toFixed())}
         <td title="Add to" style={tdStyle}>
           Add to
-          {this.props.foodComboNames.map(
-              (name, idx) => trackButton(name, () => this.handleTrackFood(idx))
-            )
-          }
+          {this.props.foodComboNames.map((name, idx) =>
+            trackButton(name, () => this.handleTrackFood(idx))
+          )}
         </td>
         {copyCell}
       </tr>
@@ -143,10 +136,14 @@ function trackButton(foodComboName: string, onClick: () => void) {
     >
       {foodComboName}
     </button>
-   );
+  );
 }
 
-function ingredientCell(contents: string | number | JSX.Element | JSX.Element[]) {
-  const opts = { title: contents.toString(), style: tdStyle};
+function ingredientCell(
+  contents: string | number | JSX.Element | JSX.Element[],
+  title?: string
+) {
+  title = title === undefined ? contents.toString() : title;
+  const opts = { title: title, style: tdStyle };
   return <td {...opts}>{contents}</td>;
 }

@@ -327,6 +327,9 @@ export const ingredientFromJson = CustomIngredient.fromJson;
 export function scaleFoodTo(
   ingredient: Nutritional & Quantifiable, amount: number
 ): Ingredient {
+  // TODO should I be passing around objects that are an ingredient + an amount?
+  // then i won't need to be careful about scaling foods to 0, can always just
+  // take the original food
   return new ScaledFood(ingredient, amount);
 }
 

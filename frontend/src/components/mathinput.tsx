@@ -2,33 +2,33 @@ import * as React from 'react';
 
 interface Props {
   id?: string;
-  amountOverride?: string;
+  amount: string;
   onChange: (input: number) => void;
 }
 
 interface State {
   input: string;
-  amountModified: boolean;
 }
 
 export class MathInput extends React.Component<Props, State> {
+  // TODO parens creates Unexpected EOF errors in the eval
+  // not sure why e.g. `15*` wouldn't
+  /* OPERATIONS = new Set(['(', ')', '*', '-', '+', '.']); */
   OPERATIONS = new Set(['*', '-', '+', '.']);
   NUMBERS = new Set(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']);
 
   constructor(props: Props) {
     super(props);
     this.state = {
-      input: '',
-      amountModified: false
+      input: this.props.amount.toString()
     };
   }
 
-  isMath(value: string) {
-    const itIs = value
+  isMath(input: string) {
+    const itIs = input
       .split('')
       .map(char => this.OPERATIONS.has(char) || this.NUMBERS.has(char))
       .every(bool => bool);
-    console.log(`isMath: ${itIs}`);
     return itIs;
   }
 
@@ -47,11 +47,9 @@ export class MathInput extends React.Component<Props, State> {
 
   handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const val = e.target.value;
-    console.log(`handling change ${val}`);
     if (this.isMath(val)) {
       this.setState({
-        input: val,
-        amountModified: true
+        input: val
       });
       const input = this.doMath(val);
       if (input) {
@@ -60,18 +58,22 @@ export class MathInput extends React.Component<Props, State> {
     }
   }
 
+  handleBlur() {
+    this.setState({input: this.props.amount.toString()});
+  }
+
   render() {
-    const props = { id: this.props.id };
+    /* const value =
+      this.props.amountOverride !== undefined
+        ? this.props.amountOverride
+        : this.state.input; */
     return (
       <input
-        {...props}
+        id={this.props.id}
         type="text"
-        value={
-          this.props.amountOverride !== undefined
-            ? this.props.amountOverride
-            : this.state.input
-        }
+        value={this.state.input}
         onChange={e => this.handleChange(e)}
+        onBlur={e => this.handleBlur()}
       />
     );
   }
