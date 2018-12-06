@@ -2,6 +2,7 @@ import { Ingredient, FOOD_UNIT, macrosFromFoods } from '../classes';
 import * as React from 'react';
 import { tdStyle, thStyle } from '../style';
 import { toTitleCase } from '../datautil';
+import { MathInput } from './mathinput';
 
 export function headerCell(text: string) {
   return <th title={text.toString()} style={thStyle}>{text}</th>;
@@ -60,25 +61,24 @@ class IngredientRow extends React.Component<IngredientRowProps, IngredientRowSta
     };
   }
 
-  handleFoodAmountChange(food: Ingredient, event: React.ChangeEvent<HTMLInputElement>) {
-    const amount = Number(event.target.value);
-    if (amount) {
+  handleFoodAmountChange(food: Ingredient, amount: number) {
+    if (amount > 0) {
       this.setState({ amount });
       this.state.handleFoodAmountChange(food, amount);
-    } else {
-      this.setState({ amount });
     }
+    /*  else {
+      this.setState({ amount });
+    } */
   }
 
   render() {
     let amountElement;
     if (this.props.handleFoodAmountChange) {
       amountElement = (
-        <input
+        <MathInput
           id={`foodAmountInput_${this.props.food.uid}`}
-          type="number"
-          value={this.state.amount || ''}
-          onChange={(e) => this.handleFoodAmountChange(this.props.food, e)}
+          amount={this.state.amount.toString()}
+          onChange={amount => this.handleFoodAmountChange(this.props.food, amount)}
         />
       );
     } else {

@@ -28,7 +28,7 @@ interface CreateIngredientInputState {
 
 export class CreateIngredientInput extends React.Component<
   CreateIngredientInputProps, CreateIngredientInputState
-  > {
+> {
 
   constructor(props: CreateIngredientInputProps) {
     super(props);

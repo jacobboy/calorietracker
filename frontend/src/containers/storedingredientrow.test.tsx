@@ -1,7 +1,6 @@
 import * as React from 'react';
-import * as enzyme from 'enzyme';
 import StoredIngredientRow from './storedingredientrow';
-import { mount } from 'enzyme';
+import { mount, ReactWrapper } from 'enzyme';
 import { createStore, Store, AnyAction } from 'redux';
 import { reducer } from '../reducers';
 import { Provider } from 'react-redux';
@@ -12,14 +11,15 @@ import { TopBitDisplay, TopBitState, emptyState } from '../types';
 
 describe('When the track food button is clicked', () => {
   // tslint:disable-next-line:no-any
-  let wrapper: enzyme.ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
+  let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
   let store: Store<{topbit: TopBitState, today: Meal[]}, AnyAction>;
-  let thisMeal: Meal, thatMeal: Meal, thisIngred: Ingredient;
+  let thisMeal: Meal, thatMeal: Meal, thisIngred: Ingredient, trackFoodId: string;
 
   beforeEach(() => {
     let [fat, carbs, protein, calories, amount] = [1, 2, 3, 4, 5];
     thisIngred = makeIngredient('foo', fat, carbs, protein, calories, amount, FOOD_UNIT.g, false);
     [thisMeal, thatMeal] = [meal([]), meal([])];
+    trackFoodId = `#trackFoodAmountInput_${thisIngred.uid}`;
     store = createStore(reducer, {
       topbit: { display: TopBitDisplay.MEALS },
       today: [thisMeal, thatMeal]
@@ -35,8 +35,8 @@ describe('When the track food button is clicked', () => {
 
   it(`adds to the meal if it should`, () => {
     const newAmount = 100;
-    wrapper.find('#trackFoodAmountInput').simulate(
-      'change', { target: { value: newAmount } }
+    wrapper.find(trackFoodId).first().simulate(
+      'change', { target: { value: newAmount.toString() } }
     );
     wrapper.find('#trackFoodSubmit_meal1').simulate('click');
 
@@ -47,14 +47,16 @@ describe('When the track food button is clicked', () => {
   });
   it(`can add to multiple meals`, () => {
     const newAmount2 = 200;
-    wrapper.find('#trackFoodAmountInput').simulate(
-      'change', { target: { value: newAmount2 } }
+    // TODO using first here because the `id` props causes enzyme
+    // to find it twice.  Can I use `ShallowWrapper.dive` instead?
+    wrapper.find(trackFoodId).first().simulate(
+      'change', { target: { value: newAmount2.toString() } }
     );
     wrapper.find('#trackFoodSubmit_meal2').simulate('click');
 
     const newAmount1 = 100;
-    wrapper.find('#trackFoodAmountInput').simulate(
-      'change', { target: { value: newAmount1 } }
+    wrapper.find(trackFoodId).first().simulate(
+      'change', { target: { value: newAmount1.toString() } }
     );
     wrapper.find('#trackFoodSubmit_meal1').simulate('click');
 
@@ -72,7 +74,7 @@ describe('When the track food button is clicked', () => {
 
 describe('When the track food button is clicked', () => {
   // tslint:disable-next-line:no-any
-  let wrapper: enzyme.ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
+  let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
   let store: Store<{topbit: TopBitState}, AnyAction>;
   let thisIngred: Ingredient;
 
@@ -100,8 +102,9 @@ describe('When the track food button is clicked', () => {
 
   it(`adds to the recipe if it should`, () => {
     const newAmount = 100;
-    wrapper.find('#trackFoodAmountInput').simulate(
-      'change', { target: { value: newAmount } }
+    const trackFoodId = `#trackFoodAmountInput_${thisIngred.uid}`;
+    wrapper.find(trackFoodId).last().simulate(
+      'change', { target: { value: newAmount.toString() } }
     );
     wrapper.find('#trackFoodSubmit_recipe').simulate('click');
 

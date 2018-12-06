@@ -121,7 +121,9 @@ describe('Recipes', () => {
     wrapper.find('#recipePortionInput').simulate('change', {target: { value: portionSize }});
     wrapper.find('#recipeAmountInput').simulate('change', {target: { value: totalSize }});
     wrapper.find('#recipeUnitInput').simulate('change', {target: { value: unit }});
-    wrapper.find(`#foodAmountInput_${foods[1].uid}`).simulate('change', {target: { value: newFood.amount }});
+    wrapper.find(`#foodAmountInput_${foods[1].uid}`).first().simulate(
+      'change', {target: { value: newFood.amount.toString() }}
+    );
 
     expect(wrapper.find('#portionFat').text()).toEqual(createdRecipe.fat.toFixed());
     expect(wrapper.find('#portionCarbs').text()).toEqual(createdRecipe.carbs.toFixed());

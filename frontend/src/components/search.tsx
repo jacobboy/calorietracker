@@ -55,6 +55,7 @@ export class SearchComponent extends React.Component<
             <input
               type="text"
               placeholder="Search USDA Database"
+              autoFocus={true}
               value={this.props.searchString || ''}
               onChange={(e) => this.handleSearchChange(e)}
             />
