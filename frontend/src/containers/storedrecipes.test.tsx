@@ -56,7 +56,7 @@ describe('The stored ingredient component', () => {
 
     wrapper = mount(
       <Provider store={store}>
-        <StoredRecipes searchText={'2'}/>
+        <StoredRecipes searchText={'2'} focusRef={React.createRef()}/>
       </Provider>
     );
 

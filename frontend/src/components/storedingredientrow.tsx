@@ -33,6 +33,7 @@ interface IngredientRowProps<T extends Ingredient> {
     foodComboIdx: number
   ) => void;
   onCopyClick?: (item: T) => void;
+  focusRef: React.RefObject<HTMLElement>;
 }
 
 interface IngredientRowState {
@@ -64,6 +65,9 @@ export class StoredIngredientRow<T extends Ingredient> extends React.Component<
     this.setState({ scaledIngredient: this.props.item });
     if (e) {
       e.preventDefault();
+    }
+    if (this.props.focusRef.current) {
+      this.props.focusRef.current.focus();
     }
   }
 

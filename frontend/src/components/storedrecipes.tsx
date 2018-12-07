@@ -10,6 +10,7 @@ type StoredRecipesProps = {
   recipes: Recipe[];
   onCopyRecipeClick: (recipe: Recipe) => void;
   searchText: string;
+  focusRef: React.RefObject<HTMLElement>;
 };
 
 function findRecipes(recipes: Recipe[], searchText: string) {
@@ -29,6 +30,7 @@ export function StoredRecipes(props: StoredRecipesProps) {
                 key={item.uid}
                 item={item}
                 onCopyClick={props.onCopyRecipeClick}
+                focusRef={props.focusRef}
               />
             ))}
         </tbody>

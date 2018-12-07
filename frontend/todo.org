@@ -9,6 +9,7 @@
    Update: this one passes now, now heinz ketchup is broken
            calories is missing
 ** Can't create two ingredients with the same name?
+** Search filter creates duplicates after saving an ingredient that is already saved
 
 * TODO Features
 ** should I be passing around objects that are an ingredient + an amount?

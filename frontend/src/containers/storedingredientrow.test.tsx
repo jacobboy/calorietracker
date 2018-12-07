@@ -14,6 +14,7 @@ describe('When the track food button is clicked', () => {
   let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
   let store: Store<{topbit: TopBitState, today: Meal[]}, AnyAction>;
   let thisMeal: Meal, thatMeal: Meal, thisIngred: Ingredient, trackFoodId: string;
+  let ref: React.RefObject<HTMLElement>;
 
   beforeEach(() => {
     let [fat, carbs, protein, calories, amount] = [1, 2, 3, 4, 5];
@@ -24,10 +25,11 @@ describe('When the track food button is clicked', () => {
       topbit: { display: TopBitDisplay.MEALS },
       today: [thisMeal, thatMeal]
     });
+    ref = {current: {focus: jest.fn()} as unknown as HTMLElement};
     wrapper = mount(
       <Provider store={store}>
         <table><tbody>
-          <StoredIngredientRow item={thisIngred} />
+          <StoredIngredientRow item={thisIngred} focusRef={ref}/>
         </tbody></table>
       </Provider>
     );
@@ -70,6 +72,12 @@ describe('When the track food button is clicked', () => {
       store.getState().today[1].foods, [expectedIngred2]
     );
   });
+  it('returns focus to provided ref', () => {
+    wrapper.find('#trackFoodSubmit_meal2').simulate('click');
+    // TODO I know this isn't null, but i'm pretty sure i'm still doing it wrong
+    const current = ref.current!;
+    expect(current.focus).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('When the track food button is clicked', () => {
@@ -77,6 +85,7 @@ describe('When the track food button is clicked', () => {
   let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
   let store: Store<{topbit: TopBitState}, AnyAction>;
   let thisIngred: Ingredient;
+  let ref: React.RefObject<HTMLElement>;
 
   beforeEach(() => {
     let [fat, carbs, protein, calories, amount] = [1, 2, 3, 4, 5];
@@ -91,10 +100,11 @@ describe('When the track food button is clicked', () => {
         }
       }
     });
+    ref = {current: {focus: jest.fn()} as unknown as HTMLElement};
     wrapper = mount(
       <Provider store={store}>
         <table><tbody>
-          <StoredIngredientRow item={thisIngred} />
+          <StoredIngredientRow item={thisIngred} focusRef={ref}/>
         </tbody></table>
       </Provider>
     );
@@ -111,6 +121,13 @@ describe('When the track food button is clicked', () => {
     const expectedIngred = scaleFoodTo(thisIngred, newAmount);
     expect(store.getState().topbit.recipe.foods.length).toEqual(1);
     verifyIngredientList(store.getState().topbit.recipe.foods, [expectedIngred]);
+  });
+
+  it('returns focus to provided ref', () => {
+    wrapper.find('#trackFoodSubmit_recipe').simulate('click');
+    // TODO I know this isn't null, but i'm pretty sure i'm still doing it wrong
+    const current = ref.current!;
+    expect(current.focus).toHaveBeenCalledTimes(1);
   });
 });
 

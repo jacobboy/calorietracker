@@ -10,6 +10,7 @@ type StoredIngredientsProps = {
   ingredients: Ingredient[];
   ndbs: Ingredient[];
   searchText: string;
+  focusRef: React.RefObject<HTMLElement>;
 };
 
 function findIngredients(ingredients: Ingredient[], searchText: string) {
@@ -24,10 +25,22 @@ export function StoredIngredients(props: StoredIngredientsProps) {
         <tbody>
           {Header}
           {findIngredients(props.ingredients, props.searchText).map(
-            item => <StoredIngredientRow key={item.uid} item={item} />
+            item => (
+              <StoredIngredientRow
+                key={item.uid}
+                item={item}
+                focusRef={props.focusRef}
+              />
+            )
           )}
           {findIngredients(props.ndbs, props.searchText).map(
-            item => <StoredIngredientRow key={item.uid} item={item} />
+            item => (
+            <StoredIngredientRow
+              key={item.uid}
+              item={item}
+              focusRef={props.focusRef}
+            />
+            )
           )}
         </tbody>
       </table>

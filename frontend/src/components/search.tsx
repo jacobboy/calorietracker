@@ -23,10 +23,14 @@ export interface SearchComponentState {
 export class SearchComponent extends React.Component<
   SearchComponentProps, SearchComponentState
   > {
+  searchRef: React.RefObject<HTMLInputElement>;
 
   constructor(props: SearchComponentProps) {
     super(props);
-    this.state = { createIngredientOn: false };
+    this.state = {
+      createIngredientOn: false
+    };
+    this.searchRef = React.createRef();
   }
 
   handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
@@ -53,6 +57,8 @@ export class SearchComponent extends React.Component<
           <label>
             Search:
             <input
+              id="globalSearchInput"
+              ref={this.searchRef}
               type="text"
               placeholder="Search USDA Database"
               autoFocus={true}
@@ -73,8 +79,14 @@ export class SearchComponent extends React.Component<
           </label>
           <input type="submit" value="Submit" />
         </form>
-        <StoredRecipes searchText={this.props.searchString || ''}/>
-        <StoredIngredients searchText={this.props.searchString || ''}/>
+        <StoredRecipes
+          searchText={this.props.searchString || ''}
+          focusRef={this.searchRef}
+        />
+        <StoredIngredients
+          searchText={this.props.searchString || ''}
+          focusRef={this.searchRef}
+        />
         USDA:
         <table style={tableStyle}>
           <tbody>
