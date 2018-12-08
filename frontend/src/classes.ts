@@ -1,5 +1,4 @@
 import * as uuid from 'uuid';
-import { ReportNutrient, Report } from './ndbapi/classes';
 import { scaleQuantity, round } from './transforms';
 import {
   saveIngredient,
@@ -10,17 +9,13 @@ import {
   getMealKey,
   getDateKey
 } from './storage';
+import { Report } from './ndbapi/classes';
 
 export enum MACROS {
   'fat' = 'fat',
   'carbs' = 'carbs',
   'protein' = 'protein'
 }
-
-const CALORIES_ID = '208';
-const PROTEIN_ID = '203';
-const FAT_ID = '204';
-const CARB_ID = '205';
 
 function ingredientId() { return getIngredientKey(uuid.v4()); }
 function ndbnoId(ndbno: string) { return getNdbKey(ndbno); }
@@ -33,18 +28,6 @@ export enum FOOD_UNIT {
   'ml' = 'ml'
 }
 
-export interface Named {
-  readonly name: string;
-}
-
-export interface UIDed {
-  readonly uid: string;
-}
-
-export interface NDBed {
-  readonly ndbno: string;
-}
-
 export interface Nutritional {
   readonly fat: number;
   readonly carbs: number;
@@ -53,32 +36,6 @@ export interface Nutritional {
   readonly fatPct: number;
   readonly carbsPct: number;
   readonly proteinPct: number;
-}
-
-export interface Quantifiable extends Named {
-  readonly amount: number;
-  readonly unit: string;
-}
-
-export interface Ingredient extends Nutritional, Quantifiable, UIDed { }
-
-export interface Recipe extends Ingredient {
-  readonly foods: Ingredient[];
-}
-
-export interface FoodCombo extends Nutritional {
-  readonly foods: Ingredient[];
-  withFood(Ingredient: Ingredient): FoodCombo;
-  withoutFood(Ingredient: Ingredient): FoodCombo;
-}
-
-/*
- * Why is this separate from Recipe?
- */
-export interface Meal extends FoodCombo, UIDed {
-  foods: Ingredient[];  // TODO Shouldn't actually expose this
-  withFood(food: Ingredient): Meal;
-  withoutFood(food: Ingredient): Meal;
 }
 
 abstract class AbstractNutritional {
@@ -107,11 +64,83 @@ class NutritionalImpl extends AbstractNutritional {
   ) { super(); }
 }
 
+class BaseIngredient {
+  static new(
+    name: string, fat: number, carbs: number, protein: number,
+    calories: number, amount: number, unit: FOOD_UNIT
+  ): BaseIngredient {
+    return new BaseIngredient(
+      ingredientId(), name, fat, carbs, protein, calories, amount, unit
+    );
+  }
+
+  static fromJson(jsonStr: string): BaseIngredient {
+    const {
+      uid, name, fat, carbs, protein, calories, amount, unit
+    } = JSON.parse(jsonStr);
+    return new BaseIngredient(
+      uid, name, fat, carbs, protein, calories, amount, unit
+    );
+  }
+
+  macrosAt(amount: number, unit: FOOD_UNIT): Nutritional {
+    const scaler = (amt: number) => scaleQuantity(amt, this.amount, amount);
+    return new NutritionalImpl(
+      scaler(this.fat),
+      scaler(this.carbs),
+      scaler(this.protein),
+      scaler(this.calories)
+    );
+  }
+
+  private constructor(
+    readonly uid: string,
+    readonly name: string,
+    readonly fat: number,
+    readonly carbs: number,
+    readonly protein: number,
+    readonly calories: number,
+    readonly amount: number,
+    readonly unit: FOOD_UNIT,
+  ) { }
+}
+
+export interface Named { readonly name: string; }
+
+export interface UIDed { readonly uid: string; }
+
+export interface NDBed { readonly ndbno: string; }
+
+export interface Quantifiable extends Named {
+  readonly amount: number;
+  readonly unit: string;
+}
+
+export interface Ingredient extends Nutritional, Quantifiable, UIDed { }
+
 abstract class AbstractIngredient extends AbstractNutritional implements Ingredient {
   readonly name: string;
   readonly amount: number;
   readonly unit: string;
   readonly uid: string;
+  protected readonly baseIngredient: Ingredient;
+}
+
+export interface Recipe extends Ingredient { readonly foods: Ingredient[]; }
+
+export interface FoodCombo extends Nutritional {
+  readonly foods: Ingredient[];
+  withFood(Ingredient: Ingredient): FoodCombo;
+  withoutFood(Ingredient: Ingredient): FoodCombo;
+}
+
+/*
+ * Why is this separate from Recipe?
+ */
+export interface Meal extends FoodCombo, UIDed {
+  foods: Ingredient[];  // TODO Shouldn't actually expose this
+  withFood(food: Ingredient): Meal;
+  withoutFood(food: Ingredient): Meal;
 }
 
 class NDBIngredient extends AbstractIngredient implements NDBed {
@@ -128,20 +157,12 @@ class NDBIngredient extends AbstractIngredient implements NDBed {
   static fromReport(report: Report): NDBIngredient {
     const ndbno = report.food.ndbno;
     const name = report.food.name;
-    const calories = parseFloat(
-      NDBIngredient.findNutrient(report.food.nutrients, CALORIES_ID)
-    );
-    const protein = parseFloat(
-      NDBIngredient.findNutrient(report.food.nutrients, PROTEIN_ID)
-    );
-    const fat = parseFloat(
-      NDBIngredient.findNutrient(report.food.nutrients, FAT_ID)
-    );
-    const carbs = parseFloat(
-      NDBIngredient.findNutrient(report.food.nutrients, CARB_ID)
-    );
-    const amount = 100;  // pretty sure it's always 100?
-    const unit = FOOD_UNIT[report.food.ru];
+    const fat = report.fat;
+    const carbs = report.carbs;
+    const protein = report.protein;
+    const calories = report.calories;
+    const amount = report.amount;
+    const unit = FOOD_UNIT[report.unit];
     return new NDBIngredient(ndbno, name, fat, carbs, protein, calories, amount, unit);
   }
 
@@ -152,12 +173,6 @@ class NDBIngredient extends AbstractIngredient implements NDBed {
     return new NDBIngredient(
       ndbno, name, fat, carbs, protein, calories, amount, unit
     );
-  }
-
-  private static findNutrient(nutrients: ReportNutrient[], nutrientId: string): string {
-    return nutrients.filter(function(nutrient: ReportNutrient) {
-      return nutrient.nutrient_id === nutrientId;
-    })[0].value;
   }
 
   private constructor(

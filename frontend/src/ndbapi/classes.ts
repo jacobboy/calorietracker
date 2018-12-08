@@ -1,14 +1,18 @@
-import { Named, NDBed } from '../classes';
+import { Named, NDBed, FOOD_UNIT } from '../classes';
+
+const CALORIES_ID = '208';
+const PROTEIN_ID = '203';
+const FAT_ID = '204';
+const CARB_ID = '205';
 
 export class IngredientSearchItem implements Named, NDBed {
-
   static fromSearchListItem(item: SearchListItem) {
     return new IngredientSearchItem(
       item.ndbno,
       item.offset,
       item.group,
       item.name,
-      item.ds,
+      item.ds
     );
   }
 
@@ -18,7 +22,9 @@ export class IngredientSearchItem implements Named, NDBed {
     readonly group: string,
     readonly name: string,
     readonly ds: string
-  ) { /*noop*/ }
+  ) {
+    /*noop*/
+  }
 }
 
 export class SearchListItem {
@@ -54,7 +60,7 @@ class ReportMeasure {
   value: string;
 }
 
-export class ReportNutrient {
+class ReportNutrient {
   static CALORIES_ID: '208';
   static PROTEIN_ID: '203';
   static FAT_ID: '204';
@@ -84,6 +90,38 @@ export class Report {
   type: string;
   food: ReportFood;
   footnotes: string[];
+
+  get fat() {
+    return this.findNutrient(FAT_ID);
+  }
+
+  get carbs() {
+    return this.findNutrient(CARB_ID);
+  }
+
+  get protein() {
+    return this.findNutrient(PROTEIN_ID);
+  }
+
+  get calories() {
+    return this.findNutrient(CALORIES_ID);
+  }
+
+  get unit() {
+    return this.food.ru;
+  }
+
+  get amount() {
+    return 100;  // TODO pretty sure it's always 100?
+  }
+
+  private findNutrient(nutrientId: string): number {
+    return parseFloat(
+      this.food.nutrients.filter(function(nutrient: ReportNutrient) {
+        return nutrient.nutrient_id === nutrientId;
+      })[0].value
+    );
+  }
 }
 
 export class ReportResponse {
