@@ -1,6 +1,14 @@
 import * as client from '../client';
 import { Report } from '../ndbapi/classes';
-import { Ingredient, Recipe, ingredientFromJson, ingredientFromReport, Meal, MealDate } from '../classes';
+import {
+  Ingredient,
+  ingredientFromJson,
+  ingredientFromReport,
+  Meal,
+  MealDate,
+  Recipe,
+  recipeFromJson
+} from '../classes';
 
 function getKey(keyType: string) {
   // was '::' but Enzyme didn't like that
@@ -23,7 +31,10 @@ export const getDateKey = getKey('date');
 export const isDateKey = isKey('date');
 
 export function saveReport(report: Report): void {
-  window.localStorage.setItem(getNdbKey(report.food.ndbno), JSON.stringify(report));
+  window.localStorage.setItem(
+    getNdbKey(report.food.ndbno),
+    JSON.stringify(report)
+  );
 }
 
 export function loadReport(ndbno: string): Report | null {
@@ -77,7 +88,7 @@ export function loadRecipe(recipeId: string): Recipe {
   const recipeStr = window.localStorage.getItem(recipeId);
   if (recipeStr !== null) {
     // console.log('Retrieved ' + recipeId + ' from window storage');
-    return Recipe.fromJson(recipeStr);
+    return recipeFromJson(recipeStr);
   } else {
     throw new Error('Recipe ' + recipeId + ' not found.');
   }
@@ -103,7 +114,7 @@ export function getAllStoredIngredients(): Ingredient[] {
       }
     }
   }
-  return ingreds.sort( (l, r) => l.name < r.name ? -1 : 1 );
+  return ingreds.sort((l, r) => (l.name < r.name ? -1 : 1));
 }
 
 export function getAllCustomIngredients(): Ingredient[] {
@@ -114,7 +125,7 @@ export function getAllCustomIngredients(): Ingredient[] {
       ingreds.push(loadIngredient(key));
     }
   }
-  return ingreds.sort( (l, r) => l.name < r.name ? -1 : 1 );
+  return ingreds.sort((l, r) => (l.name < r.name ? -1 : 1));
 }
 
 export function getAllRecipes(): Recipe[] {
@@ -125,5 +136,5 @@ export function getAllRecipes(): Recipe[] {
       recipes.push(loadRecipe(key));
     }
   }
-  return recipes.sort( (l, r) => l.name < r.name ? -1 : 1 );
+  return recipes.sort((l, r) => (l.name < r.name ? -1 : 1));
 }

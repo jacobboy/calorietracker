@@ -45,30 +45,14 @@ export interface NDBed {
   readonly ndbno: string;
 }
 
-export abstract class Nutritional {
+export interface Nutritional {
   readonly fat: number;
   readonly carbs: number;
   readonly protein: number;
   readonly calories: number;
-
-  get fatPct() {
-    return round(this.fat * 9 / this.calories, .01);
-  }
-  get carbsPct() {
-    return round(this.carbs * 4 / this.calories, .01);
-  }
-  get proteinPct() {
-    return round(this.protein * 4 / this.calories, .01);
-  }
-}
-
-class NutritionalImpl extends Nutritional {
-  constructor(
-    readonly fat: number,
-    readonly carbs: number,
-    readonly protein: number,
-    readonly calories: number
-  ) { super(); }
+  readonly fatPct: number;
+  readonly carbsPct: number;
+  readonly proteinPct: number;
 }
 
 export interface Quantifiable extends Named {
@@ -76,11 +60,10 @@ export interface Quantifiable extends Named {
   readonly unit: string;
 }
 
-export abstract class Ingredient extends Nutritional implements Quantifiable, UIDed {
-  readonly name: string;
-  readonly amount: number;
-  readonly unit: string;
-  readonly uid: string;
+export interface Ingredient extends Nutritional, Quantifiable, UIDed { }
+
+export interface Recipe extends Ingredient {
+  readonly foods: Ingredient[];
 }
 
 export interface FoodCombo extends Nutritional {
@@ -98,7 +81,40 @@ export interface Meal extends FoodCombo, UIDed {
   withoutFood(food: Ingredient): Meal;
 }
 
-class NDBIngredient extends Ingredient implements NDBed {
+abstract class AbstractNutritional {
+  readonly fat: number;
+  readonly carbs: number;
+  readonly protein: number;
+  readonly calories: number;
+
+  get fatPct() {
+    return round(this.fat * 9 / this.calories, .01);
+  }
+  get carbsPct() {
+    return round(this.carbs * 4 / this.calories, .01);
+  }
+  get proteinPct() {
+    return round(this.protein * 4 / this.calories, .01);
+  }
+}
+
+class NutritionalImpl extends AbstractNutritional {
+  constructor(
+    readonly fat: number,
+    readonly carbs: number,
+    readonly protein: number,
+    readonly calories: number
+  ) { super(); }
+}
+
+abstract class AbstractIngredient extends AbstractNutritional implements Ingredient {
+  readonly name: string;
+  readonly amount: number;
+  readonly unit: string;
+  readonly uid: string;
+}
+
+class NDBIngredient extends AbstractIngredient implements NDBed {
   readonly ndbno: string;
   readonly name: string;
   readonly fat: number;
@@ -161,7 +177,7 @@ class NDBIngredient extends Ingredient implements NDBed {
   }
 }
 
-class CustomIngredient extends Ingredient {
+class CustomIngredient extends AbstractIngredient {
   static new(
     name: string, fat: number, carbs: number, protein: number,
     calories: number, amount: number, unit: FOOD_UNIT
@@ -192,7 +208,7 @@ class CustomIngredient extends Ingredient {
   ) { super(); }
 }
 
-class ScaledFood extends Ingredient {
+class ScaledFood extends AbstractIngredient {
   readonly uid: string;
   readonly food: Nutritional & Quantifiable;
   readonly amount: number;
@@ -217,7 +233,7 @@ class ScaledFood extends Ingredient {
   }
 }
 
-class MealImpl extends Ingredient implements Meal {
+class MealImpl extends AbstractIngredient implements Meal {
   readonly uid: string;
   readonly foods: Ingredient[];
 
@@ -242,16 +258,7 @@ class MealImpl extends Ingredient implements Meal {
   }
 }
 
-export class Recipe extends Ingredient {
-
-  static copy(recipe: Recipe) {
-    const uid = recipeId();
-    return new Recipe(
-      uid, `${recipe.name}'s Bitchin' Copy` , recipe.foods, recipe.fat,
-      recipe.carbs, recipe.protein, recipe.calories, recipe.amount,
-      recipe.unit, recipe.portionRatio
-    );
-  }
+class RecipeImpl extends AbstractIngredient implements Recipe {
 
   static new(name: string, foods: Ingredient[], portionSize: number, totalSize?: number, unit?: string) {
     if (unit === undefined) {
@@ -273,7 +280,7 @@ export class Recipe extends Ingredient {
     const carbs = foods.reduce((l, r) => l + r.carbs, 0) * portionRatio;
 
     const uid = recipeId();
-    return new Recipe(
+    return new RecipeImpl(
       uid, name, foods, fat, carbs, protein,
       calories, portionSize, unit, portionRatio
     );
@@ -283,7 +290,7 @@ export class Recipe extends Ingredient {
     const {
       uid, name, foods, fat, carbs, protein, calories, amount, unit, portionRatio
     } = JSON.parse(jsonStr);
-    return new Recipe(
+    return new RecipeImpl(
       uid, name, foods, fat, carbs, protein, calories, amount, unit, portionRatio
     );
   }
@@ -333,13 +340,6 @@ export function scaleFoodTo(
   return new ScaledFood(ingredient, amount);
 }
 
-export function scaleFoodBy(
-  ingredient: Nutritional & Quantifiable, ratio: number
-): Ingredient {
-  const amount = ingredient.amount * ratio;
-  return new ScaledFood(ingredient, amount);
-}
-
 export function makeIngredient(
   name: string,
   fat: number,
@@ -381,10 +381,12 @@ export function ingredientFromReport(report: Report): Ingredient {
 export function makeRecipe(
   name: string, foods: Ingredient[], portionSize: number, totalSize?: number, unit?: string
 ): Recipe {
-  const recipe = Recipe.new(name, foods, portionSize, totalSize, unit);
+  const recipe = RecipeImpl.new(name, foods, portionSize, totalSize, unit);
   saveRecipe(recipe);
   return recipe;
 }
+
+export const recipeFromJson = RecipeImpl.fromJson;
 
 export function meal(foods: Ingredient[]): Meal {
   return new MealImpl(foods);

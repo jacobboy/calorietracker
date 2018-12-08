@@ -2,7 +2,7 @@ import { ReactWrapper, mount } from 'enzyme';
 import * as React from 'react';
 import { Provider } from 'react-redux';
 import { Store, AnyAction, createStore } from 'redux';
-import { makeIngredient, FOOD_UNIT, Ingredient, Recipe } from '../classes';
+import { makeIngredient, FOOD_UNIT, Ingredient, Recipe, makeRecipe } from '../classes';
 import StoredRecipes from '../containers/storedrecipes';
 import { reducer } from '../reducers';
 import { TopBitDisplay } from '../types';
@@ -36,7 +36,7 @@ describe('The stored ingredient component', () => {
 
   beforeEach(() => {
     foods = mockIngredients(2);
-    recipe = Recipe.new('Test Recipe 2', foods, 100);
+    recipe = makeRecipe('Test Recipe 2', foods, 100);
 
     let state = {
       topbit: {
@@ -47,7 +47,7 @@ describe('The stored ingredient component', () => {
       },
       saved: {
         recipes: [
-          Recipe.new('Test Recipe 1', [foods[1]], 12), // just to have more than one
+          makeRecipe('Test Recipe 1', [foods[1]], 12), // just to have more than one
           recipe
         ]
       }
