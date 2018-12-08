@@ -16,6 +16,8 @@
    then i won't need to be careful about scaling foods to 0, can always just take the original food
    see scaleFoodTo
 ** copy recipe uses previous amount as well
+** enhanced keyboard navigation
+   arrows, readline, vim keybindings to navigate
 ** simultaneously create multiple recipes
 ** recent recipes / ingredients
 ** delete recipe / ingredient
