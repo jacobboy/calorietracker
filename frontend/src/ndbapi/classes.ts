@@ -1,4 +1,4 @@
-import { Named, NDBed, FOOD_UNIT } from '../classes';
+import { Named, NDBed } from '../classes';
 
 const CALORIES_ID = '208';
 const PROTEIN_ID = '203';
@@ -60,7 +60,7 @@ class ReportMeasure {
   value: string;
 }
 
-class ReportNutrient {
+export class ReportNutrient {
   static CALORIES_ID: '208';
   static PROTEIN_ID: '203';
   static FAT_ID: '204';
@@ -86,10 +86,12 @@ class ReportFood {
 }
 
 export class Report {
-  sr: string;
-  type: string;
-  food: ReportFood;
-  footnotes: string[];
+  constructor(
+    readonly sr: string,
+    readonly type: string,
+    readonly food: ReportFood,
+    readonly footnotes: string[]
+  ) {}
 
   get fat() {
     return this.findNutrient(FAT_ID);
@@ -112,7 +114,7 @@ export class Report {
   }
 
   get amount() {
-    return 100;  // TODO pretty sure it's always 100?
+    return 100; // TODO pretty sure it's always 100?
   }
 
   private findNutrient(nutrientId: string): number {
@@ -125,5 +127,19 @@ export class Report {
 }
 
 export class ReportResponse {
-  report: Report;
+  readonly report: {
+    sr: string;
+    type: string;
+    food: ReportFood;
+    footnotes: string[];
+  };
+}
+
+export function parseResponse(response: ReportResponse): Report {
+  return new Report(
+    response.report.sr,
+    response.report.type,
+    response.report.food,
+    response.report.footnotes
+  );
 }

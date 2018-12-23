@@ -1,9 +1,9 @@
 import {
-  makeScaledIngredient,
   makeRecipe,
   FOOD_UNIT,
   Ingredient,
-  scaleFoodTo
+  scaleFoodTo,
+  makeScaledIngredient
 } from '../classes';
 import {
   CREATE_INGREDIENT_TOGGLE,

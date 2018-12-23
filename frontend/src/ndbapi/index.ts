@@ -1,5 +1,5 @@
 import { GOV_API_KEY } from '../apikey';
-import { SearchList, Report, IngredientSearchItem } from './classes';
+import { SearchList, IngredientSearchItem, Report } from './classes';
 
 export enum DataSource {
   SR = 'SR',
