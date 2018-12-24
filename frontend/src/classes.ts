@@ -143,6 +143,7 @@ class NDBIngredient extends AbstractNutritional implements NDBed {
   readonly uid: string;
 
   static fromReport(report: Report): NDBIngredient {
+    console.log(report);
     const ndbno = report.food.ndbno;
     const name = report.food.name;
     const fat = report.fat;

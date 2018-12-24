@@ -86,7 +86,21 @@ class ReportFood {
 }
 
 export class Report {
-  constructor(
+  static new(reportObj: {
+    sr: string;
+    type: string;
+    food: ReportFood;
+    footnotes: string[];
+  }) {
+    return new Report(
+      reportObj.sr,
+      reportObj.type,
+      reportObj.food,
+      reportObj.footnotes
+    );
+  }
+
+  private constructor(
     readonly sr: string,
     readonly type: string,
     readonly food: ReportFood,
@@ -133,13 +147,4 @@ export class ReportResponse {
     food: ReportFood;
     footnotes: string[];
   };
-}
-
-export function parseResponse(response: ReportResponse): Report {
-  return new Report(
-    response.report.sr,
-    response.report.type,
-    response.report.food,
-    response.report.footnotes
-  );
 }

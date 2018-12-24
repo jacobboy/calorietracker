@@ -78,7 +78,6 @@ export class StoredIngredientRow<T extends Ingredient> extends React.Component<
   }
 
   render() {
-    console.log(this.state.scaledIngredient);
     let copyCell: JSX.Element | null;
     if (this.props.onCopyClick !== undefined) {
       copyCell = ingredientCell(

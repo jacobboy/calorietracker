@@ -39,14 +39,17 @@ export function saveReport(report: Report): void {
 
 export function loadReport(ndbno: string): Report | null {
   const key = getNdbKey(ndbno);
-  return loadReportFromKey(key);
+  const report = loadReportFromKey(key);
+  return report;
 }
 
 function loadReportFromKey(key: string): Report | null {
   const reportStr: string | null = window.localStorage.getItem(key);
-  if (reportStr !== null) {
-    /* console.log('Retrieved ' + key + ' from window storage'); */
-    return JSON.parse(reportStr);
+  if (reportStr) {
+    /* console.log(`Retrieved ${key} from window storage`);
+    console.log(`It was:\n ${reportStr}`); */
+    const reportObj = JSON.parse(reportStr);
+    return Report.new(reportObj);
   } else {
     return null;
   }
