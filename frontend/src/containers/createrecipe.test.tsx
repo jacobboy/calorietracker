@@ -10,7 +10,8 @@ import {
   makeRecipe,
   Nutritional,
   Quantifiable,
-  scaleFoodTo
+  scaleFoodTo,
+  AmountOf
 } from '../classes';
 import { AnyAction, createStore, Store } from 'redux';
 import { reducer } from '../reducers';
@@ -40,7 +41,7 @@ describe('Recipes', () => {
 
   // tslint:disable-next-line:no-any
   let wrapper: enzyme.ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
-  let foods: Ingredient[];
+  let foods: AmountOf<Ingredient>[];
   let store: Store<{topbit: TopBitState, saved: {recipes: Recipe[]}}, AnyAction>;
 
   beforeEach(() => {

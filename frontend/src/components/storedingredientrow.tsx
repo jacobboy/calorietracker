@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Ingredient, scaleFoodTo } from '../classes';
+import { Ingredient, scaleFoodTo, AmountOf, amountOf } from '../classes';
 import { TopBitDisplay } from '../types';
 import { tdStyle, thStyle } from '../style';
 import { toTitleCase } from '../datautil';
@@ -28,7 +28,7 @@ interface IngredientRowProps<T extends Ingredient> {
   // add an ingredient to
   foodComboNames: string[];
   onTrackClick: (
-    ingredient: Ingredient,
+    ingredient: AmountOf<T>,
     topbitDisplay: TopBitDisplay,
     foodComboIdx: number
   ) => void;
@@ -36,33 +36,28 @@ interface IngredientRowProps<T extends Ingredient> {
   focusRef: React.RefObject<HTMLElement>;
 }
 
-interface IngredientRowState {
-  scaledIngredient: Ingredient;
+interface IngredientRowState<T extends Ingredient> {
+  scaledIngredient: AmountOf<T>;
 }
 
 export class StoredIngredientRow<T extends Ingredient> extends React.Component<
   IngredientRowProps<T>,
-  IngredientRowState
+  IngredientRowState<T>
 > {
   constructor(props: IngredientRowProps<T>) {
     super(props);
     this.state = {
-      scaledIngredient: this.props.item
+      scaledIngredient: amountOf(this.props.item)
     };
   }
 
   handleAmount(amount: number) {
-    this.setState({ scaledIngredient: scaleFoodTo(this.props.item, amount) });
+    this.setState({ scaledIngredient: scaleFoodTo(this.state.scaledIngredient, amount) });
   }
 
   handleTrackFood(foodComboIdx: number, e?: React.FormEvent<HTMLFormElement>) {
-    // scale again here to get around hitting submit twice putting same key in meals list
-    const ingred = scaleFoodTo(
-      this.props.item,
-      this.state.scaledIngredient.amount
-    );
-    this.props.onTrackClick(ingred, this.props.topbitDisplay, foodComboIdx);
-    this.setState({ scaledIngredient: this.props.item });
+    this.props.onTrackClick(this.state.scaledIngredient, this.props.topbitDisplay, foodComboIdx);
+    this.setState({ scaledIngredient: amountOf(this.props.item) });
     if (e) {
       e.preventDefault();
     }

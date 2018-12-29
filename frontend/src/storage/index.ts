@@ -89,13 +89,25 @@ export function saveRecipe(recipe: Recipe): void {
 
 export function loadRecipe(recipeId: string): Recipe {
   const recipeStr = window.localStorage.getItem(recipeId);
-  if (recipeStr !== null) {
+  if (recipeStr) {
     // console.log('Retrieved ' + recipeId + ' from window storage');
     return recipeFromJson(recipeStr);
   } else {
     throw new Error('Recipe ' + recipeId + ' not found.');
   }
 }
+
+/* export function loadRecipe(recipeId: string): Promise<Recipe> {
+  // console.log('Retrieved ' + recipeId + ' from window storage');
+  return new Promise((resolve, reject) => {
+    const recipeStr = window.localStorage.getItem(recipeId);
+    if (recipeStr !== null) {
+      resolve(recipeFromJson(recipeStr));
+    } else {
+      reject(Error('Recipe ' + recipeId + ' not found.'));
+    }
+  });
+} */
 
 export function saveDay(date: MealDate, meals: Meal[]) {
   window.localStorage.setItem(date.id, JSON.stringify(meals));
@@ -131,7 +143,8 @@ export function getAllCustomIngredients(): Ingredient[] {
   return ingreds.sort((l, r) => (l.name < r.name ? -1 : 1));
 }
 
-export function getAllRecipes(): Recipe[] {
+/* TODO change this to use RecipeIngredient */
+export function getAllRecipes(): Ingredient[] {
   const recipes: Recipe[] = [];
   for (let i = 0; i < window.localStorage.length; i++) {
     const key = window.localStorage.key(i);

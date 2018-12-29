@@ -154,7 +154,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
           ...state.topbit,
           recipe: {
             ...state.topbit.recipe,
-            foods: [...state.topbit.recipe.foods, ...action.payload]
+            foods: [...state.topbit.recipe.foods, ...action.payload.foods]
           }
         }
       };

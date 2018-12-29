@@ -4,7 +4,7 @@ import { mount, ReactWrapper } from 'enzyme';
 import { createStore, Store, AnyAction } from 'redux';
 import { reducer } from '../reducers';
 import { Provider } from 'react-redux';
-import { FOOD_UNIT, makeIngredient, meal, scaleFoodTo, Ingredient, Meal } from '../classes';
+import { FOOD_UNIT, makeIngredient, meal, Ingredient, Meal, amountOf } from '../classes';
 import { TopBitDisplay, TopBitState, emptyState } from '../types';
 
 // TODO try these with foods already in the meal/recipe
@@ -42,7 +42,7 @@ describe('When the track food button is clicked', () => {
     );
     wrapper.find('#trackFoodSubmit_meal1').simulate('click');
 
-    const expectedIngred = scaleFoodTo(thisIngred, newAmount);
+    const expectedIngred = amountOf(thisIngred, newAmount);
     verifyIngredientList(
       store.getState().today[0].foods, [expectedIngred]
     );
@@ -62,12 +62,12 @@ describe('When the track food button is clicked', () => {
     );
     wrapper.find('#trackFoodSubmit_meal1').simulate('click');
 
-    const expectedIngred1 = scaleFoodTo(thisIngred, newAmount1);
+    const expectedIngred1 = amountOf(thisIngred, newAmount1);
     verifyIngredientList(
       store.getState().today[0].foods, [expectedIngred1]
     );
 
-    const expectedIngred2 = scaleFoodTo(thisIngred, newAmount2);
+    const expectedIngred2 = amountOf(thisIngred, newAmount2);
     verifyIngredientList(
       store.getState().today[1].foods, [expectedIngred2]
     );
@@ -118,7 +118,7 @@ describe('When the track food button is clicked', () => {
     );
     wrapper.find('#trackFoodSubmit_recipe').simulate('click');
 
-    const expectedIngred = scaleFoodTo(thisIngred, newAmount);
+    const expectedIngred = amountOf(thisIngred, newAmount);
     expect(store.getState().topbit.recipe.foods.length).toEqual(1);
     verifyIngredientList(store.getState().topbit.recipe.foods, [expectedIngred]);
   });
