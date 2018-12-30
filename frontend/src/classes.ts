@@ -229,15 +229,13 @@ class MealImpl extends AbstractNutritional implements Meal {
   get fat() { return this.foods.reduce((l, r) => l + r.fat, 0); }
   get carbs() { return this.foods.reduce((l, r) => l + r.carbs, 0); }
   withFood(food: AmountOf<Ingredient>): Meal {
-    console.log(food);
     return new MealImpl([...this.foods, food]);
   }
   withoutFood(food: AmountOf<Ingredient>): Meal {
     if (this.foods.find((f) => f === food) !== undefined) {
       return new MealImpl(this.foods.filter(f => f !== food));
     } else {
-      console.log(`Food not found: ${JSON.stringify(food)} in ${this.foods.map(f => f.uid)}`);
-      return this;
+      throw(Error(`Food not found: ${JSON.stringify(food)} in ${this.foods.map(f => f.uid)}`));
     }
   }
 }
