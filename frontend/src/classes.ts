@@ -99,7 +99,7 @@ class ScalableIngredientImpl<T extends Ingredient> extends AbstractNutritional i
     super();
     this.baseFood = baseFood;
     this.amount = amount;
-    const scaler = (amt: number) => scaleQuantity(amt, this.amount, amount);
+    const scaler = (amt: number) => scaleQuantity(amt, this.baseFood.amount, this.amount);
     this.macros = new NutritionalImpl(
       scaler(baseFood.fat),
       scaler(baseFood.carbs),
@@ -134,8 +134,8 @@ export interface FoodCombo extends Nutritional {
  */
 export interface Meal extends FoodCombo, UIDed {
   foods: AmountOf<Ingredient>[];  // TODO Shouldn't actually expose this
-  withFood(food: Ingredient): Meal;
-  withoutFood(food: Ingredient): Meal;
+  withFood(food: AmountOf<Ingredient>): Meal;
+  withoutFood(food: AmountOf<Ingredient>): Meal;
 }
 
 class NDBIngredient extends AbstractNutritional implements Ingredient, NDBed {
@@ -228,7 +228,10 @@ class MealImpl extends AbstractNutritional implements Meal {
   get protein() { return this.foods.reduce((l, r) => l + r.protein, 0); }
   get fat() { return this.foods.reduce((l, r) => l + r.fat, 0); }
   get carbs() { return this.foods.reduce((l, r) => l + r.carbs, 0); }
-  withFood(food: AmountOf<Ingredient>): Meal { return new MealImpl([...this.foods, food]); }
+  withFood(food: AmountOf<Ingredient>): Meal {
+    console.log(food);
+    return new MealImpl([...this.foods, food]);
+  }
   withoutFood(food: AmountOf<Ingredient>): Meal {
     if (this.foods.find((f) => f === food) !== undefined) {
       return new MealImpl(this.foods.filter(f => f !== food));

@@ -21,7 +21,7 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
     handleDeleteMealClick: (mealIdx: number) => {
       dispatch(actions.removeMeal(mealIdx));
     },
-    handleRemoveFoodClick: (mealIdx: number, food: Ingredient) => {
+    handleRemoveFoodClick: (mealIdx: number, food: AmountOf<Ingredient>) => {
       dispatch(actions.removeFoodFromMeal(mealIdx, food));
     },
   };

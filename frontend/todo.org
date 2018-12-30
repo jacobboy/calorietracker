@@ -1,4 +1,8 @@
+* TODO Recipe, ingred storage
+  copy recipe is broken
+
 * TODO Bugs
+** Clicking away from input does not lead to onBlur and amount reset
 ** Searching for quaker steel oats and clicking more details results in TypeError
      108 | private static findNutrient(nutrients: ReportNutrient[], nutrientId: string): string {
      109 |   return nutrients.filter(function(nutrient: ReportNutrient) {

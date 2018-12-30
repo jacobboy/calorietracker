@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AmountOf, Ingredient } from '../classes';
+import { Ingredient } from '../classes';
 import { tableStyle } from '../style';
 /* TODO pretty sure the below is definitely not how to import both */
 import { Header } from '../components/storedingredientrow';
@@ -7,13 +7,13 @@ import StoredIngredientRow from '../containers/storedingredientrow';
 import { nameMatches } from '../datautil';
 
 type StoredRecipesProps = {
-  recipes: AmountOf<Ingredient>[];
+  recipes: Ingredient[];
   onCopyRecipeClick: (recipeIngredient: Ingredient) => void;
   searchText: string;
   focusRef: React.RefObject<HTMLElement>;
 };
 
-function findRecipes(recipes: AmountOf<Ingredient>[], searchText: string) {
+function findRecipes(recipes: Ingredient[], searchText: string) {
   return nameMatches(recipes, searchText);
 }
 

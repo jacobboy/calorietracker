@@ -48,7 +48,7 @@ function createAction<T extends string, P>(type: T, payload?: P) {
   return payload !== undefined ? { type, payload } : { type };
 }
 
-function addFoodToMeal(food: Ingredient, mealIdx: number) {
+function addFoodToMeal(food: AmountOf<Ingredient>, mealIdx: number) {
   return createAction(ADD_FOOD_TO_MEAL, { mealIdx, food });
 }
 
@@ -121,7 +121,7 @@ export const actions = {
   changeMealFoodAmount,
   addFoodToMeal,
   removeFoodFromMeal:
-    (mealIdx: number, food: Ingredient) =>
+    (mealIdx: number, food: AmountOf<Ingredient>) =>
       createAction(REMOVE_FOOD_FROM_MEAL, { mealIdx, food }),
   createIngredientToggle: (destination: TopBitDisplay) => createAction(CREATE_INGREDIENT_TOGGLE, destination),
   createIngredientSubmit,
