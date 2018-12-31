@@ -34,6 +34,7 @@ describe('When ingredient create button is clicked', () => {
     wrapper.find('#proteinInput').simulate('change', { target: { value: protein } })
     wrapper.find('#caloriesInput').simulate('change', { target: { value: calories } })
     wrapper.find('#createIngredientAmountInput').simulate('change', { target: { value: amount } })
+    wrapper.find('#createIngredientConvertAmountInput').simulate('change', { target: { value: amount } })
     wrapper.find('#submitIngredient').simulate('submit')
 
     expect(mockSave.mock.calls.length).toBe(1)

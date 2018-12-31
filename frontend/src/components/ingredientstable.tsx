@@ -77,7 +77,7 @@ class IngredientRow extends React.Component<IngredientRowProps, IngredientRowSta
       amountElement = (
         <MathInput
           id={`foodAmountInput_${this.props.food.uid}`}
-          amount={this.state.amount.toString()}
+          amount={this.state.amount}
           onChange={amount => this.handleFoodAmountChange(this.props.food, amount)}
         />
       );

@@ -28,7 +28,7 @@ describe('The StoredIngredientComponent', () => {
 
   });
   it('Passes the MealInput the input amount when no scaling has happened', () => {
-    expect(wrapper.find(MathInput).props().amount).toBe('5');
+    expect(wrapper.find(MathInput).props().amount).toBe(5);
   });
 
   // how do i get a handle on a specific component

@@ -5,20 +5,20 @@ import { MathInput } from './mathinput';
 describe('The MathInput', () => {
   it('displays the amount if provided', () => {
     const wrapper = shallow(
-      <MathInput id="theInput" amount="theAmount" onChange={e => undefined} />
+      <MathInput id="theInput" amount={200} onChange={e => undefined} />
     );
-    expect(wrapper.find('#theInput').props().value).toEqual('theAmount');
+    expect(wrapper.find('#theInput').props().value).toEqual('200');
   });
   it('displays the changed value', () => {
     const wrapper = shallow(
-      <MathInput id="theInput" amount={'100'} onChange={e => undefined} />
+      <MathInput id="theInput" amount={100} onChange={e => undefined} />
     );
     wrapper.find('#theInput').simulate('change', { target: { value: '12' } });
     expect(wrapper.find('#theInput').props().value).toEqual('12');
   });
   it('displays the amount provided on focus loss', () => {
     const wrapper = shallow(
-      <MathInput id="theInput" amount={'100'} onChange={e => undefined} />
+      <MathInput id="theInput" amount={100} onChange={e => undefined} />
     );
     wrapper.find('#theInput').simulate('change', { target: { value: '12' } });
     wrapper.find('#theInput').simulate('blur');
@@ -27,7 +27,7 @@ describe('The MathInput', () => {
   it('calls the handler with the value of an equation', () => {
     const handler = jest.fn();
     const wrapper = shallow(
-      <MathInput id="theInput" amount={'100'} onChange={handler} />
+      <MathInput id="theInput" amount={100} onChange={handler} />
     );
     wrapper
       .find('#theInput')
@@ -37,7 +37,7 @@ describe('The MathInput', () => {
   it('calls the handler with number input', () => {
     const handler = jest.fn();
     const wrapper = shallow(
-      <MathInput id="theInput" amount={'100'} onChange={handler} />
+      <MathInput id="theInput" amount={100} onChange={handler} />
     );
     wrapper.find('#theInput').simulate('change', { target: { value: '1212' } });
     expect(handler.mock.calls).toEqual([[1212]]);
@@ -45,7 +45,7 @@ describe('The MathInput', () => {
   it('ignores non-equation input', () => {
     const handler = jest.fn();
     const wrapper = shallow(
-      <MathInput id="theInput" amount={'100'} onChange={handler} />
+      <MathInput id="theInput" amount={100} onChange={handler} />
     );
     wrapper
       .find('#theInput')

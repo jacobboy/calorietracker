@@ -98,7 +98,7 @@ export class StoredIngredientRow<T extends Ingredient> extends React.Component<
           >
             <MathInput
               id={`trackFoodAmountInput_${this.props.item.uid}`}
-              amount={this.state.scaledIngredient.amount.toString()}
+              amount={this.props.item.amount}
               onChange={e => this.handleAmount(e)}
             />
           </form>,

@@ -2,7 +2,7 @@ import * as React from 'react';
 
 interface Props {
   id?: string;
-  amount: string;
+  amount: number;
   onChange: (input: number) => void;
 }
 
@@ -60,6 +60,7 @@ export class MathInput extends React.Component<Props, State> {
 
   handleBlur() {
     this.setState({input: this.props.amount.toString()});
+    this.props.onChange(this.props.amount);
   }
 
   render() {
