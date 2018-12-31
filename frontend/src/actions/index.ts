@@ -1,9 +1,10 @@
 import {
-  makeScaledIngredient,
   makeRecipe,
   FOOD_UNIT,
   Ingredient,
-  scaleFoodTo
+  scaleFoodTo,
+  makeScaledIngredient,
+  AmountOf
 } from '../classes';
 import {
   CREATE_INGREDIENT_TOGGLE,
@@ -28,6 +29,7 @@ import {
 import { DataSource } from '../ndbapi';
 import { IngredientSearchItem } from '../ndbapi/classes';
 import { TopBitDisplay } from '../types';
+import { loadRecipe } from '../storage';
 
 interface Action<T extends string> {
   type: T;
@@ -46,7 +48,7 @@ function createAction<T extends string, P>(type: T, payload?: P) {
   return payload !== undefined ? { type, payload } : { type };
 }
 
-function addFoodToMeal(food: Ingredient, mealIdx: number) {
+function addFoodToMeal(food: AmountOf<Ingredient>, mealIdx: number) {
   return createAction(ADD_FOOD_TO_MEAL, { mealIdx, food });
 }
 
@@ -66,17 +68,19 @@ function createIngredientSubmit(
   return createAction(CREATE_INGREDIENT_SUBMIT, ingredient);
 }
 
-function changeRecipeFoodAmount(food: Ingredient, newAmount: number) {
+function changeRecipeFoodAmount(food: AmountOf<Ingredient>, newAmount: number) {
   const newFood = scaleFoodTo(food, newAmount);
   return createAction(REPLACE_FOOD_IN_RECIPE, {from: food, to: newFood});
 }
 
-function addFoodToRecipe(ingredient: Ingredient) {
+function addFoodToRecipe(ingredient: AmountOf<Ingredient>) {
   return createAction(ADD_FOOD_TO_RECIPE, ingredient);
 }
 
-function addFoodsToRecipe(ingredients: Ingredient[]) {
-  return createAction(ADD_FOODS_TO_RECIPE, ingredients);
+function addFoodsToRecipe(recipeIngredient: Ingredient) {
+  /* loadRecipe(recipe.uid).then((r) => createAction(ADD_FOODS_TO_RECIPE, r.foods)); */
+  const recipe = loadRecipe(recipeIngredient.uid);
+  return createAction(ADD_FOODS_TO_RECIPE, recipe);
 }
 
 function removeFoodFromRecipe(food: Ingredient) {
@@ -84,7 +88,7 @@ function removeFoodFromRecipe(food: Ingredient) {
 }
 
 function saveRecipe(
-  name: string, foods: Ingredient[], portionSize: number, totalSize?: number, unit?: string
+  name: string, foods: AmountOf<Ingredient>[], portionSize: number, totalSize?: number, unit?: string
 ) {
   const recipe = makeRecipe(name, foods, portionSize, totalSize, unit);
   return createAction(CREATE_RECIPE_SUBMIT, recipe);
@@ -94,7 +98,7 @@ function saveIngredient(ingredient: Ingredient) {
   return createAction(SAVE_INGREDIENT, ingredient);
 }
 
-function changeMealFoodAmount(mealIdx: number, food: Ingredient, newAmount: number) {
+function changeMealFoodAmount(mealIdx: number, food: AmountOf<Ingredient>, newAmount: number) {
   const newFood = scaleFoodTo(food, newAmount);
   return createAction(REPLACE_FOOD_IN_MEAL, {mealIdx, from: food, to: newFood});
 }
@@ -117,7 +121,7 @@ export const actions = {
   changeMealFoodAmount,
   addFoodToMeal,
   removeFoodFromMeal:
-    (mealIdx: number, food: Ingredient) =>
+    (mealIdx: number, food: AmountOf<Ingredient>) =>
       createAction(REMOVE_FOOD_FROM_MEAL, { mealIdx, food }),
   createIngredientToggle: (destination: TopBitDisplay) => createAction(CREATE_INGREDIENT_TOGGLE, destination),
   createIngredientSubmit,

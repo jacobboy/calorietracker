@@ -109,10 +109,10 @@ class IngredientRow extends React.Component<IngredientRowProps, IngredientRowSta
   }
 }
 
-interface IngredientsTableProps {
+interface IngredientsTableProps<T extends Ingredient> {
   foods: Ingredient[];
-  handleFoodAmountChange?: (food: Ingredient, newAmount: number) => void;
-  handleRemoveFoodClick: (food: Ingredient) => void;
+  handleFoodAmountChange?: (food: T, newAmount: number) => void;
+  handleRemoveFoodClick: (food: T) => void;
   handleDeleteAllClick: () => void;
   handleAmountAllInput?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   amount?: number;
@@ -120,8 +120,8 @@ interface IngredientsTableProps {
   unit?: FOOD_UNIT;
 }
 
-export class IngredientsTable extends React.Component<
-  IngredientsTableProps, {}
+export class IngredientsTable<T extends Ingredient> extends React.Component<
+  IngredientsTableProps<T>, {}
   > {
 
   static headerRow() {
@@ -142,7 +142,7 @@ export class IngredientsTable extends React.Component<
     );
   }
 
-  constructor(props: IngredientsTableProps) {
+  constructor(props: IngredientsTableProps<T>) {
     super(props);
   }
 

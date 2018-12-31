@@ -21,7 +21,7 @@ import {
   ADD_FOODS_TO_RECIPE
 } from '../constants/index';
 import { dropIndex, replaceElement, replaceObject } from '../datautil';
-import { meal, Ingredient, Meal } from '../classes';
+import { meal, Ingredient, Meal, AmountOf } from '../classes';
 
 function mealIdxOrLast(state: StoreState, mealIdx?: number) {
   return mealIdx === undefined ? state.today.length - 1 : mealIdx;
@@ -29,7 +29,7 @@ function mealIdxOrLast(state: StoreState, mealIdx?: number) {
 
 function addFoodToMeal(
   state: StoreState,
-  payload: { mealIdx?: number; food: Ingredient }
+  payload: { mealIdx?: number; food: AmountOf<Ingredient> }
 ): StoreState {
   const idx = mealIdxOrLast(state, payload.mealIdx);
   const newMeal: Meal = state.today[idx].withFood(payload.food);
@@ -39,7 +39,7 @@ function addFoodToMeal(
 
 function removeFoodFromMeal(
   state: StoreState,
-  payload: { mealIdx: number; food: Ingredient }
+  payload: { mealIdx: number; food: AmountOf<Ingredient> }
 ) {
   const idx = mealIdxOrLast(state, payload.mealIdx);
   // console.log(`removing food ${JSON.stringify(payload.food)} from meal ${idx}`);
@@ -154,7 +154,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
           ...state.topbit,
           recipe: {
             ...state.topbit.recipe,
-            foods: [...state.topbit.recipe.foods, ...action.payload]
+            foods: [...state.topbit.recipe.foods, ...action.payload.foods]
           }
         }
       };

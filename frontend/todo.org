@@ -1,4 +1,5 @@
 * TODO Bugs
+** Clicking away from input does not lead to onBlur and amount reset
 ** Searching for quaker steel oats and clicking more details results in TypeError
      108 | private static findNutrient(nutrients: ReportNutrient[], nutrientId: string): string {
      109 |   return nutrients.filter(function(nutrient: ReportNutrient) {
@@ -10,6 +11,19 @@
            calories is missing
 ** Can't create two ingredients with the same name?
 ** Search filter creates duplicates after saving an ingredient that is already saved
+
+* TODO Refactorings
+** `amountOf` needs to not do type checking.  Perhaps Ingredient has `scaleTo(amount?: number): this`?
+** have Recipe implement FoodCombo and Ingredient
+** RecipeIngredient for partially loading Recipes
+** clean up scaleFood and ScaledIngredient usage
+*** IngredientRow stores a food and a scaledFood
+*** StoredIngredientRow stores a food and a scaledFood
+** don't remove from meal by index?
+*** Does FoodCombo need to exist? If so, Why doesn't IngredientTable use it?
+    Represent Meal as Food[]?
+** convert window storage saves to promises
+** find consistent solution to conversion/portion nomenclature
 
 * TODO Features
 ** should I be passing around objects that are an ingredient + an amount?
@@ -34,16 +48,6 @@
 ** what other units can we get from the USDA
 ** edit meals ingredients
 ** a11y?  use titles for "Fat: 12", etc?
-
-* TODO Refactorings
-** clean up scaleFood and ScaledIngredient usage
-*** IngredientRow stores a food and a scaledFood
-*** StoredIngredientRow stores a food and a scaledFood
-** don't remove from meal by index?
-*** Does FoodCombo need to exist? If so, Why doesn't IngredientTable use it?
-    Represent Meal as Food[]?
-** convert window storage saves to promises
-** find consistent solution to conversion/portion nomenclature
 
 * TODO figure out test issues
 ** how to mock local storage?

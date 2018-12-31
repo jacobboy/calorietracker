@@ -1,5 +1,4 @@
 import * as uuid from 'uuid';
-import { ReportNutrient, Report } from './ndbapi/classes';
 import { scaleQuantity, round } from './transforms';
 import {
   saveIngredient,
@@ -10,17 +9,13 @@ import {
   getMealKey,
   getDateKey
 } from './storage';
+import { Report } from './ndbapi/classes';
 
 export enum MACROS {
   'fat' = 'fat',
   'carbs' = 'carbs',
   'protein' = 'protein'
 }
-
-const CALORIES_ID = '208';
-const PROTEIN_ID = '203';
-const FAT_ID = '204';
-const CARB_ID = '205';
 
 function ingredientId() { return getIngredientKey(uuid.v4()); }
 function ndbnoId(ndbno: string) { return getNdbKey(ndbno); }
@@ -33,19 +28,17 @@ export enum FOOD_UNIT {
   'ml' = 'ml'
 }
 
-export interface Named {
-  readonly name: string;
+export interface Nutritional {
+  readonly fat: number;
+  readonly carbs: number;
+  readonly protein: number;
+  readonly calories: number;
+  readonly fatPct: number;
+  readonly carbsPct: number;
+  readonly proteinPct: number;
 }
 
-export interface UIDed {
-  readonly uid: string;
-}
-
-export interface NDBed {
-  readonly ndbno: string;
-}
-
-export abstract class Nutritional {
+abstract class AbstractNutritional implements Nutritional {
   readonly fat: number;
   readonly carbs: number;
   readonly protein: number;
@@ -62,7 +55,7 @@ export abstract class Nutritional {
   }
 }
 
-class NutritionalImpl extends Nutritional {
+class NutritionalImpl extends AbstractNutritional {
   constructor(
     readonly fat: number,
     readonly carbs: number,
@@ -71,17 +64,64 @@ class NutritionalImpl extends Nutritional {
   ) { super(); }
 }
 
+export interface Named { readonly name: string; }
+
+export interface UIDed { readonly uid: string; }
+
+export interface NDBed { readonly ndbno: string; }
+
 export interface Quantifiable extends Named {
   readonly amount: number;
   readonly unit: string;
 }
 
-export abstract class Ingredient extends Nutritional implements Quantifiable, UIDed {
-  readonly name: string;
-  readonly amount: number;
-  readonly unit: string;
-  readonly uid: string;
+export interface Ingredient extends Nutritional, Quantifiable, UIDed { }
+
+export interface AmountOf<T extends Ingredient> extends Ingredient {
+  baseFood: T;
+  scaleTo(amount: number): AmountOf<T>;
 }
+
+class ScalableIngredientImpl<T extends Ingredient> extends AbstractNutritional implements AmountOf<T> {
+
+  get name() { return this.baseFood.name; }
+  get fat() { return this.macros.fat; }
+  get carbs() { return this.macros.carbs; }
+  get protein() { return this.macros.protein; }
+  get calories() { return this.macros.calories; }
+  get unit() { return this.baseFood.unit; }
+  readonly uid: string;
+  readonly baseFood: T;
+  protected readonly macros: Nutritional;
+  readonly amount: number;
+
+  static new<U extends Ingredient>(baseFood: U, amount: number) {
+    return new ScalableIngredientImpl(baseFood, amount);
+  }
+
+  protected constructor(
+    baseFood: T,
+    amount: number,
+  ) {
+    super();
+    this.baseFood = baseFood;
+    this.amount = amount;
+    const scaler = (amt: number) => scaleQuantity(amt, this.baseFood.amount, this.amount);
+    this.macros = new NutritionalImpl(
+      scaler(baseFood.fat),
+      scaler(baseFood.carbs),
+      scaler(baseFood.protein),
+      scaler(baseFood.calories)
+    );
+    this.uid = ingredientId();
+  }
+
+  scaleTo(amount: number): AmountOf<T> {
+    return new ScalableIngredientImpl(this.baseFood, amount);
+  }
+}
+
+export interface Recipe extends Ingredient { readonly foods: AmountOf<Ingredient>[]; }
 
 export interface FoodCombo extends Nutritional {
   readonly foods: Ingredient[];
@@ -93,12 +133,12 @@ export interface FoodCombo extends Nutritional {
  * Why is this separate from Recipe?
  */
 export interface Meal extends FoodCombo, UIDed {
-  foods: Ingredient[];  // TODO Shouldn't actually expose this
-  withFood(food: Ingredient): Meal;
-  withoutFood(food: Ingredient): Meal;
+  foods: AmountOf<Ingredient>[];  // TODO Shouldn't actually expose this
+  withFood(food: AmountOf<Ingredient>): Meal;
+  withoutFood(food: AmountOf<Ingredient>): Meal;
 }
 
-class NDBIngredient extends Ingredient implements NDBed {
+class NDBIngredient extends AbstractNutritional implements Ingredient, NDBed {
   readonly ndbno: string;
   readonly name: string;
   readonly fat: number;
@@ -106,47 +146,33 @@ class NDBIngredient extends Ingredient implements NDBed {
   readonly protein: number;
   readonly calories: number;
   readonly amount: number;
-  readonly unit: FOOD_UNIT;
+  readonly unit: string;
   readonly uid: string;
 
   static fromReport(report: Report): NDBIngredient {
     const ndbno = report.food.ndbno;
+    const uid = ndbnoId(ndbno);
     const name = report.food.name;
-    const calories = parseFloat(
-      NDBIngredient.findNutrient(report.food.nutrients, CALORIES_ID)
-    );
-    const protein = parseFloat(
-      NDBIngredient.findNutrient(report.food.nutrients, PROTEIN_ID)
-    );
-    const fat = parseFloat(
-      NDBIngredient.findNutrient(report.food.nutrients, FAT_ID)
-    );
-    const carbs = parseFloat(
-      NDBIngredient.findNutrient(report.food.nutrients, CARB_ID)
-    );
-    const amount = 100;  // pretty sure it's always 100?
-    const unit = FOOD_UNIT[report.food.ru];
-    return new NDBIngredient(ndbno, name, fat, carbs, protein, calories, amount, unit);
+    const fat = report.fat;
+    const carbs = report.carbs;
+    const protein = report.protein;
+    const calories = report.calories;
+    const amount = report.amount;
+    const unit = FOOD_UNIT[report.unit];
+    return new NDBIngredient(uid, ndbno, name, fat, carbs, protein, calories, amount, unit);
   }
 
-  static fromJson(jsonStr: string): NDBIngredient {
-    const {
-      ndbno, name, fat, carbs, protein, calories, amount, unit
-    } = JSON.parse(jsonStr);
+  static fromObj(obj: NDBIngredient): NDBIngredient {
+    // Not totally sure what i want to do here
     return new NDBIngredient(
-      ndbno, name, fat, carbs, protein, calories, amount, unit
-    );
-  }
-
-  private static findNutrient(nutrients: ReportNutrient[], nutrientId: string): string {
-    return nutrients.filter(function(nutrient: ReportNutrient) {
-      return nutrient.nutrient_id === nutrientId;
-    })[0].value;
+      obj.uid, obj.ndbno, obj.name,
+      obj.fat, obj.carbs, obj.protein, obj.calories,
+      obj.amount, obj.unit);
   }
 
   private constructor(
-    ndbno: string, name: string, fat: number, carbs: number,
-    protein: number, calories: number, amount: number, unit: FOOD_UNIT
+    uid: string, ndbno: string, name: string, fat: number, carbs: number,
+    protein: number, calories: number, amount: number, unit: string
   ) {
     super();
     this.ndbno = ndbno;
@@ -161,10 +187,15 @@ class NDBIngredient extends Ingredient implements NDBed {
   }
 }
 
-class CustomIngredient extends Ingredient {
+class CustomIngredient extends AbstractNutritional implements Ingredient {
   static new(
-    name: string, fat: number, carbs: number, protein: number,
-    calories: number, amount: number, unit: FOOD_UNIT
+    name: string,
+    fat: number,
+    carbs: number,
+    protein: number,
+    calories: number,
+    amount: number,
+    unit: string
   ): CustomIngredient {
     return new CustomIngredient(
       ingredientId(), name, fat, carbs, protein, calories, amount, unit
@@ -188,40 +219,15 @@ class CustomIngredient extends Ingredient {
     readonly protein: number,
     readonly calories: number,
     readonly amount: number,
-    readonly unit: FOOD_UNIT,
+    readonly unit: string,
   ) { super(); }
 }
 
-class ScaledFood extends Ingredient {
+class MealImpl extends AbstractNutritional implements Meal {
   readonly uid: string;
-  readonly food: Nutritional & Quantifiable;
-  readonly amount: number;
-  readonly unit: string;
-  readonly name: string;
-  readonly fat: number;
-  readonly carbs: number;
-  readonly protein: number;
-  readonly calories: number;
+  readonly foods: AmountOf<Ingredient>[];
 
-  constructor(food: Nutritional & Quantifiable, amount: number) {
-    super();
-    this.uid = uuid.v4();
-    this.food = food;
-    this.amount = amount;
-    this.unit = this.food.unit;
-    this.name = this.food.name;
-    this.fat = scaleQuantity(this.food.fat, this.food.amount, this.amount);
-    this.carbs = scaleQuantity(this.food.carbs, this.food.amount, this.amount);
-    this.protein = scaleQuantity(this.food.protein, this.food.amount, this.amount);
-    this.calories = scaleQuantity(this.food.calories, this.food.amount, this.amount);
-  }
-}
-
-class MealImpl extends Ingredient implements Meal {
-  readonly uid: string;
-  readonly foods: Ingredient[];
-
-  constructor(foods: Ingredient[]) {
+  constructor(foods: AmountOf<Ingredient>[]) {
     super();
     this.uid = mealId();
     this.foods = foods;
@@ -231,29 +237,21 @@ class MealImpl extends Ingredient implements Meal {
   get protein() { return this.foods.reduce((l, r) => l + r.protein, 0); }
   get fat() { return this.foods.reduce((l, r) => l + r.fat, 0); }
   get carbs() { return this.foods.reduce((l, r) => l + r.carbs, 0); }
-  withFood(food: Ingredient): Meal { return new MealImpl([...this.foods, food]); }
-  withoutFood(food: Ingredient): Meal {
+  withFood(food: AmountOf<Ingredient>): Meal {
+    return new MealImpl([...this.foods, food]);
+  }
+  withoutFood(food: AmountOf<Ingredient>): Meal {
     if (this.foods.find((f) => f === food) !== undefined) {
       return new MealImpl(this.foods.filter(f => f !== food));
     } else {
-      console.log(`Food not found: ${JSON.stringify(food)} in ${this.foods.map(f => f.uid)}`);
-      return this;
+      throw new Error(`Food not found: ${JSON.stringify(food)} in ${this.foods.map(f => f.uid)}`);
     }
   }
 }
 
-export class Recipe extends Ingredient {
+class RecipeImpl extends AbstractNutritional implements Ingredient, Recipe {
 
-  static copy(recipe: Recipe) {
-    const uid = recipeId();
-    return new Recipe(
-      uid, `${recipe.name}'s Bitchin' Copy` , recipe.foods, recipe.fat,
-      recipe.carbs, recipe.protein, recipe.calories, recipe.amount,
-      recipe.unit, recipe.portionRatio
-    );
-  }
-
-  static new(name: string, foods: Ingredient[], portionSize: number, totalSize?: number, unit?: string) {
+  static new(name: string, foods: AmountOf<Ingredient>[], portionAmount: number, totalAmount?: number, unit?: string) {
     if (unit === undefined) {
       const units = new Set(foods.map(f => f.unit));
       if (units.size !== 1) {
@@ -262,44 +260,56 @@ export class Recipe extends Ingredient {
       }
       unit = foods[0].unit;
     }
-    if (totalSize === undefined) {
-      totalSize = foods.reduce((l, r) => l + r.amount, 0);
+    if (totalAmount === undefined) {
+      totalAmount = foods.reduce((l, r) => l + r.amount, 0);
     }
-    const portionRatio = portionSize / totalSize;
 
-    const calories = foods.reduce((l, r) => l + r.calories, 0) * portionRatio;
-    const protein = foods.reduce((l, r) => l + r.protein, 0) * portionRatio;
-    const fat = foods.reduce((l, r) => l + r.fat, 0) * portionRatio;
-    const carbs = foods.reduce((l, r) => l + r.carbs, 0) * portionRatio;
+    const calories = foods.reduce((l, r) => l + r.calories, 0);
+    const protein = foods.reduce((l, r) => l + r.protein, 0);
+    const fat = foods.reduce((l, r) => l + r.fat, 0);
+    const carbs = foods.reduce((l, r) => l + r.carbs, 0);
 
     const uid = recipeId();
-    return new Recipe(
+    return new RecipeImpl(
       uid, name, foods, fat, carbs, protein,
-      calories, portionSize, unit, portionRatio
+      calories, portionAmount, totalAmount, unit
     );
   }
 
-  static fromJson(jsonStr: string): Recipe {
-    const {
-      uid, name, foods, fat, carbs, protein, calories, amount, unit, portionRatio
-    } = JSON.parse(jsonStr);
-    return new Recipe(
-      uid, name, foods, fat, carbs, protein, calories, amount, unit, portionRatio
-    );
-  }
+  static fromObject(uid: string,
+                    name: string,
+                    foods: AmountOf<Ingredient>[],
+                    totalFat: number,
+                    totalCarbs: number,
+                    totalProtein: number,
+                    totalCalories: number,
+                    portionAmount: number,
+                    totalAmount: number,
+                    unit: string, ) {
+      return new RecipeImpl(
+        uid, name, foods, totalFat, totalCarbs, totalProtein,
+        totalCalories, portionAmount, totalAmount, unit
+      );
+    }
 
   private constructor(
     readonly uid: string,
     readonly name: string,
-    readonly foods: Ingredient[],
-    readonly fat: number,
-    readonly carbs: number,
-    readonly protein: number,
-    readonly calories: number,
-    readonly amount: number,
+    readonly foods: AmountOf<Ingredient>[],
+    readonly totalFat: number,
+    readonly totalCarbs: number,
+    readonly totalProtein: number,
+    readonly totalCalories: number,
+    readonly portionAmount: number,
+    readonly totalAmount: number,
     readonly unit: string,
-    readonly portionRatio: number,
   ) { super(); }
+
+  get fat() { return scaleQuantity(this.totalFat, this.totalAmount, this.portionAmount); }
+  get carbs() { return scaleQuantity(this.totalCarbs, this.totalAmount, this.portionAmount); }
+  get protein() { return scaleQuantity(this.totalProtein, this.totalAmount, this.portionAmount); }
+  get calories() { return scaleQuantity(this.totalCalories, this.totalAmount, this.portionAmount); }
+  get amount() { return this.portionAmount; }
 }
 
 export class MealDate {
@@ -322,22 +332,25 @@ export class MealDate {
    }
 }
 
-export const ingredientFromJson = CustomIngredient.fromJson;
-
-export function scaleFoodTo(
-  ingredient: Nutritional & Quantifiable, amount: number
-): Ingredient {
-  // TODO should I be passing around objects that are an ingredient + an amount?
-  // then i won't need to be careful about scaling foods to 0, can always just
-  // take the original food
-  return new ScaledFood(ingredient, amount);
+export function ingredientFromJson(jsonStr: string): AmountOf<Ingredient> {
+  const baseIngred = CustomIngredient.fromJson(jsonStr);
+  return ScalableIngredientImpl.new(baseIngred, baseIngred.amount);
 }
 
-export function scaleFoodBy(
-  ingredient: Nutritional & Quantifiable, ratio: number
-): Ingredient {
-  const amount = ingredient.amount * ratio;
-  return new ScaledFood(ingredient, amount);
+export function scaleFoodTo<T extends Ingredient>(
+  ingredient: AmountOf<T>, amount: number
+): AmountOf<T> {
+  return ingredient.scaleTo(amount);
+}
+
+export function amountOf(ingredient: Ingredient, amount?: number) {
+  amount = amount || ingredient.amount;
+  // TODO uhhh this is double plus bad, fix this
+  if (ingredient instanceof ScalableIngredientImpl) {
+    return scaleFoodTo(ingredient, amount);
+  } else {
+    return ScalableIngredientImpl.new(ingredient, amount);
+  }
 }
 
 export function makeIngredient(
@@ -347,9 +360,9 @@ export function makeIngredient(
   protein: number,
   calories: number,
   amount: number,
-  unit: FOOD_UNIT,
+  unit: string,
   persist: boolean = true
-) {
+): AmountOf<Ingredient> {
   return makeScaledIngredient(name, fat, carbs, protein, calories, amount, amount, unit, persist);
 }
 
@@ -361,9 +374,9 @@ export function makeScaledIngredient(
   calories: number,
   amount: number,
   convertAmount: number,
-  unit: FOOD_UNIT,
+  unit: string,
   persist: boolean = true
-) {
+): AmountOf<Ingredient> {
   const [sFat, sCarbs, sProtein, sCalories] = [fat, carbs, protein, calories].map(
     (m) => scaleQuantity(m, amount, convertAmount)
   );
@@ -371,22 +384,41 @@ export function makeScaledIngredient(
   if (persist) {
     saveIngredient(ingred);
   }
-  return ingred;
+  return ScalableIngredientImpl.new(ingred, ingred.amount);
 }
 
-export function ingredientFromReport(report: Report): Ingredient {
-  return NDBIngredient.fromReport(report);
-}
+export const ingredientFromReport = NDBIngredient.fromReport;
 
 export function makeRecipe(
-  name: string, foods: Ingredient[], portionSize: number, totalSize?: number, unit?: string
+  name: string, foods: AmountOf<Ingredient>[], portionSize: number, totalSize?: number, unit?: string
 ): Recipe {
-  const recipe = Recipe.new(name, foods, portionSize, totalSize, unit);
+  const recipe = RecipeImpl.new(name, foods, portionSize, totalSize, unit);
   saveRecipe(recipe);
   return recipe;
 }
 
-export function meal(foods: Ingredient[]): Meal {
+// tslint:disable-next-line:no-any
+function amountOfFromObj(amountOfObj: {amount: number, baseFood: any}): AmountOf<Ingredient> {
+  let { amount, baseFood } = amountOfObj;
+  if (baseFood.ndbno !== undefined) {
+    baseFood = NDBIngredient.fromObj(baseFood);
+  } else {
+    baseFood = CustomIngredient.fromJson(JSON.stringify(baseFood));
+  }
+  return amountOf(baseFood, amount);
+}
+
+export function recipeFromJson (jsonStr: string): Recipe {
+  let {
+    uid, name, foods, fat, carbs, protein, calories, portionAmount, totalAmount, unit
+  } = JSON.parse(jsonStr);
+  foods = foods.map(amountOfFromObj);
+  return RecipeImpl.fromObject(
+    uid, name, foods, fat, carbs, protein, calories, portionAmount, totalAmount, unit
+  );
+}
+
+export function meal(foods: AmountOf<Ingredient>[]): Meal {
   return new MealImpl(foods);
 }
 

@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { MealsComponent } from '../components/meals';
 import { mount, ReactWrapper } from 'enzyme';
-import { Meal, meal, Ingredient, makeIngredient, FOOD_UNIT } from '../classes';
+import { Meal, meal, Ingredient, makeIngredient, FOOD_UNIT, AmountOf } from '../classes';
 
 function mockMeals(nMeals: number, nFoods: number): Meal[] {
     const meals: Meal[] = [];
     for (let i = 0; i < nMeals; i++) {
-        const foods: Ingredient[] = [];
+        const foods: AmountOf<Ingredient>[] = [];
         for (let j = 0; j < nFoods; j++) {
             const food = makeIngredient(
                 'ingredient_' + i.toString + j.toString(),

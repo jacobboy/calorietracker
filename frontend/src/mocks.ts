@@ -1,6 +1,6 @@
-import { ReportResponse, SearchResponse } from './ndbapi/classes';
+/* import { ReportResponse, SearchResponse } from './ndbapi/classes'; */
 
-export const CheddarCheese: ReportResponse = {
+export const CheddarCheese = {
     'report': {
         'sr': '28',
         'type': 'Basic',
@@ -1735,7 +1735,7 @@ export const CheddarCheese: ReportResponse = {
     }
 };
 
-export const FetaCheese: ReportResponse = {
+export const FetaCheese = {
   'report': {
     'sr': '28',
     'type': 'Basic',
@@ -2968,7 +2968,7 @@ export const FetaCheese: ReportResponse = {
   }
 };
 
-export const mockSearchResp: SearchResponse = {
+export const mockSearchResponse = {
   'list': {
     'q': 'butter',
     'sr': '28',

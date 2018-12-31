@@ -1,4 +1,4 @@
-import { Meal, Ingredient, Recipe, Named, NDBed } from '../classes';
+import { Meal, Ingredient, Named, NDBed, AmountOf } from '../classes';
 import { DataSource } from '../ndbapi';
 import {
   getAllCustomIngredients,
@@ -9,7 +9,7 @@ import {
 export interface SavedState {
   ndbs: Ingredient[];
   ingredients: Ingredient[];
-  recipes: Recipe[];
+  recipes: Ingredient[];
 }
 
 export interface SearchState {
@@ -34,7 +34,7 @@ export enum Modals {
 export class TopBitState {
   display: TopBitDisplay;
   recipe: {
-    foods: Ingredient[],
+    foods: AmountOf<Ingredient>[],
     /* amount: number,
     unit: FOOD_UNIT */
   };

@@ -1,6 +1,14 @@
 import * as client from '../client';
 import { Report } from '../ndbapi/classes';
-import { Ingredient, Recipe, ingredientFromJson, ingredientFromReport, Meal, MealDate } from '../classes';
+import {
+  Ingredient,
+  ingredientFromJson,
+  ingredientFromReport,
+  Meal,
+  MealDate,
+  Recipe,
+  recipeFromJson
+} from '../classes';
 
 function getKey(keyType: string) {
   // was '::' but Enzyme didn't like that
@@ -23,19 +31,25 @@ export const getDateKey = getKey('date');
 export const isDateKey = isKey('date');
 
 export function saveReport(report: Report): void {
-  window.localStorage.setItem(getNdbKey(report.food.ndbno), JSON.stringify(report));
+  window.localStorage.setItem(
+    getNdbKey(report.food.ndbno),
+    JSON.stringify(report)
+  );
 }
 
 export function loadReport(ndbno: string): Report | null {
   const key = getNdbKey(ndbno);
-  return loadReportFromKey(key);
+  const report = loadReportFromKey(key);
+  return report;
 }
 
 function loadReportFromKey(key: string): Report | null {
   const reportStr: string | null = window.localStorage.getItem(key);
-  if (reportStr !== null) {
-    /* console.log('Retrieved ' + key + ' from window storage'); */
-    return JSON.parse(reportStr);
+  if (reportStr) {
+    /* console.log(`Retrieved ${key} from window storage`);
+    console.log(`It was:\n ${reportStr}`); */
+    const reportObj = JSON.parse(reportStr);
+    return Report.new(reportObj);
   } else {
     return null;
   }
@@ -75,13 +89,25 @@ export function saveRecipe(recipe: Recipe): void {
 
 export function loadRecipe(recipeId: string): Recipe {
   const recipeStr = window.localStorage.getItem(recipeId);
-  if (recipeStr !== null) {
+  if (recipeStr) {
     // console.log('Retrieved ' + recipeId + ' from window storage');
-    return Recipe.fromJson(recipeStr);
+    return recipeFromJson(recipeStr);
   } else {
     throw new Error('Recipe ' + recipeId + ' not found.');
   }
 }
+
+/* export function loadRecipe(recipeId: string): Promise<Recipe> {
+  // console.log('Retrieved ' + recipeId + ' from window storage');
+  return new Promise((resolve, reject) => {
+    const recipeStr = window.localStorage.getItem(recipeId);
+    if (recipeStr !== null) {
+      resolve(recipeFromJson(recipeStr));
+    } else {
+      reject(Error('Recipe ' + recipeId + ' not found.'));
+    }
+  });
+} */
 
 export function saveDay(date: MealDate, meals: Meal[]) {
   window.localStorage.setItem(date.id, JSON.stringify(meals));
@@ -103,7 +129,7 @@ export function getAllStoredIngredients(): Ingredient[] {
       }
     }
   }
-  return ingreds.sort( (l, r) => l.name < r.name ? -1 : 1 );
+  return ingreds.sort((l, r) => (l.name < r.name ? -1 : 1));
 }
 
 export function getAllCustomIngredients(): Ingredient[] {
@@ -114,10 +140,11 @@ export function getAllCustomIngredients(): Ingredient[] {
       ingreds.push(loadIngredient(key));
     }
   }
-  return ingreds.sort( (l, r) => l.name < r.name ? -1 : 1 );
+  return ingreds.sort((l, r) => (l.name < r.name ? -1 : 1));
 }
 
-export function getAllRecipes(): Recipe[] {
+/* TODO change this to use RecipeIngredient */
+export function getAllRecipes(): Ingredient[] {
   const recipes: Recipe[] = [];
   for (let i = 0; i < window.localStorage.length; i++) {
     const key = window.localStorage.key(i);
@@ -125,5 +152,5 @@ export function getAllRecipes(): Recipe[] {
       recipes.push(loadRecipe(key));
     }
   }
-  return recipes.sort( (l, r) => l.name < r.name ? -1 : 1 );
+  return recipes.sort((l, r) => (l.name < r.name ? -1 : 1));
 }

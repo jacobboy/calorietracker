@@ -10,8 +10,8 @@ function mapStateToProps(state: StoreState) {
 
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
-    onIngredientToggle: (destination: TopBitDisplay) => { 
-      dispatch(actions.createIngredientToggle(destination)); 
+    onIngredientToggle: (destination: TopBitDisplay) => {
+      dispatch(actions.createIngredientToggle(destination));
     }
   };
 }

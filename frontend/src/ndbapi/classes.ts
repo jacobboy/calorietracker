@@ -1,14 +1,18 @@
 import { Named, NDBed } from '../classes';
 
-export class IngredientSearchItem implements Named, NDBed {
+const CALORIES_ID = '208';
+const PROTEIN_ID = '203';
+const FAT_ID = '204';
+const CARB_ID = '205';
 
+export class IngredientSearchItem implements Named, NDBed {
   static fromSearchListItem(item: SearchListItem) {
     return new IngredientSearchItem(
       item.ndbno,
       item.offset,
       item.group,
       item.name,
-      item.ds,
+      item.ds
     );
   }
 
@@ -18,7 +22,9 @@ export class IngredientSearchItem implements Named, NDBed {
     readonly group: string,
     readonly name: string,
     readonly ds: string
-  ) { /*noop*/ }
+  ) {
+    /*noop*/
+  }
 }
 
 export class SearchListItem {
@@ -80,12 +86,65 @@ class ReportFood {
 }
 
 export class Report {
-  sr: string;
-  type: string;
-  food: ReportFood;
-  footnotes: string[];
+  static new(reportObj: {
+    sr: string;
+    type: string;
+    food: ReportFood;
+    footnotes: string[];
+  }) {
+    return new Report(
+      reportObj.sr,
+      reportObj.type,
+      reportObj.food,
+      reportObj.footnotes
+    );
+  }
+
+  private constructor(
+    readonly sr: string,
+    readonly type: string,
+    readonly food: ReportFood,
+    readonly footnotes: string[]
+  ) {}
+
+  get fat() {
+    return this.findNutrient(FAT_ID);
+  }
+
+  get carbs() {
+    return this.findNutrient(CARB_ID);
+  }
+
+  get protein() {
+    return this.findNutrient(PROTEIN_ID);
+  }
+
+  get calories() {
+    return this.findNutrient(CALORIES_ID);
+  }
+
+  get unit() {
+    return this.food.ru;
+  }
+
+  get amount() {
+    return 100; // TODO pretty sure it's always 100?
+  }
+
+  private findNutrient(nutrientId: string): number {
+    return parseFloat(
+      this.food.nutrients.filter(function(nutrient: ReportNutrient) {
+        return nutrient.nutrient_id === nutrientId;
+      })[0].value
+    );
+  }
 }
 
 export class ReportResponse {
-  report: Report;
+  readonly report: {
+    sr: string;
+    type: string;
+    food: ReportFood;
+    footnotes: string[];
+  };
 }
