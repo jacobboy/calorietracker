@@ -1,0 +1,257 @@
+openapi: "3.0.2"
+info:
+  version: 1.0.0
+  title: Macro Macro API
+  description: An API that provides access to recipe and ingredient information, both user-generated and sourced from the USDA
+  # termsOfService: http://swagger.io/terms/
+  # contact:
+  #   name: Swagger API Team
+  #   email: apiteam@swagger.io
+  #   url: http://swagger.io
+  # license:
+  #   name: Apache 2.0
+  #   url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: http://localhost:5555
+paths:
+  /ingredients:
+    get:
+      description: |
+        Returns all ingredients the user has saved
+      operationId: findIngredients
+      parameters:
+        - name: sort
+          in: query
+          description: "sort key. options: recent"
+          required: false
+          style: form
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: "maximum number of results to return. default: 10"
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: ingredient response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ingredient'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelError'
+    post:
+      description: Creates a new ingredient.  Duplicates are allowed.
+      operationId: addIngredient
+      requestBody:
+        description: Ingredient to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ingredient'
+      responses:
+        '200':
+          description: ingredient response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelError'
+
+  /ingredients/{uid}:
+    get:
+      description: Returns the ingredient specified by the UID
+      operationId: findIngredientByUID
+      parameters:
+        - name: uid
+          in: path
+          description: UID of ingredient to fetch
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ingredient response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelError'
+  /recipes:
+    get:
+      description: |
+        Returns all ingredients the user has saved
+      operationId: findRecipes
+      parameters:
+        - name: sort
+          in: query
+          description: "sort key. options: recent"
+          required: false
+          style: form
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: "maximum number of results to return. default: 10"
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: recipe response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelError'
+    post:
+      description: Creates a new recipe.  Duplicates are allowed.
+      operationId: addRecipe
+      requestBody:
+        description: Recipe to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recipe'
+      responses:
+        '200':
+          description: recipe response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelError'
+  /recipes/{uid}:
+    get:
+      description: Returns the recipe specified by the UID
+      operationId: findRecipeByUID
+      parameters:
+        - name: uid
+          in: path
+          description: UID of recipe to fetch
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: recipe response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelError'
+
+components:
+  schemas:
+
+    Meal:
+      required:
+        - foods
+      properties:
+        foods:
+          type: array
+          items:
+            $ref: '#/components/schemas/AmountOfIngredient'
+
+    Recipe:
+      required:
+        - uid
+        - foods
+      properties:
+        uid:
+          type: string
+        foods:
+          type: array
+          items:
+            $ref: '#/components/schemas/AmountOfIngredient'
+
+    AmountOfIngredient:
+      required:
+        - amount
+        - baseFood
+      properties:
+        uid:
+          type: string
+        amount:
+          type: integer
+          format: int32
+        baseFood:
+          type: string
+
+    Ingredient:
+      required:
+        - uid
+        - name
+        - fat
+        - carbs
+        - protein
+        - calories
+        - amount
+        - unit
+      properties:
+        uid:
+          type: string
+        name:
+          type: string
+        fat:
+          type: number
+        carbs:
+          type: number
+        protein:
+          type: number
+        calories:
+          type: number
+        amount:
+          type: number
+        unit:
+          type: string
+
+    ModelError:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
