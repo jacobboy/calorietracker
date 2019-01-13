@@ -16,6 +16,4 @@ case class AmountOfIngredient(
 
   amount: Int,
 
-  baseFood: String
-
- )
+  baseFood: String)

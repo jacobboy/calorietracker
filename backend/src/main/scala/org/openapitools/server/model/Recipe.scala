@@ -14,6 +14,4 @@ package org.openapitools.server.model
 case class Recipe(
   uid: String,
 
-  foods: List[AmountOfIngredient]
-
- )
+  foods: List[AmountOfIngredient])

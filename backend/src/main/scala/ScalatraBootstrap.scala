@@ -9,7 +9,6 @@
  * https://openapi-generator.tech
  */
 
-
 import org.openapitools.server.api._
 import org.openapitools.app.{ ResourcesApp, OpenAPIApp }
 import javax.servlet.ServletContext

@@ -12,6 +12,4 @@
 package org.openapitools.server.model
 
 case class Meal(
-  foods: List[AmountOfIngredient]
-
- )
+  foods: List[AmountOfIngredient])

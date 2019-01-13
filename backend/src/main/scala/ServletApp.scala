@@ -9,7 +9,6 @@
  * https://openapi-generator.tech
  */
 
-
 package org.openapitools.app
 
 import org.scalatra.swagger.{ ApiInfo, SwaggerWithAuth, Swagger }

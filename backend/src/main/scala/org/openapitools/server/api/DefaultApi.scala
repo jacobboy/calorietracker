@@ -9,7 +9,6 @@
  * https://openapi-generator.tech
  */
 
-
 package org.openapitools.server.api
 
 import org.openapitools.server.model.Ingredient
@@ -20,12 +19,15 @@ import java.io.File
 
 import org.scalatra.ScalatraServlet
 import org.scalatra.swagger._
+import org.scalatra._
 import org.json4s._
 import org.json4s.JsonDSL._
 import org.scalatra.json.{ JValueResult, JacksonJsonSupport }
 import org.scalatra.servlet.{ FileUploadSupport, MultipartConfig, SizeConstraintExceededException }
 
 import scala.collection.JavaConverters._
+
+import com.macromacro.storage.Storage
 
 class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
   with FileUploadSupport
@@ -39,80 +41,67 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
     contentType = formats("json")
     response.headers += ("Access-Control-Allow-Origin" -> "*")
   }
-  
+
+  get("/") {
+    Storage.message()
+  }
 
   val addIngredientOperation = (apiOperation[Ingredient]("addIngredient")
     summary ""
-    parameters(bodyParam[Ingredient]("ingredient").description(""))
-  )
+    parameters (bodyParam[Ingredient]("ingredient").description("")))
 
   post("/ingredients", operation(addIngredientOperation)) {
     //println("ingredient: " + ingredient)
   }
 
-  
-
   val addRecipeOperation = (apiOperation[Recipe]("addRecipe")
     summary ""
-    parameters(bodyParam[Recipe]("recipe").description(""))
-  )
+    parameters (bodyParam[Recipe]("recipe").description("")))
 
   post("/recipes", operation(addRecipeOperation)) {
     //println("recipe: " + recipe)
   }
 
-  
-
   val findIngredientByUIDOperation = (apiOperation[Ingredient]("findIngredientByUID")
     summary ""
-    parameters(pathParam[String]("uid").description(""))
-  )
+    parameters (pathParam[String]("uid").description("")))
 
   get("/ingredients/:uid", operation(findIngredientByUIDOperation)) {
     val uid = params.getOrElse("uid", halt(400))
     //println("uid: " + uid)
   }
 
-  
-
   val findIngredientsOperation = (apiOperation[List[Ingredient]]("findIngredients")
     summary ""
-    parameters(queryParam[String]("sort").description("").optional, queryParam[Int]("limit").description("").optional)
-  )
+    parameters (queryParam[String]("sort").description("").optional, queryParam[Int]("limit").description("").optional))
 
   get("/ingredients", operation(findIngredientsOperation)) {
-            val sort = params.getAs[String]("sort")
+    val sort = params.getAs[String]("sort")
 
     //println("sort: " + sort)
-            val limit = params.getAs[Int]("limit")
+    val limit = params.getAs[Int]("limit")
 
     //println("limit: " + limit)
   }
 
-  
-
   val findRecipeByUIDOperation = (apiOperation[Recipe]("findRecipeByUID")
     summary ""
-    parameters(pathParam[String]("uid").description(""))
-  )
+    parameters (pathParam[String]("uid").description("")))
 
   get("/recipes/:uid", operation(findRecipeByUIDOperation)) {
     val uid = params.getOrElse("uid", halt(400))
     //println("uid: " + uid)
   }
 
-  
-
   val findRecipesOperation = (apiOperation[List[Recipe]]("findRecipes")
     summary ""
-    parameters(queryParam[String]("sort").description("").optional, queryParam[Int]("limit").description("").optional)
-  )
+    parameters (queryParam[String]("sort").description("").optional, queryParam[Int]("limit").description("").optional))
 
   get("/recipes", operation(findRecipesOperation)) {
-            val sort = params.getAs[String]("sort")
+    val sort = params.getAs[String]("sort")
 
     //println("sort: " + sort)
-            val limit = params.getAs[Int]("limit")
+    val limit = params.getAs[Int]("limit")
 
     //println("limit: " + limit)
   }

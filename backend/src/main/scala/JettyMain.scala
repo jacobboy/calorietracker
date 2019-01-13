@@ -26,6 +26,7 @@ object JettyMain {
   def main(args: Array[String]) = {
     val server: Server = new Server
     println("starting jetty")
+    println("yeah hell yeah with the jetty")
 
     server setStopTimeout conf.stopTimeout
     //server setDumpAfterStart true
