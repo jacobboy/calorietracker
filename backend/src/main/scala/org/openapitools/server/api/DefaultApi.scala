@@ -43,7 +43,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
   }
 
   get("/") {
-    Storage.message()
+    "Ready to rock"
   }
 
   val addIngredientOperation = (apiOperation[Ingredient]("addIngredient")

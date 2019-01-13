@@ -8,15 +8,12 @@ import com.google.appengine.api.search.Field;
 import com.google.appengine.api.search.PutException;
 import com.google.appengine.api.search.SearchServiceFactory;
 import com.google.appengine.api.search.StatusCode;
+import org.openapitools.server.model.Ingredient
 
 object Storage {
 
-  def message() = {
-    indexShit()
-  }
-
-  def indexShit() = {
-    val indexName = "hisup"
+  def indexIngredient(ingredient: Ingredient) = {
+    val indexName = "ingredients"
     val document = Document.newBuilder.setId("documentid")
       .addField(Field.newBuilder()
         .setName("subject")
