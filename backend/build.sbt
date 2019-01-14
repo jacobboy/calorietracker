@@ -1,5 +1,5 @@
 organization := "org.openapitools"
-name := "calorietracker"
+name := "macromacro"
 version := "0.1.0-SNAPSHOT"
 scalaVersion := "2.12.4"
 
@@ -21,7 +21,5 @@ libraryDependencies ++= Seq(
   "javax.servlet"     %  "javax.servlet-api"    % "3.1.0",
   "ch.qos.logback"    %  "logback-classic"      % "1.2.3" % Provided
 )
-
-// libraryDependencies += "com.google.appengine" % "appengine-api" % "1.3.5"
 
 enablePlugins(JettyPlugin)
