@@ -11,11 +11,7 @@
 
 package org.openapitools.server.model
 
-import java.util.UUID
-
-case class Ingredient(
-  uid: UUID,
-
+case class NewIngredient(
   name: String,
 
   fat: BigDecimal,

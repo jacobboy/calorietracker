@@ -58,7 +58,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Ingredient'
+              $ref: '#/components/schemas/NewIngredient'
       responses:
         '200':
           description: ingredient response
@@ -217,9 +217,8 @@ components:
         baseFood:
           type: string
 
-    Ingredient:
+    NewIngredient:
       required:
-        - uid
         - name
         - fat
         - carbs
@@ -228,8 +227,6 @@ components:
         - amount
         - unit
       properties:
-        uid:
-          type: string
         name:
           type: string
         fat:
@@ -244,6 +241,15 @@ components:
           type: number
         unit:
           type: string
+
+    Ingredient:
+      allOf:
+        - $ref: '#/components/schemas/NewPet'
+        - required:
+          - uid
+          properties:
+            uid:
+              type: string
 
     ModelError:
       required:

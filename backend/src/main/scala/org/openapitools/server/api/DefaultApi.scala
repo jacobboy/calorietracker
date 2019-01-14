@@ -13,16 +13,18 @@ package org.openapitools.server.api
 
 import org.openapitools.server.model.Ingredient
 import org.openapitools.server.model.ModelError
+import org.openapitools.server.model.NewIngredient
 import org.openapitools.server.model.Recipe
 
 import java.io.File
 
 import org.scalatra.ScalatraServlet
 import org.scalatra.swagger._
-import org.scalatra._
 import org.json4s._
 import org.json4s.JsonDSL._
 import org.scalatra.json.{ JValueResult, JacksonJsonSupport }
+import org.json4s.ext.JavaTypesSerializers
+import org.json4s.jackson.Serialization
 import org.scalatra.servlet.{ FileUploadSupport, MultipartConfig, SizeConstraintExceededException }
 
 import scala.collection.JavaConverters._
@@ -33,9 +35,11 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
   with FileUploadSupport
   with JacksonJsonSupport
   with SwaggerSupport {
-  protected implicit val jsonFormats: Formats = DefaultFormats
 
-  protected val applicationDescription: String = "DefaultApi"
+  // protected implicit val jsonFormats: Formats = DefaultFormats
+  protected implicit val jsonFormats: Formats = Serialization.formats(NoTypeHints) ++ JavaTypesSerializers.all
+
+  protected val applicationDescription: String = "MacroMacroApi"
 
   before() {
     contentType = formats("json")
@@ -43,15 +47,16 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
   }
 
   get("/") {
-    "Ready to rock"
+    "what's up"
   }
 
   val addIngredientOperation = (apiOperation[Ingredient]("addIngredient")
     summary ""
-    parameters (bodyParam[Ingredient]("ingredient").description("")))
+    parameters (bodyParam[NewIngredient]("newIngredient").description("")))
 
   post("/ingredients", operation(addIngredientOperation)) {
-    //println("ingredient: " + ingredient)
+    val newIngredient = parsedBody.extract[NewIngredient]
+    Storage.saveIngredient(newIngredient)
   }
 
   val addRecipeOperation = (apiOperation[Recipe]("addRecipe")
@@ -68,7 +73,8 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
 
   get("/ingredients/:uid", operation(findIngredientByUIDOperation)) {
     val uid = params.getOrElse("uid", halt(400))
-    //println("uid: " + uid)
+    println("getIngredient: " + uid)
+    Storage.getIngredient(uid)
   }
 
   val findIngredientsOperation = (apiOperation[List[Ingredient]]("findIngredients")
