@@ -1,4 +1,10 @@
 * TODO Bugs
+** copy recipe in, removing last ingredients, removes wrong amounts
+** enter on save recipe should submit
+** Copy recipe doesn't keep total
+** Adding to recipe via submit button does not keep ingredient amount
+** math in total field on create recipe doesn't work
+** Can't have 0 for a nutrient in an ingredient
 ** Searching for quaker steel oats and clicking more details results in TypeError
      108 | private static findNutrient(nutrients: ReportNutrient[], nutrientId: string): string {
      109 |   return nutrients.filter(function(nutrient: ReportNutrient) {
@@ -25,6 +31,7 @@
 ** find consistent solution to conversion/portion nomenclature
 
 * TODO Features
+** Add notes to recipes
 ** should I be passing around objects that are an ingredient + an amount?
    then i won't need to be careful about scaling foods to 0, can always just take the original food
    see scaleFoodTo
