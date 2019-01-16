@@ -1,9 +1,9 @@
 val ScalatraVersion = "2.6.4"
 val JettyVersion = "9.4.14.v20181114"
 
-organization := "com.example"
+organization := "com.macromacro"
 
-name := "My Scalatra Web App"
+name := "Macro Macro"
 
 version := "0.1.0-SNAPSHOT"
 

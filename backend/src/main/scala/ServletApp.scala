@@ -16,6 +16,13 @@ import org.scalatra.swagger.{ JacksonSwaggerBase, Swagger }
 import org.scalatra.ScalatraServlet
 import org.json4s.{ DefaultFormats, Formats }
 
+class ResourcesApp(implicit protected val swagger: OpenAPIApp)
+  extends ScalatraServlet with JacksonSwaggerBase {
+  before() {
+    response.headers += ("Access-Control-Allow-Origin" -> "*")
+  }
+}
+
 class OpenAPIApp extends Swagger(apiInfo = OpenAPIInfo.apiInfo, apiVersion = "1.0", swaggerVersion = Swagger.SpecVersion)
 
 object OpenAPIInfo {
