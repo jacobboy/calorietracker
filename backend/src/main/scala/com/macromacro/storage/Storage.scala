@@ -10,7 +10,7 @@ import com.google.appengine.api.search.SearchServiceFactory;
 import com.google.appengine.api.search.StatusCode;
 import java.util.Date
 import java.util.UUID.randomUUID
-import org.openapitools.server.model.NewIngredient
+import org.openapitools.server.model.{ NewIngredient, Recipe }
 import org.openapitools.server.model.Ingredient
 import org.json4s._
 import org.json4s.ext.JavaTypesSerializers
@@ -37,16 +37,10 @@ object Storage {
     val ingredientJson = write(ingredient)
 
     val document = Document.newBuilder.setId(uuid.toString)
-      .addField(Field.newBuilder()
-        .setName("name")
-        .setText(ingredient.name))
-      .addField(Field.newBuilder()
-        .setName("body")
-        .setText(ingredientJson))
-      .addField(Field.newBuilder()
-        .setName("created")
-        .setDate(new Date()))
-      // .addFacet(Facet.withAtom("tag", "food"))
+      .addField(Field.newBuilder().setName("name").setText(ingredient.name))
+      .addField(Field.newBuilder().setName("body").setText(ingredientJson))
+      .addField(Field.newBuilder().setName("created").setDate(new Date()))
+      .addFacet(Facet.withAtom("type", "ingredient"))
       .build()
 
     val indexSpec = IndexSpec.newBuilder().setName(ingredientIndexName).build()
@@ -73,6 +67,36 @@ object Storage {
 
     val ingredient = read[Ingredient](ingredientJson)
     println(ingredient)
+    ingredient
+  }
+
+  def saveRecipe(newRecipe: NewRecipe) = {
+    val uuid = randomUUID
+    val ingredient = Recipe(
+      uuid,
+      newRecipe.foods)
+
+    val ingredientJson = write(ingredient)
+
+    val document = Document.newBuilder.setId(uuid.toString)
+      .addField(Field.newBuilder().setName("name").setText(ingredient.name))
+      .addField(Field.newBuilder().setName("body").setText(ingredientJson))
+      .addField(Field.newBuilder().setName("created").setDate(new Date()))
+      .addFacet(Facet.withAtom("type", "ingredient"))
+      .build()
+
+    val indexSpec = IndexSpec.newBuilder().setName(ingredientIndexName).build()
+    val index = SearchServiceFactory.getSearchService().getIndex(indexSpec)
+
+    index.put(document)
+    // try {
+    //   index.put(document);
+    // } catch (PutException e) {
+    //   if (StatusCode.TRANSIENT_ERROR.equals(e.getOperationResult().getCode())) {
+    //     // retry putting document
+    //   }
+    // }
+
     ingredient
   }
 }

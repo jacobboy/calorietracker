@@ -59,11 +59,11 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
     Storage.saveIngredient(newIngredient)
   }
 
-  val addRecipeOperation = (apiOperation[Recipe]("addRecipe")
+  val createRecipeOperation = (apiOperation[Recipe]("createRecipe")
     summary ""
     parameters (bodyParam[Recipe]("recipe").description("")))
 
-  post("/recipes", operation(addRecipeOperation)) {
+  post("/recipes", operation(createRecipeOperation)) {
     //println("recipe: " + recipe)
   }
 

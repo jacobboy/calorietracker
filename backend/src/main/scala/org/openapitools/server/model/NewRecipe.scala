@@ -11,9 +11,5 @@
 
 package org.openapitools.server.model
 
-import java.util.UUID
-
-case class Recipe(
-  uid: UUID,
-
+case class NewRecipe(
   foods: List[AmountOfIngredient])
