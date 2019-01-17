@@ -21,6 +21,4 @@ project/plugins/project/
 .idea
 *.iml
 
-# Ensime
-.ensime
-.ensime_cache
+.ensime*

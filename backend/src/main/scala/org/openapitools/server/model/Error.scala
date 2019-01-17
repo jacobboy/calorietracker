@@ -11,13 +11,9 @@
 
 package org.openapitools.server.model
 
-case class NewRecipe(
-  foods: List[AmountOfIngredient],
+case class Error(
+  code: Int,
 
-  totalSize: BigDecimal,
-
-  portionSize: BigDecimal,
-
-  unit: String
+  message: String
 
  )

@@ -48,7 +48,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ModelError'
+                $ref: '#/components/schemas/Error'
     post:
       description: Creates a new ingredient.  Duplicates are allowed.
       operationId: addIngredient
@@ -61,17 +61,17 @@ paths:
               $ref: '#/components/schemas/NewIngredient'
       responses:
         '200':
-          description: ingredient response
+          description: Macros of created ingredient
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Ingredient'
+                $ref: '#/components/schemas/NamedMacros'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ModelError'
+                $ref: '#/components/schemas/Error'
 
   /ingredients/{uid}:
     get:
@@ -86,21 +86,20 @@ paths:
             type: string
       responses:
         '200':
-          description: ingredient response
+          description: Macros of ingredient
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Ingredient'
+                $ref: '#/components/schemas/NamedMacros'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ModelError'
+                $ref: '#/components/schemas/Error'
   /recipes:
     get:
-      description: |
-        Returns all ingredients the user has saved
+      description: Returns all ingredients the user has saved
       operationId: findRecipes
       parameters:
         - name: sort
@@ -119,42 +118,42 @@ paths:
             format: int32
       responses:
         '200':
-          description: recipe response
+          description: A list of recipes
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Recipe'
+                  $ref: '#/components/schemas/NamedMacros'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ModelError'
+                $ref: '#/components/schemas/Error'
     post:
       description: Creates a new recipe.  Duplicates are allowed.
-      operationId: addRecipe
+      operationId: createRecipe
       requestBody:
         description: Recipe to create
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Recipe'
+              $ref: '#/components/schemas/NewRecipe'
       responses:
         '200':
-          description: recipe response
+          description: Macros of created recipe
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Recipe'
+                $ref: '#/components/schemas/NamedMacros'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ModelError'
+                $ref: '#/components/schemas/Error'
   /recipes/{uid}:
     get:
       description: Returns the recipe specified by the UID
@@ -164,6 +163,15 @@ paths:
           in: path
           description: UID of recipe to fetch
           required: true
+          schema:
+            type: string
+        - name: format
+          in: query
+          description: >-
+            Format of the response. Options are 'macros' and 'full',
+            default 'macros'
+          required: false
+          style: form
           schema:
             type: string
       responses:
@@ -178,57 +186,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ModelError'
+                $ref: '#/components/schemas/Error'
 
 components:
   schemas:
 
-    Meal:
+    Macros:
       required:
-        - foods
-      properties:
-        foods:
-          type: array
-          items:
-            $ref: '#/components/schemas/AmountOfIngredient'
-
-    Recipe:
-      required:
-        - uid
-        - foods
-      properties:
-        uid:
-          type: string
-        foods:
-          type: array
-          items:
-            $ref: '#/components/schemas/AmountOfIngredient'
-
-    AmountOfIngredient:
-      required:
-        - amount
-        - baseFood
-      properties:
-        uid:
-          type: string
-        amount:
-          type: integer
-          format: int32
-        baseFood:
-          type: string
-
-    NewIngredient:
-      required:
-        - name
         - fat
         - carbs
         - protein
         - calories
-        - amount
-        - unit
       properties:
-        name:
-          type: string
         fat:
           type: number
         carbs:
@@ -237,21 +206,95 @@ components:
           type: number
         calories:
           type: number
+
+    NamedMacros:  # name this better
+      allOf:
+        - $ref: '#/components/schemas/Macros'
+        - required:
+          - uid
+          - name
+          - amount
+          - unit
+          properties:
+            uid:
+              type: string
+            name:
+              type: string
+            amount:
+              type: number
+            unit:
+              type: string
+
+    NewIngredient:
+      allOf:
+        - $ref: '#/components/schemas/Macros'
+        - required:
+          - name
+          - amount
+          - unit
+      properties:
+        name:
+          type: string
         amount:
           type: number
         unit:
           type: string
 
-    Ingredient:
-      allOf:
-        - $ref: '#/components/schemas/NewPet'
-        - required:
-          - uid
-          properties:
-            uid:
-              type: string
+    AmountOfIngredient:
+      required:
+        - amount
+        - baseFood
+      properties:
+        amount:
+          type: number
+        baseFood:
+          type: string
 
-    ModelError:
+    NewRecipe:
+      required:
+        - foods
+        - totalSize
+        - portionSize
+        - unit
+      properties:
+        foods:
+          type: array
+          items:
+            $ref: '#/components/schemas/AmountOfIngredient'
+        totalSize:
+          type: number
+        portionSize:
+          type: number
+        unit:
+          type: string
+
+    Recipe:
+      allOf:
+        - $ref: '#/components/schemas/NamedMacros'
+        - required:
+          - foods
+          - totalSize
+          - portionSize
+          properties:
+            foods:
+              type: array
+              items:
+                $ref: '#/components/schemas/NamedMacros'
+            totalSize:
+              type: number
+            portionSize:
+              type: number
+
+    Meal:
+      required:
+        - foods
+      properties:
+        foods:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedMacros'
+
+    Error:
       required:
         - code
         - message
@@ -261,3 +304,17 @@ components:
           format: int32
         message:
           type: string
+
+  responses:
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

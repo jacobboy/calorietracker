@@ -11,9 +11,27 @@
 
 package org.openapitools.server.model
 
-import java.util.UUID
-
 case class Recipe(
-  uid: UUID,
+  uid: String,
 
-  foods: List[AmountOfIngredient])
+  name: String,
+
+  fat: BigDecimal,
+
+  carbs: BigDecimal,
+
+  protein: BigDecimal,
+
+  calories: BigDecimal,
+
+  amount: BigDecimal,
+
+  unit: String,
+
+  foods: List[NamedMacros],
+
+  totalSize: BigDecimal,
+
+  portionSize: BigDecimal
+
+ )

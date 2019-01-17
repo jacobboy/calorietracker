@@ -11,13 +11,13 @@
 
 package org.openapitools.server.model
 
-case class NewRecipe(
-  foods: List[AmountOfIngredient],
+case class Macros(
+  fat: BigDecimal,
 
-  totalSize: BigDecimal,
+  carbs: BigDecimal,
 
-  portionSize: BigDecimal,
+  protein: BigDecimal,
 
-  unit: String
+  calories: BigDecimal
 
  )

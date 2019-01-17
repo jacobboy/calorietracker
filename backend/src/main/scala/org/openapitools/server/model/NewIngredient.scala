@@ -24,4 +24,5 @@ case class NewIngredient(
 
   amount: BigDecimal,
 
-  unit: String)
+  unit: String
+)

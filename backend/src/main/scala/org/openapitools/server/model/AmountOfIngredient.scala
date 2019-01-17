@@ -12,8 +12,9 @@
 package org.openapitools.server.model
 
 case class AmountOfIngredient(
-  uid: Option[String],
 
-  amount: Int,
+  amount: BigDecimal,
 
-  baseFood: String)
+  baseFood: String
+
+)
