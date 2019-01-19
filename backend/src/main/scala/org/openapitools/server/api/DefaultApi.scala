@@ -9,15 +9,9 @@
  * https://openapi-generator.tech
  */
 
-
 package org.openapitools.server.api
 
-import org.openapitools.server.model.Error
-import org.openapitools.server.model.Ingredient
-import org.openapitools.server.model.NamedMacros
-import org.openapitools.server.model.NewIngredient
-import org.openapitools.server.model.NewRecipe
-import org.openapitools.server.model.Recipe
+import org.openapitools.server.model._
 
 import java.io.File
 
@@ -49,49 +43,40 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
     response.headers += ("Access-Control-Allow-Origin" -> "*")
   }
 
-  val addIngredientOperation = (apiOperation[NamedMacros]("addIngredient")
+  val createIngredientOperation = (apiOperation[NamedMacros]("createIngredient")
     summary ""
-    parameters(bodyParam[NewIngredient]("newIngredient").description(""))
-  )
+    parameters (bodyParam[NewIngredient]("newIngredient").description("")))
 
-  post("/ingredients", operation(addIngredientOperation)) {
+  post("/ingredients", operation(createIngredientOperation)) {
     val newIngredient = parsedBody.extract[NewIngredient]
     Storage.saveIngredient(newIngredient)
   }
 
-  
-
   val createRecipeOperation = (apiOperation[NamedMacros]("createRecipe")
     summary ""
-    parameters(bodyParam[NewRecipe]("newRecipe").description(""))
-  )
+    parameters (bodyParam[NewRecipe]("newRecipe").description("")))
 
   post("/recipes", operation(createRecipeOperation)) {
-    //println("newRecipe: " + newRecipe)
+    val newRecipe = parsedBody.extract[NewRecipe]
+    Storage.saveRecipe(newRecipe)
   }
-
-  
 
   val findIngredientByUIDOperation = (apiOperation[NamedMacros]("findIngredientByUID")
     summary ""
-    parameters(pathParam[String]("uid").description(""))
-  )
+    parameters (pathParam[String]("uid").description("")))
 
   get("/ingredients/:uid", operation(findIngredientByUIDOperation)) {
     val uid = params.getOrElse("uid", halt(400))
-    println("getIngredient: " + uid)
     Storage.getIngredient(uid)
   }
 
-  val findIngredientsOperation = (apiOperation[List[Ingredient]]("findIngredients")
+  val findIngredientsOperation = (apiOperation[List[NamedMacros]]("findIngredients")
     summary ""
-    parameters(queryParam[String]("sort").description("").optional, queryParam[Int]("limit").description("").optional)
-  )
+    parameters (queryParam[String]("sort").description("").optional, queryParam[Int]("limit").description("").optional))
 
   get("/ingredients", operation(findIngredientsOperation)) {
     val sort = params.getAs[String]("sort")
 
-    //println("sort: " + sort)
     val limit = params.getAs[Int]("limit")
 
     //println("limit: " + limit)
@@ -99,20 +84,16 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
 
   val findRecipeByUIDOperation = (apiOperation[Recipe]("findRecipeByUID")
     summary ""
-    parameters(pathParam[String]("uid").description(""), queryParam[String]("format").description("").optional)
-  )
+    parameters (pathParam[String]("uid").description(""), queryParam[String]("format").description("").optional))
 
   get("/recipes/:uid", operation(findRecipeByUIDOperation)) {
     val uid = params.getOrElse("uid", halt(400))
-    //println("uid: " + uid)
+    Storage.getRecipe(uid)
   }
-
-  
 
   val findRecipesOperation = (apiOperation[List[NamedMacros]]("findRecipes")
     summary ""
-    parameters(queryParam[String]("sort").description("").optional, queryParam[Int]("limit").description("").optional)
-  )
+    parameters (queryParam[String]("sort").description("").optional, queryParam[Int]("limit").description("").optional))
 
   get("/recipes", operation(findRecipesOperation)) {
     val sort = params.getAs[String]("sort")

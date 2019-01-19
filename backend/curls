@@ -1,0 +1,47 @@
+# -*- restclient -*-
+#
+
+:api = http://localhost:8080/Default
+
+
+# Make an Ingredient
+POST :api/ingredients
+Content-Type: application/json
+{
+    "name": "ingredient",
+    "carbs": 1,
+    "fat": 2,
+    "protein": 3,
+    "calories": 4,
+    "amount": 5,
+    "unit": "g"
+}
+
+
+:ingredient = ingredient::v1::204c1f1d-3540-4658-b1ca-6ce92c4bdf5e
+
+
+# Check if we can get it back
+GET :api/ingredients/:ingredient
+
+
+# Make a recipe from it
+POST :api/recipes
+Content-Type: application/json
+{
+    "name": "recipe",
+    "foods": [{
+        "amount": 112,
+        "baseFood": ":ingredient"
+    }],
+    "totalSize": 300,
+    "portionSize": 100,
+    "unit": "g"
+}
+
+
+:recipe = recipe::v1::f369d1a6-caad-4150-91a7-d4d5a5c4a53f
+
+
+# Check if we can get it back
+GET :api/recipes/:recipe

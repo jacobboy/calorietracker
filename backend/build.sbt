@@ -14,6 +14,9 @@ resolvers += Classpaths.typesafeReleases
 
 libraryDependencies ++= Seq(
   "com.google.appengine" % "appengine-api-1.0-sdk"    % "1.9.71",
+  // "com.google.appengine" % "appengine-api-1.0-sdk"    % "1.9.71",
+  // "com.google.appengine" % "appengine-api-1.0-sdk"    % "1.9.71",
+  // "com.google.appengine" % "appengine-api-1.0-sdk"    % "1.9.71",
   // "com.google.appengine" % "appengine-endpoints"      % "1.9.71",
   "org.scalatra"        %% "scalatra"             % ScalatraVersion,
   "org.scalatra"        %% "scalatra-scalatest"   % ScalatraVersion   % "test",

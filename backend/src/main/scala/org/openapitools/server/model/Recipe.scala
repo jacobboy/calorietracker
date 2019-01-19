@@ -24,14 +24,12 @@ case class Recipe(
 
   calories: BigDecimal,
 
-  amount: BigDecimal,
-
   unit: String,
 
   foods: List[NamedMacros],
 
   totalSize: BigDecimal,
 
-  portionSize: BigDecimal
+  portionSize: BigDecimal) {
 
- )
+}

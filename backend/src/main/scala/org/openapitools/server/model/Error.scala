@@ -14,6 +14,4 @@ package org.openapitools.server.model
 case class Error(
   code: Int,
 
-  message: String
-
- )
+  message: String)

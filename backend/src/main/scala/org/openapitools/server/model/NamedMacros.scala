@@ -13,6 +13,10 @@ package org.openapitools.server.model
 
 case class NamedMacros(
 
+  uid: String,
+
+  name: String,
+
   fat: BigDecimal,
 
   carbs: BigDecimal,
@@ -21,12 +25,6 @@ case class NamedMacros(
 
   calories: BigDecimal,
 
-  uid: String,
-
-  name: String,
-
   amount: BigDecimal,
 
-  unit: String
-
-)
+  unit: String)

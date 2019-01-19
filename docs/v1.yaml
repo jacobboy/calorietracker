@@ -42,7 +42,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Ingredient'
+                  $ref: '#/components/schemas/NamedMacros'
         default:
           description: unexpected error
           content:
@@ -51,7 +51,7 @@ paths:
                 $ref: '#/components/schemas/Error'
     post:
       description: Creates a new ingredient.  Duplicates are allowed.
-      operationId: addIngredient
+      operationId: createIngredient
       requestBody:
         description: Ingredient to create
         required: true
@@ -180,7 +180,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Recipe'
+                $ref: '#/components/schemas/NamedMacros'
         default:
           description: unexpected error
           content:
@@ -252,11 +252,14 @@ components:
 
     NewRecipe:
       required:
+        - name
         - foods
         - totalSize
         - portionSize
         - unit
       properties:
+        name:
+          type: string
         foods:
           type: array
           items:

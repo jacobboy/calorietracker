@@ -12,12 +12,12 @@
 package org.openapitools.server.model
 
 case class NewRecipe(
+  name: String,
+
   foods: List[AmountOfIngredient],
 
   totalSize: BigDecimal,
 
   portionSize: BigDecimal,
 
-  unit: String
-
- )
+  unit: String)

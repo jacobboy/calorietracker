@@ -18,6 +18,4 @@ case class Macros(
 
   protein: BigDecimal,
 
-  calories: BigDecimal
-
- )
+  calories: BigDecimal)
