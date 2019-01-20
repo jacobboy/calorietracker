@@ -78,11 +78,21 @@ object Storage {
     val doc = index.get(uid)
     val ingredientJson = doc.getOnlyField("body").getText
 
-    println("uid: " + uid)
-    println("ingredientJson: " + ingredientJson)
-
     val ingredient = read[NamedMacros](ingredientJson)
     ingredient
+  }
+
+  private def scaleMacro(amount: BigDecimal, macros: NamedMacros) = {
+    val multiplier = amount / macros.amount
+    NamedMacros(
+      macros.uid,
+      macros.name,
+      macros.fat * amount,
+      macros.carbs * amount,
+      macros.protein * amount,
+      macros.calories * amount,
+      amount,
+      macros.unit)
   }
 
   case class StoredRecipe(
@@ -101,11 +111,11 @@ object Storage {
     def apply(uid: String, name: String, foods: List[AmountOfIngredient], totalSize: BigDecimal,
       portionSize: BigDecimal, unit: String) = {
       val multiplier = portionSize / totalSize
-      val _foods = foods.map(f => getIngredient(f.baseFood))
-      val fat = _foods.map(_.fat).sum * multiplier
-      val carbs = _foods.map(_.carbs).sum * multiplier
-      val protein = _foods.map(_.protein).sum * multiplier
-      val calories = _foods.map(_.calories).sum * multiplier
+      val _foods = foods.map(f => (f.amount, getIngredient(f.baseFood)))
+      val fat = _foods.map(f => f._2.fat * f._1 / f._2.amount).sum * multiplier
+      val carbs = _foods.map(f => f._2.carbs * f._1 / f._2.amount).sum * multiplier
+      val protein = _foods.map(f => f._2.protein * f._1 / f._2.amount).sum * multiplier
+      val calories = _foods.map(f => f._2.calories * f._1 / f._2.amount).sum * multiplier
       new StoredRecipe(uid, name, fat, carbs, protein, calories, unit, foods, totalSize, portionSize)
     }
   }
@@ -142,15 +152,20 @@ object Storage {
       recipe.protein, recipe.calories, recipe.portionSize, recipe.unit)
   }
 
+  private def getRecipeOrIngredient(uid: String) = {
+    uid match {
+      case id if id.startsWith("ingredient") => getIngredient(id)
+      case id if id.startsWith("recipe") => getIngredient(id)
+    }
+  }
+
   def getRecipe(uid: String) = {
     val index = ingredientIndex
     val doc = index.get(uid)
     val recipeJson = doc.getOnlyField("body").getText
 
-    println("recipe: " + recipeJson)
-
     val recipe = read[StoredRecipe](recipeJson)
-    val foods = recipe.foods.map(f => getIngredient(f.baseFood))
+    val foods = recipe.foods.map(f => getRecipeOrIngredient(f.baseFood))
     Recipe(recipe.uid, recipe.name, recipe.fat, recipe.carbs, recipe.protein, recipe.calories,
       recipe.unit, foods, recipe.totalSize, recipe.portionSize)
   }
