@@ -22,9 +22,9 @@ libraryDependencies ++= Seq(
   "org.scalatra"          %% "scalatra-swagger"       % ScalatraVersion,
   "org.eclipse.jetty"      % "jetty-webapp"           % JettyVersion       % "container",
   "org.json4s"            %% "json4s-jackson"         % "3.6.3",
-  "org.json4s"            %% "json4s-ext"             % "3.6.3"
+  "org.json4s"            %% "json4s-ext"             % "3.6.3",
   "org.scalatra"          %% "scalatra-scalatest"     % ScalatraVersion    % "test",
-  "com.google.appengine"   % "appengine-testing"      % AppEngineVersion,  % "test",
+  "com.google.appengine"   % "appengine-testing"      % AppEngineVersion   % "test"
 )
 
 enablePlugins(ScalatraPlugin)

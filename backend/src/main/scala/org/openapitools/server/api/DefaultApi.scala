@@ -104,4 +104,18 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
     //println("limit: " + limit)
   }
 
+  val searchByNameOperation = (apiOperation[List[NamedMacros]]("searchAll")
+    summary ""
+    parameters (
+      queryParam[String]("q").description(""),
+      queryParam[String]("sort").description("").optional,
+      queryParam[Int]("limit").description("").optional))
+
+  get("/search", operation(searchByNameOperation)) {
+    val q = params.getOrElse("q", halt(400))
+    val sort = params.getAs[String]("sort")
+    val limit = params.getAs[Int]("limit")
+    Storage.getIngredientsAndRecipes(q)
+  }
+
 }
