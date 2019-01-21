@@ -118,4 +118,14 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
     Storage.getIngredientsAndRecipes(q)
   }
 
+  val deleteByUidOperation = (apiOperation[String]("deleteItem")
+    summary ""
+    parameters (
+      pathParam[String]("uid").description("")))
+
+  delete("/items/:uid", operation(deleteByUidOperation)) {
+    val uid = params.getOrElse("uid", halt(400))
+    Storage.deleteItem(uid)
+  }
+
 }

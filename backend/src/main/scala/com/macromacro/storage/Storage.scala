@@ -43,8 +43,7 @@ object Storage {
     val doc = Document.newBuilder
       .setId(id)
       .addFacet(Facet.withAtom(typeFacet, t))
-      // Shouldn't have to add this field but i just can't figure out how to
-      // to get facets from a document
+      // Adding field bc it doesn't seem possible to get facets from Document
       .addField(Field.newBuilder.setName(typeFacet).setAtom(t))
       .addField(Field.newBuilder.setName("created").setDate(new Date()))
     keyValues.map { case (k, v) => Field.newBuilder.setName(k).setText(v) }
@@ -216,8 +215,7 @@ object Storage {
     asScalaIterator(results.iterator).map(readToNamedMacros(_)).toList
   }
 
-  def justSomeLogic() = {
-
+  def deleteItem(uid: String) = {
+    ingredientIndex.delete(uid)
   }
-
 }
