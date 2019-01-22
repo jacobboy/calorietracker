@@ -1,12 +1,14 @@
 package org.openapitools.server.api
 
+import org.openapitools.app.OpenAPIApp
 import org.scalatra.test.scalatest._
 
 class DefaultApiServletTests extends ScalatraFunSuite {
 
-  addServlet(classOf[DefaultApi], "/*")
+  implicit val openapi = new OpenAPIApp
+  addServlet(new DefaultApi, "/*")
 
-  test("GET / on MyScalatraServlet should return status 200") {
+  test("GET / on DefaultApi should return status 200") {
     get("/") {
       status should equal(200)
     }

@@ -88,7 +88,36 @@ class StorageSpec extends FunSuite with BeforeAndAfter {
   }
 
   test("TODO: can store recipes as part of recipes") {
-    assert(false)
+    val newIngredient = NewIngredient("test", 1, 2, 3, 4, 5, "g")
+    val ingredient = Storage.saveIngredient(newIngredient)
+    val testRecipe = NewRecipe("testRecipe", List(AmountOfIngredient(8, ingredient.uid)), 100, 50, "g")
+    val testRecipeMacros = Storage.saveRecipe(testRecipe)
+
+    val recipe = NewRecipe(
+      "recipe",
+      List(
+        AmountOfIngredient(8, ingredient.uid),
+        AmountOfIngredient(10, testRecipeMacros.uid)),
+      100,
+      50,
+      "g")
+
+    val recipeMacros = Storage.saveRecipe(recipe)
+
+    val foundRecipe = Storage.getRecipe(recipeMacros.uid)
+
+    val expectedRecipe = Recipe(
+      foundRecipe.uid,
+      "recipe",
+      recipeMacros.fat,
+      recipeMacros.carbs,
+      recipeMacros.protein,
+      recipeMacros.calories,
+      recipeMacros.unit,
+      List(ingredient, testRecipeMacros),
+      100,
+      50)
+
   }
 
   test("search returns some stuff") {
