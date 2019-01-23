@@ -1,0 +1,219 @@
+openapi: "3.0.2"
+info:
+  title: USDA Report API
+  version: 2
+  # description: An API that provides access to recipe and ingredient information, both user-generated and sourced from the USDA
+  # termsOfService: http://swagger.io/terms/
+  # contact:
+  #   name: Swagger API Team
+  #   email: apiteam@swagger.io
+  #   url: http://swagger.io
+  # license:
+  #   name: Apache 2.0
+  #   url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: https://api.nal.usda.gov/ndb/V2/
+paths:
+  /reports:
+    get:
+      description: Get a food report
+      operationId: reports
+      parameters:
+        - name: api_key
+          in: query
+          description: Must be a data.gov registered API key
+          required: true
+          schema:
+            type: integer
+        - name: ndbno
+          in: query
+          description: A list of up to 25 NDB numbers
+          required: true
+          style: form
+          schema:
+            type: array
+            items:
+              type: string
+        - name: type
+          in: query
+          description: "Report type: [b]asic or [f]ull or [s]tats. Default: basic"
+          required: false
+          style: form
+          schema:
+            type: string
+        - name: format
+          in: query
+          description: "Report format: xml or json"
+          required: false
+          style: form
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Food reports
+          content:
+            application/json:
+              schema:
+                $ref: FoodReport
+components:
+  schemas:
+    FoodReport:
+      type:
+        object
+      properties:
+        foods:
+          description: the list of foods reported for a request
+          type: array
+          items:
+            $ref: '#/components/schemas/Food'
+        count:
+          description: Number of foods requested and processed
+          type: number
+        notfound:
+          description: Number of requested foods not found in the database
+          type: number
+        api:
+          description: API Version
+          type: number
+      required:
+        - foods
+        - count
+        - notfound
+        - api
+
+    Food:
+      description: the food report
+      properties:
+        type:
+          description: report type
+          type: string
+        sr:
+          description: Release version of the data being reported
+          type: string
+        desc:
+          $ref: '#/components/schema/Desc'
+        ing:
+          description: ingredients (Branded Food Products report only)
+          type: object
+          properties:
+            desc:
+              description: list of ingredients
+              type: array
+              items:
+                type: string
+            upd:
+              description: date ingredients were last updated by company
+              type: string
+        nutrient:
+          description: metadata elements for each nutrient included in the food report
+          type: array
+          items:
+            $ref: '#/components/schemas/Nutrient'
+
+    Nutrient:
+      description: metadata elements for each nutrient included in the food report
+      properties:
+        nutrient_id:
+          description: nutrient number (nutrient_no) for the nutrient
+          type: string
+        name:
+          description: nutrient name
+          type: string
+        # sourcecode:
+        #   description: >
+        #     list of source id's in the sources list referenced for this nutrient
+        #   type: arroy
+        #   items:
+        #     type: string
+        derivation:
+          description: Indicator of how the value was derived
+          type: string
+        unit:
+          description: unit of measure for this nutrient
+          type: string
+        value:
+          description: 100 g equivalent value of the nutrient
+          type: string
+        dp:
+          description: "# of data points"
+          type: string
+        se:
+          description: standard error
+          type: string
+        measures:
+          description: list of measures reported for a nutrient
+          type: object
+          properties:
+            label:
+              description: name of the measure, e.g. "large"
+              type: string
+            eqv:
+              description: equivalent of the measure expressed as an eunit
+              type: number
+              format: int32
+            eunit:
+              description: >
+                Unit in with the equivalent amount is expressed.
+                Usually either gram (g) or milliliter (ml)
+              type: string
+            value:
+              description: gram equivalent value of the measure
+              type: string
+            qty:
+              description: Dunno, not in the docs
+              type: number
+              format: int32
+          required:
+            - label
+            - eqv
+            - eunit
+            - value
+
+    Desc:
+      description: metadata elements for the food being reported
+      type: object
+      properties:
+        ndbno:
+          description: NDB food number
+          type: string
+        name:
+          description: food name
+          type: string
+        sd:
+          description: short description
+        group:
+          description: food group
+        sn:
+          description: scientific name
+        cn:
+          description: commercial name
+        manu:
+          description: manufacturer
+          type: string
+        nf:
+          description: nitrogen to protein conversion factor
+        cf:
+          description: carbohydrate factor
+        ff:
+          description: fat factor
+        pf:
+          description: protein factor
+        r:
+          description: refuse %
+        rd:
+          description: refuse description
+        ds:
+          description: >
+            database source: 'Branded Food Products' or 'Standard Reference'
+          type: string
+          enum: ['Branded Food Products', 'Standard Reference']
+        ru:
+          description: >
+            reporting unit: nutrient values are reported in this unit,
+            usually gram (g) or milliliter (ml)
+          type: string
+      required:
+        - ndbno
+        - name
+        - ds
+        - ru
