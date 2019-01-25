@@ -55,11 +55,10 @@ paths:
             application/json:
               schema:
                 $ref: FoodReport
+
 components:
   schemas:
     FoodReport:
-      type:
-        object
       properties:
         foods:
           description: the list of foods reported for a request
@@ -83,35 +82,49 @@ components:
 
     Food:
       description: the food report
+      type: object
       properties:
-        type:
-          description: report type
-          type: string
-        sr:
-          description: Release version of the data being reported
-          type: string
-        desc:
-          $ref: '#/components/schema/Desc'
-        ing:
-          description: ingredients (Branded Food Products report only)
+        food:
           type: object
           properties:
+            type:
+              description: report type
+              type: string
+            sr:
+              description: Release version of the data being reported
+              type: string
             desc:
-              description: list of ingredients
+              description: metadata elements for the food being reported
+              $ref: '#/components/schema/Desc'
+            ing:
+              description: ingredients (Branded Food Products report only)
+              type: object
+              properties:
+                desc:
+                  description: list of ingredients
+                  type: string
+                upd:
+                  description: date ingredients were last updated by company
+                  type: string
+              required:
+                - desc
+                - upd
+            nutrients:
+              description: metadata elements for each nutrient included in the food report
               type: array
               items:
-                type: string
-            upd:
-              description: date ingredients were last updated by company
-              type: string
-        nutrient:
-          description: metadata elements for each nutrient included in the food report
-          type: array
-          items:
-            $ref: '#/components/schemas/Nutrient'
+                $ref: '#/components/schemas/Nutrients'
+          required:
+            - sr
+            - type
+            - desc
+            - nutrients
+      required:
+        - food
 
-    Nutrient:
+    Nutrients:
       description: metadata elements for each nutrient included in the food report
+      type: object
       properties:
         nutrient_id:
           description: nutrient number (nutrient_no) for the nutrient
@@ -122,7 +135,7 @@ components:
         # sourcecode:
         #   description: >
         #     list of source id's in the sources list referenced for this nutrient
-        #   type: arroy
+        #   type: array
         #   items:
         #     type: string
         derivation:
@@ -142,32 +155,44 @@ components:
           type: string
         measures:
           description: list of measures reported for a nutrient
-          type: object
-          properties:
-            label:
-              description: name of the measure, e.g. "large"
-              type: string
-            eqv:
-              description: equivalent of the measure expressed as an eunit
-              type: number
-              format: int32
-            eunit:
-              description: >
-                Unit in with the equivalent amount is expressed.
-                Usually either gram (g) or milliliter (ml)
-              type: string
-            value:
-              description: gram equivalent value of the measure
-              type: string
-            qty:
-              description: Dunno, not in the docs
-              type: number
-              format: int32
-          required:
-            - label
-            - eqv
-            - eunit
-            - value
+          $ref: '#/components/schemas/NutrientsMeasures'
+      required:
+        - nutrient_id
+        - name
+        - derivation
+        - group
+        - unit
+        - value
+        - measures
+
+    NutrientsMeasures:
+      description: list of measures reported for a nutrient
+      type: object
+      properties:
+        label:
+          description: name of the measure, e.g. "large"
+          type: string
+        eqv:
+          description: equivalent of the measure expressed as an eunit
+          type: number
+          format: int32
+        eunit:
+          description: >
+            Unit in with the equivalent amount is expressed.
+            Usually either gram (g) or milliliter (ml)
+          type: string
+        value:
+          description: gram equivalent value of the measure
+          type: string
+        qty:
+          description: Dunno, not in the docs
+          type: number
+          format: int32
+      required:
+        - label
+        - eqv
+        - eunit
+        - value
 
     Desc:
       description: metadata elements for the food being reported

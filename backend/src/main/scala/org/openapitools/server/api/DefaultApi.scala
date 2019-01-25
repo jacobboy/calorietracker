@@ -17,19 +17,17 @@ import java.io.File
 
 import org.scalatra.ScalatraServlet
 import org.scalatra.swagger._
+import org.scalatra.json.{ JValueResult, JacksonJsonSupport }
 import org.json4s._
 import org.json4s.JsonDSL._
-import org.scalatra.json.{ JValueResult, JacksonJsonSupport }
 import org.json4s.ext.JavaTypesSerializers
 import org.json4s.jackson.Serialization
-import org.scalatra.servlet.{ FileUploadSupport, MultipartConfig, SizeConstraintExceededException }
 
 import scala.collection.JavaConverters._
 
 import com.macromacro.storage.Storage
 
 class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
-  with FileUploadSupport
   with JacksonJsonSupport
   with SwaggerSupport {
 
