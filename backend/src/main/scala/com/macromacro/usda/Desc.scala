@@ -12,8 +12,7 @@
 
 package com.macromacro.usda
 
-
-case class Desc (
+case class Desc(
   // NDB food number
   ndbno: String,
   // food name
@@ -43,5 +42,4 @@ case class Desc (
   // database source: 'Branded Food Products' or 'Standard Reference'
   ds: String,
   // reporting unit: nutrient values are reported in this unit, usually gram (g) or milliliter (ml)
-  ru: String
-)
+  ru: String)

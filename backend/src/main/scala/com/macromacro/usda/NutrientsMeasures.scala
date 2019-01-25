@@ -12,8 +12,7 @@
 
 package com.macromacro.usda
 
-
-case class NutrientsMeasures (
+case class NutrientsMeasures(
   // name of the measure, e.g. \"large\"
   label: String,
   // equivalent of the measure expressed as an eunit
@@ -23,5 +22,4 @@ case class NutrientsMeasures (
   // gram equivalent value of the measure
   value: String,
   // Dunno, not in the docs
-  qty: Option[Double] = None
-)
+  qty: Option[Double] = None)

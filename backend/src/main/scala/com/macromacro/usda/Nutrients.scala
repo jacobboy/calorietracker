@@ -12,10 +12,9 @@
 
 package com.macromacro.usda
 
-
-case class Nutrients (
+case class Nutrients(
   // nutrient number (nutrient_no) for the nutrient
-  nutrientId: String,
+  nutrient_id: String,
   // nutrient name
   name: String,
   // Indicator of how the value was derived
@@ -29,5 +28,4 @@ case class Nutrients (
   // standard error
   se: Option[String] = None,
   // list of measures reported for a nutrient
-  measures: NutrientsMeasures
-)
+  measures: List[NutrientsMeasures])

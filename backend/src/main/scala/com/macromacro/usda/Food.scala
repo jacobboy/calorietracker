@@ -12,7 +12,5 @@
 
 package com.macromacro.usda
 
-
-case class Food (
-  food: FoodFood
-)
+case class Food(
+  food: FoodFood)

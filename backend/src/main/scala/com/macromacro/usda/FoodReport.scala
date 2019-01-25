@@ -12,8 +12,7 @@
 
 package com.macromacro.usda
 
-
-case class FoodReport (
+case class FoodReport(
   // the list of foods reported for a request
   foods: List[Food],
   // Number of foods requested and processed
@@ -21,5 +20,4 @@ case class FoodReport (
   // Number of requested foods not found in the database
   notfound: Number,
   // API Version
-  api: Number
-)
+  api: Number)

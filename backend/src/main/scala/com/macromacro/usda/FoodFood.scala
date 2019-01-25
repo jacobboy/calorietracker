@@ -12,8 +12,7 @@
 
 package com.macromacro.usda
 
-
-case class FoodFood (
+case class FoodFood(
   // report type
   `type`: String,
   // Release version of the data being reported
@@ -23,5 +22,4 @@ case class FoodFood (
   // ingredients (Branded Food Products report only)
   ing: Option[FoodFoodIng] = None,
   // metadata elements for each nutrient included in the food report
-  nutrients: List[Nutrients]
-)
+  nutrients: List[Nutrients])

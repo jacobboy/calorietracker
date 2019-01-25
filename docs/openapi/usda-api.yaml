@@ -155,7 +155,9 @@ components:
           type: string
         measures:
           description: list of measures reported for a nutrient
-          $ref: '#/components/schemas/NutrientsMeasures'
+          type: array
+          items:
+            $ref: '#/components/schemas/NutrientsMeasures'
       required:
         - nutrient_id
         - name

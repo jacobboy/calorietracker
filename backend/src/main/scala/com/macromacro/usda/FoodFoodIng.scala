@@ -12,10 +12,8 @@
 
 package com.macromacro.usda
 
-
-case class FoodFoodIng (
+case class FoodFoodIng(
   // list of ingredients
   desc: String,
   // date ingredients were last updated by company
-  upd: String
-)
+  upd: String)
