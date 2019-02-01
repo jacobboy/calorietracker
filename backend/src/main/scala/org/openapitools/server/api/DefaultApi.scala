@@ -25,7 +25,7 @@ import org.json4s.jackson.Serialization
 
 import scala.collection.JavaConverters._
 
-import com.macromacro.storage.Storage
+import com.macromacro.storage._
 
 class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
   with JacksonJsonSupport
@@ -47,7 +47,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
 
   post("/ingredients", operation(createIngredientOperation)) {
     val newIngredient = parsedBody.extract[NewIngredient]
-    Storage.saveIngredient(newIngredient)
+    Storage.save(newIngredient)
   }
 
   val createRecipeOperation = (apiOperation[NamedMacros]("createRecipe")
@@ -56,7 +56,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
 
   post("/recipes", operation(createRecipeOperation)) {
     val newRecipe = parsedBody.extract[NewRecipe]
-    Storage.saveRecipe(newRecipe)
+    Storage.save(newRecipe)
   }
 
   val findIngredientByUIDOperation = (apiOperation[NamedMacros]("findIngredientByUID")

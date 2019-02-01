@@ -12,6 +12,14 @@
 
 package com.macromacro.usda
 
+object Nutrients {
+  val DEFAULT_AMOUNT = 100 // pretty sure the docs say this
+  val FAT_ID = "204"
+  val CARB_ID = "205"
+  val PROTEIN_ID = "203"
+  val CALORIES_ID = "208"
+}
+
 case class Nutrients(
   // nutrient number (nutrient_no) for the nutrient
   nutrient_id: String,

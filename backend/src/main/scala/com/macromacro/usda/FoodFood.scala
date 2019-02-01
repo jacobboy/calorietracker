@@ -12,6 +12,8 @@
 
 package com.macromacro.usda
 
+import org.openapitools.server.model.NamedMacros
+
 case class FoodFood(
   // report type
   `type`: String,
@@ -22,4 +24,34 @@ case class FoodFood(
   // ingredients (Branded Food Products report only)
   ing: Option[FoodFoodIng] = None,
   // metadata elements for each nutrient included in the food report
-  nutrients: List[Nutrients])
+  nutrients: List[Nutrients]) {
+
+  val ndbno = desc.ndbno
+  val uid = s"ndbno::v1::$ndbno"
+  val name = desc.name
+
+  private def findNutrient(nutrientId: String) = {
+    // there will only ever be one for a given nutrientId
+    nutrients.filter(_.nutrient_id == nutrientId).lift(0)
+  }
+
+  val fat = findNutrient(Nutrients.FAT_ID).map(_.value).map(BigDecimal(_))
+  val carbs = findNutrient(Nutrients.CARB_ID).map(_.value).map(BigDecimal(_))
+  val protein = findNutrient(Nutrients.PROTEIN_ID).map(_.value).map(BigDecimal(_))
+  val calories = findNutrient(Nutrients.CALORIES_ID).map(_.value).map(BigDecimal(_))
+  val unit = desc.ru
+
+  def toNamedMacros: Option[NamedMacros] = {
+    // TODO sometimes, branded foods are missing nutrients.  How to handle?
+    for {
+      f <- fat
+      c <- carbs
+      p <- protein
+      kc <- calories
+    } yield NamedMacros(uid, name, f, c, p, kc, Nutrients.DEFAULT_AMOUNT, unit)
+  }
+
+  def hasCompleteMacros = {
+    toNamedMacros.isDefined
+  }
+}

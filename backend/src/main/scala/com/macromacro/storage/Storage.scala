@@ -1,14 +1,15 @@
 package com.macromacro.storage
 
 import collection.JavaConverters._
-import com.google.appengine.api.search.{ Document, FacetRefinement, PutException, Query, QueryOptions, SortExpression, SortOptions }
-import com.google.appengine.api.search.Index;
-import com.google.appengine.api.search.IndexSpec;
-import com.google.appengine.api.search.Facet;
-import com.google.appengine.api.search.Field;
-import com.google.appengine.api.search.PutException;
-import com.google.appengine.api.search.SearchServiceFactory;
-import com.google.appengine.api.search.StatusCode;
+import com.google.appengine.api.search._
+import com.google.appengine.api.search.Index
+import com.google.appengine.api.search.IndexSpec
+import com.google.appengine.api.search.Facet
+import com.google.appengine.api.search.Field
+import com.google.appengine.api.search.PutException
+import com.google.appengine.api.search.SearchServiceFactory
+import com.google.appengine.api.search.StatusCode
+import com.macromacro.usda.FoodFood
 import java.util.Date
 import java.util.UUID.randomUUID
 import org.openapitools.server.model._
@@ -22,15 +23,8 @@ object Storage {
   private val ingredientIndexName = "ingredients"
   private implicit val jsonFormats = Serialization.formats(NoTypeHints) ++ JavaTypesSerializers.all
 
-  private def ingredientId = {
-    val uuid = randomUUID
-    "ingredient::v1::" + uuid.toString
-  }
-
-  private def recipeId = {
-    val uuid = randomUUID
-    "recipe::v1::" + uuid.toString
-  }
+  private def ingredientId = "ingredient::v1::" + randomUUID.toString
+  private def recipeId = "recipe::v1::" + randomUUID.toString
 
   private def ingredientIndex = {
     val indexSpec = IndexSpec.newBuilder().setName(ingredientIndexName).build()
@@ -108,7 +102,7 @@ object Storage {
     }
   }
 
-  def saveIngredient(newIngredient: NewIngredient) = {
+  def save(newIngredient: NewIngredient) = {
     val id = ingredientId
     val ingredient = NamedMacros(
       id,
@@ -137,13 +131,7 @@ object Storage {
     ingredient
   }
 
-  def getIngredient(uid: String) = {
-    val doc = ingredientIndex.get(uid)
-    val macrosJson = doc.getOnlyField("body").getText
-    read[NamedMacros](macrosJson)
-  }
-
-  def saveRecipe(newRecipe: NewRecipe) = {
+  def save(newRecipe: NewRecipe) = {
     val recipe = StoredRecipe(
       recipeId, newRecipe.name, newRecipe.foods, newRecipe.totalSize,
       newRecipe.portionSize, newRecipe.unit)
@@ -164,6 +152,25 @@ object Storage {
 
     NamedMacros(recipe.uid, recipe.name, recipe.fat, recipe.carbs,
       recipe.protein, recipe.calories, recipe.portionSize, recipe.unit)
+  }
+
+  def save(food: FoodFood): Either[IncompleteUsdaNutrient, NamedMacros] = {
+    // TODO pull up the decision of whether or not we want to save incomplete ingredients?
+    //      edit: I did, but this has to stay until FoodFood can be type checked to be complete
+    val namedMacros = food.toNamedMacros
+    namedMacros.foreach(
+      food => {
+        val foodJson = write(food)
+        val document = nameBodyDoc(food.uid, "usda", food.name, foodJson)
+        ingredientIndex.put(document);
+      })
+    namedMacros.toRight(IncompleteUsdaNutrient(food.ndbno))
+  }
+
+  def getIngredient(uid: String) = {
+    val doc = ingredientIndex.get(uid)
+    val macrosJson = doc.getOnlyField("body").getText
+    read[NamedMacros](macrosJson)
   }
 
   def getRecipe(uid: String) = {

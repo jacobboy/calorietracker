@@ -12,12 +12,26 @@
 
 package com.macromacro.usda
 
+case class ReportError(error: String)
+
 case class FoodReport(
-  // the list of foods reported for a request
-  foods: List[Food],
-  // Number of foods requested and processed
+  // this error condition
+  // {
+  //   "foods": [
+  //     {
+  //       "error": "No data for ndbno 40"
+  //     }
+  //   ],
+  //   "count": 1,
+  //   "notfound": 1,
+  //   "api": 2.0
+  // }
+
+  /** the list of foods reported for a request */
+  foods: List[Either[ReportError, Food]],
+  /** Number of foods requested and processed */
   count: Number,
-  // Number of requested foods not found in the database
+  /** Number of requested foods not found in the database */
   notfound: Number,
-  // API Version
+  /** API Version */
   api: Number)

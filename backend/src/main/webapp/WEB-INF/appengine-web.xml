@@ -3,5 +3,6 @@
     <application>macromacro</application>
     <version>1</version>
     <threadsafe>true</threadsafe>
-     <runtime>java8</runtime>
+    <runtime>java8</runtime>
+    <!-- <env>flex</env> -->
 </appengine-web-app>

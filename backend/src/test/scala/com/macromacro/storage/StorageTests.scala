@@ -3,22 +3,22 @@ package com.macromacro.storage
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper
 import com.google.appengine.tools.development.testing.LocalSearchServiceTestConfig
 import org.openapitools.server.model.{ AmountOfIngredient, NamedMacros, NewIngredient, NewRecipe, Recipe }
-import org.scalatest.{ BeforeAndAfter, FunSuite }
+import org.scalatest.{ BeforeAndAfterEach, FunSuite }
 
-class StorageSpec extends FunSuite with BeforeAndAfter {
+class StorageSpec extends FunSuite with BeforeAndAfterEach {
   val helper = new LocalServiceTestHelper(new LocalSearchServiceTestConfig())
 
-  before {
+  override def beforeEach {
     helper.setUp
   }
 
-  after {
-    helper.tearDown()
+  override def afterEach {
+    helper.tearDown
   }
 
-  test("ingredient returned by saveIngredient matches input") {
+  test("ingredient returned by save matches input") {
     val newIngredient = NewIngredient("test", 1, 2, 3, 4, 5, "g")
-    val ingredient = Storage.saveIngredient(newIngredient)
+    val ingredient = Storage.save(newIngredient)
 
     val foundNewIngredient = NewIngredient(
       ingredient.name, ingredient.fat, ingredient.carbs, ingredient.protein,
@@ -29,7 +29,7 @@ class StorageSpec extends FunSuite with BeforeAndAfter {
 
   test("saved ingredients can be retrieved") {
     val newIngredient = NewIngredient("test", 1, 2, 3, 4, 5, "g")
-    val ingredient = Storage.saveIngredient(newIngredient)
+    val ingredient = Storage.save(newIngredient)
     val namedMacro = Storage.getIngredient(ingredient.uid)
 
     val foundNewIngredient = NewIngredient(
@@ -39,11 +39,11 @@ class StorageSpec extends FunSuite with BeforeAndAfter {
     assert(newIngredient === foundNewIngredient)
   }
 
-  test("macro returned by saveRecipe matches input") {
+  test("macro returned by save matches input") {
     val newIngredient1 = NewIngredient("test", 10, 20, 30, 40, 50, "g")
-    val ingredient1 = Storage.saveIngredient(newIngredient1)
+    val ingredient1 = Storage.save(newIngredient1)
     val newIngredient2 = NewIngredient("test", 1, 2, 3, 4, 5, "g")
-    val ingredient2 = Storage.saveIngredient(newIngredient2)
+    val ingredient2 = Storage.save(newIngredient2)
 
     val foods = List(
       AmountOfIngredient(ingredient1.amount * 2, ingredient1.uid),
@@ -52,7 +52,7 @@ class StorageSpec extends FunSuite with BeforeAndAfter {
     val totalSize = 100
     val portionSize = 50
     val newRecipe = NewRecipe("test", foods, totalSize, portionSize, "g")
-    val namedMacros = Storage.saveRecipe(newRecipe)
+    val namedMacros = Storage.save(newRecipe)
 
     val expectedMacros = NamedMacros(
       namedMacros.uid,
@@ -65,10 +65,10 @@ class StorageSpec extends FunSuite with BeforeAndAfter {
 
   test("saved recipes can be retrieved") {
     val newIngredient = NewIngredient("test", 1, 2, 3, 4, 5, "g")
-    val ingredient = Storage.saveIngredient(newIngredient)
+    val ingredient = Storage.save(newIngredient)
     val newRecipe = NewRecipe("test", List(AmountOfIngredient(8, ingredient.uid)), 100, 50, "g")
 
-    val recipeMacros = Storage.saveRecipe(newRecipe)
+    val recipeMacros = Storage.save(newRecipe)
 
     val foundRecipe = Storage.getRecipe(recipeMacros.uid)
 
@@ -87,11 +87,11 @@ class StorageSpec extends FunSuite with BeforeAndAfter {
     assert(foundRecipe === expectedRecipe)
   }
 
-  test("TODO: can store recipes as part of recipes") {
+  test("can store recipes as part of recipes") {
     val newIngredient = NewIngredient("test", 1, 2, 3, 4, 5, "g")
-    val ingredient = Storage.saveIngredient(newIngredient)
+    val ingredient = Storage.save(newIngredient)
     val testRecipe = NewRecipe("testRecipe", List(AmountOfIngredient(8, ingredient.uid)), 100, 50, "g")
-    val testRecipeMacros = Storage.saveRecipe(testRecipe)
+    val testRecipeMacros = Storage.save(testRecipe)
 
     val recipe = NewRecipe(
       "recipe",
@@ -102,7 +102,7 @@ class StorageSpec extends FunSuite with BeforeAndAfter {
       50,
       "g")
 
-    val recipeMacros = Storage.saveRecipe(recipe)
+    val recipeMacros = Storage.save(recipe)
 
     val foundRecipe = Storage.getRecipe(recipeMacros.uid)
 
@@ -122,9 +122,9 @@ class StorageSpec extends FunSuite with BeforeAndAfter {
 
   test("search returns some stuff") {
     val newIngredient1 = NewIngredient("search test 1", 10, 20, 30, 40, 50, "g")
-    val ingredient1 = Storage.saveIngredient(newIngredient1)
+    val ingredient1 = Storage.save(newIngredient1)
     val newIngredient2 = NewIngredient("search test 2", 1, 2, 3, 4, 5, "g")
-    val ingredient2 = Storage.saveIngredient(newIngredient2)
+    val ingredient2 = Storage.save(newIngredient2)
     val foods = List(
       AmountOfIngredient(ingredient1.amount * 2, ingredient1.uid),
       AmountOfIngredient(ingredient2.amount * 2, ingredient2.uid))
@@ -132,9 +132,13 @@ class StorageSpec extends FunSuite with BeforeAndAfter {
     val totalSize = 100
     val portionSize = 50
     val newRecipe = NewRecipe("search test 3", foods, totalSize, portionSize, "g")
-    val namedMacros = Storage.saveRecipe(newRecipe)
+    val namedMacros = Storage.save(newRecipe)
 
     val results = Storage.getIngredientsAndRecipes("search")
     assert(results.length === 3)
+  }
+
+  test("saving a USDA Ingredient saves as an Ingredient") {
+    assert(false)
   }
 }
