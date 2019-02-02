@@ -28,3 +28,49 @@ case class NamedMacros(
   amount: BigDecimal,
 
   unit: String)
+
+case class IncompleteNamedMacros(
+
+  uid: String,
+
+  name: String,
+
+  fat: Option[BigDecimal],
+
+  carbs: Option[BigDecimal],
+
+  protein: Option[BigDecimal],
+
+  calories: Option[BigDecimal],
+
+  amount: BigDecimal,
+
+  unit: String) {
+
+
+  private def makeCompleteMacros(
+    thisFat: Option[BigDecimal] = fat,
+    thisCarbs: Option[BigDecimal] = carbs,
+    thisProtein: Option[BigDecimal] = protein,
+    thisCalories: Option[BigDecimal] = calories
+  ) = {
+    NamedMacros(uid, name, thisFat.get, thisCarbs.get, thisProtein.get, thisCalories.get, amount, unit)
+  }
+
+  def toComplete: Either[IncompleteNamedMacros, NamedMacros] = {
+    val numComplete = List(fat, carbs, protein, calories).map(f => if (f.isDefined) 1 else 0).sum
+    numComplete match {
+      case 4 => Right(makeCompleteMacros())
+      case 3 => {
+        Right(
+          (fat, carbs, protein, calories) match {
+            case (Some(f), Some(c), Some(p), None) => makeCompleteMacros(thisCalories=Option(f*9+c*4+p*4))
+            case (Some(f), Some(c), None, Some(kc)) => makeCompleteMacros(thisCalories=Option((kc-(f*9+c*4))/4))
+            case (Some(f), None, Some(p), Some(kc)) => makeCompleteMacros(thisCalories=Option((kc-(f*9+p*4))/4))
+            case (None, Some(c), Some(p), Some(kc)) => makeCompleteMacros(thisCalories=Option((kc-(c*4+p*4))/9))
+          })
+      }
+      case _ => Left(this)
+    }
+  }
+}

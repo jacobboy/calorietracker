@@ -184,7 +184,7 @@ object Storage {
       recipe.unit, foods, recipe.totalSize, recipe.portionSize)
   }
 
-  def getIngredientsAndRecipes(searchString: String, limit: Int = 25) = {
+  def getIngredientsAndRecipes(searchString: String, limit: Int = 10) = {
 
     val sortOptions =
       SortOptions.newBuilder()

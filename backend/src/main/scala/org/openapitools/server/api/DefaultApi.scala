@@ -42,8 +42,8 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
   }
 
   val createIngredientOperation = (apiOperation[NamedMacros]("createIngredient")
-    summary ""
-    parameters (bodyParam[NewIngredient]("newIngredient").description("")))
+    summary "Creates a new ingredient.  Duplicates are allowed."
+    parameters (bodyParam[NewIngredient]("newIngredient").description("Ingredient to create")))
 
   post("/ingredients", operation(createIngredientOperation)) {
     val newIngredient = parsedBody.extract[NewIngredient]
@@ -51,7 +51,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
   }
 
   val createRecipeOperation = (apiOperation[NamedMacros]("createRecipe")
-    summary ""
+    summary "Creates a new recipe.  Duplicates are allowed."
     parameters (bodyParam[NewRecipe]("newRecipe").description("")))
 
   post("/recipes", operation(createRecipeOperation)) {
@@ -60,7 +60,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
   }
 
   val findIngredientByUIDOperation = (apiOperation[NamedMacros]("findIngredientByUID")
-    summary ""
+    summary "Returns the ingredient specified by the UID"
     parameters (pathParam[String]("uid").description("")))
 
   get("/ingredients/:uid", operation(findIngredientByUIDOperation)) {
@@ -69,8 +69,11 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
   }
 
   val findIngredientsOperation = (apiOperation[List[NamedMacros]]("findIngredients")
-    summary ""
-    parameters (queryParam[String]("sort").description("").optional, queryParam[Int]("limit").description("").optional))
+    summary "Returns all ingredients the user has saved"
+    parameters (
+      queryParam[String]("sort").description("").optional,
+      queryParam[Int]("limit").description("").optional)
+  )
 
   get("/ingredients", operation(findIngredientsOperation)) {
     val sort = params.getAs[String]("sort")
@@ -81,8 +84,11 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
   }
 
   val findRecipeByUIDOperation = (apiOperation[Recipe]("findRecipeByUID")
-    summary ""
-    parameters (pathParam[String]("uid").description(""), queryParam[String]("format").description("").optional))
+    summary "Returns the recipe specified by the UID"
+    parameters (
+      pathParam[String]("uid").description(""),
+      queryParam[String]("format").description("").optional)
+  )
 
   get("/recipes/:uid", operation(findRecipeByUIDOperation)) {
     val uid = params.getOrElse("uid", halt(400))
@@ -90,8 +96,11 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
   }
 
   val findRecipesOperation = (apiOperation[List[NamedMacros]]("findRecipes")
-    summary ""
-    parameters (queryParam[String]("sort").description("").optional, queryParam[Int]("limit").description("").optional))
+    summary "Returns all recipes the user has saved"
+    parameters (
+      queryParam[String]("sort").description("").optional,
+      queryParam[Int]("limit").description("").optional)
+  )
 
   get("/recipes", operation(findRecipesOperation)) {
     val sort = params.getAs[String]("sort")
@@ -103,17 +112,18 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
   }
 
   val searchByNameOperation = (apiOperation[List[NamedMacros]]("searchAll")
-    summary ""
+    summary "Search for ingredients and recipes by name"
     parameters (
-      queryParam[String]("q").description(""),
-      queryParam[String]("sort").description("").optional,
-      queryParam[Int]("limit").description("").optional))
+      queryParam[String]("q").description("search key"),
+      queryParam[String]("sort").description("sort key. options: recent").optional,
+      queryParam[Int]("limit").description("maximum number of results to return. default: 10").optional)
+  )
 
   get("/search", operation(searchByNameOperation)) {
     val q = params.getOrElse("q", halt(400))
     val sort = params.getAs[String]("sort")
-    val limit = params.getAs[Int]("limit")
-    Storage.getIngredientsAndRecipes(q)
+    val limit = params.getAs[Int]("limit").getOrElse(10)
+    Storage.getIngredientsAndRecipes(q, limit)
   }
 
   // TODO remove this
