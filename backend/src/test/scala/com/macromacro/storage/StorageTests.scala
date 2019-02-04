@@ -141,4 +141,12 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach {
   test("saving a USDA Ingredient saves as an Ingredient") {
     assert(false)
   }
+
+  test("getting a non-existent ingredient fails gracefully") {
+    assert(false)
+  }
+
+  test("getting a StoredRecipe with missing ingredients errorswith a MissingIngredientsError") {
+    assert(false)
+  }
 }

@@ -65,15 +65,14 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
 
   get("/ingredients/:uid", operation(findIngredientByUIDOperation)) {
     val uid = params.getOrElse("uid", halt(400))
-    Storage.getIngredient(uid)
+    Storage.getNamedMacros(uid)
   }
 
   val findIngredientsOperation = (apiOperation[List[NamedMacros]]("findIngredients")
     summary "Returns all ingredients the user has saved"
     parameters (
       queryParam[String]("sort").description("").optional,
-      queryParam[Int]("limit").description("").optional)
-  )
+      queryParam[Int]("limit").description("").optional))
 
   get("/ingredients", operation(findIngredientsOperation)) {
     val sort = params.getAs[String]("sort")
@@ -87,8 +86,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
     summary "Returns the recipe specified by the UID"
     parameters (
       pathParam[String]("uid").description(""),
-      queryParam[String]("format").description("").optional)
-  )
+      queryParam[String]("format").description("").optional))
 
   get("/recipes/:uid", operation(findRecipeByUIDOperation)) {
     val uid = params.getOrElse("uid", halt(400))
@@ -99,8 +97,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
     summary "Returns all recipes the user has saved"
     parameters (
       queryParam[String]("sort").description("").optional,
-      queryParam[Int]("limit").description("").optional)
-  )
+      queryParam[Int]("limit").description("").optional))
 
   get("/recipes", operation(findRecipesOperation)) {
     val sort = params.getAs[String]("sort")
@@ -116,8 +113,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
     parameters (
       queryParam[String]("q").description("search key"),
       queryParam[String]("sort").description("sort key. options: recent").optional,
-      queryParam[Int]("limit").description("maximum number of results to return. default: 10").optional)
-  )
+      queryParam[Int]("limit").description("maximum number of results to return. default: 10").optional))
 
   get("/search", operation(searchByNameOperation)) {
     val q = params.getOrElse("q", halt(400))
