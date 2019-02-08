@@ -154,7 +154,7 @@ object Storage {
     })
   }
 
-  def save(newIngredient: NewIngredient) = {
+  def save(newIngredient: NewIngredient): NamedMacros = {
     val ingredient = NamedMacros(
       ingredientId,
       newIngredient.name,
@@ -207,8 +207,7 @@ object Storage {
             val macrosDoc = IngredientIndex.get(f.uid).getOrElse(throw new Exception("Oh damn"))
             val macros = readToNamedMacros(macrosDoc)
             AmountOfNamedMacros(f.amount, macros)
-          }
-        )
+          })
       Recipe(recipe.uid, recipe.name, recipe.fat, recipe.carbs, recipe.protein, recipe.calories,
         recipe.unit, foods, recipe.totalSize, recipe.portionSize)
     })
