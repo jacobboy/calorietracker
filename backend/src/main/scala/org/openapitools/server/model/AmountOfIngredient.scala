@@ -15,4 +15,4 @@ case class AmountOfIngredient(
 
   amount: BigDecimal,
 
-  baseFood: String)
+  uid: String)

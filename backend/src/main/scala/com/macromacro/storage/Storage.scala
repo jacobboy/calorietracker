@@ -121,7 +121,7 @@ object Storage {
     foods: List[AmountOfIngredient]): Either[MissingIngredientsError, List[Tuple2[BigDecimal, NamedMacros]]] = {
     // TODO here's where we'd need to map calls to the USDA client to get unknown ndbnos
     val foodDocs: List[Tuple2[AmountOfIngredient, Option[Document]]] = {
-      foods.map(f => (f, IngredientIndex.get(f.baseFood)))
+      foods.map(f => (f, IngredientIndex.get(f.uid)))
     }
     val foundFoodDocs: List[Tuple2[AmountOfIngredient, Document]] = foodDocs.flatMap {
       case (f, Some(doc)) => Some((f, doc))
@@ -135,7 +135,7 @@ object Storage {
     } else {
       val missing: List[String] = foodDocs.flatMap {
         case (f, Some(doc)) => None
-        case (f, None) => Some(f.baseFood)
+        case (f, None) => Some(f.uid)
       }
       Left(MissingIngredientsError(missing))
     }
@@ -197,11 +197,18 @@ object Storage {
   }
 
   def getRecipe(uid: String): Either[MissingIngredientError, Recipe] = {
+
     IngredientIndex.find(uid).map(doc => {
       val recipeJson = doc.getOnlyField("body").getText
       val recipe = read[StoredRecipe](recipeJson)
-      val foods = recipe.foods.map(
-        f => IngredientIndex.get(f.baseFood).getOrElse(throw new Exception("Oh damn"))).map(readToNamedMacros(_))
+      val foods = recipe.foods
+        .map(
+          f => {
+            val macrosDoc = IngredientIndex.get(f.uid).getOrElse(throw new Exception("Oh damn"))
+            val macros = readToNamedMacros(macrosDoc)
+            AmountOfNamedMacros(f.amount, macros)
+          }
+        )
       Recipe(recipe.uid, recipe.name, recipe.fat, recipe.carbs, recipe.protein, recipe.calories,
         recipe.unit, foods, recipe.totalSize, recipe.portionSize)
     })

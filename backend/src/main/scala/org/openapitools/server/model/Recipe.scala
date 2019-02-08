@@ -26,7 +26,7 @@ case class Recipe(
 
   unit: String,
 
-  foods: List[NamedMacros],
+  foods: List[AmountOfNamedMacros],
 
   totalSize: BigDecimal,
 
