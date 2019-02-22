@@ -1,0 +1,48 @@
+* NDB API search
+* Recipe
+** getAllStoredRecipes
+* Ingredient
+** getAllStoredIngredients
+*** pagination
+*** sort=recent
+* Search
+* Tests
+* TODO How to tell if Id doesn't exist or is wrong type?
+** different indexes for each type?
+* TODO Include type in NamedMacro response so we can hit the right endpoint to retrieve full info?
+  in Recipe response
+* TODO don't allow empty recipes
+* TODO error handling
+* User stories
+** Auth to save state
+** on start, load recently used CustomIngredients, Recipes, USDA Ingredients
+** typing in search bar filters these
+** enter on search bar searches all CustomIngredients, Recipes, USDA Ingredients
+** show details click brings up full details and amount bar you can type into
+* Tickets
+** For now, store reports as ingredients?
+** receiving USDA ID in AmountOfIngredient saves it as an ingredient
+** Recently used endpoint
+** On track, update recently used
+** Meals endpoint
+*** PUT AmountOfIngredient at a time, returning entire meal?
+*** or POST a meal to <day>/2/?
+** Search endpoint
+* ?s
+** USDA ingredients already tracked?
+* TODO Error handling
+** USDA report error
+** USDA search error
+** Storage error
+** ingredient / recipe 404
+** meal 404
+** Missing nutrient
+
+
+* How is a ndbno added?
+** {"ndbno": "12000"} object in the recipe or meal
+*** recipe and meal track returns with NamedMacro added
+*** send with ndbno, return with uid?
+** {"ndbno": "12000"} to createIngredient endpoint
+** usda search returns with uids
+*** recipes, meals recognizes uid of `ndbno::12000`
