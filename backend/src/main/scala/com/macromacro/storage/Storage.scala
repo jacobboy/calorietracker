@@ -180,7 +180,11 @@ object Storage {
       val carbs = ingredients.map(_.carbs).sum * multiplier
       val protein = ingredients.map(_.protein).sum * multiplier
       val calories = ingredients.map(_.calories).sum * multiplier
-      StoredRecipe(uid, name, fat, carbs, protein, calories, unit, foods, totalSize, portionSize)
+      println(ingredients)
+      println(protein)
+      val x = StoredRecipe(uid, name, fat, carbs, protein, calories, unit, foods, totalSize, portionSize)
+      println(x)
+      x
     })
   }
 

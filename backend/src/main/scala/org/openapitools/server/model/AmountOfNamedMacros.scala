@@ -8,6 +8,6 @@ case class AmountOfNamedMacros(
   private def multiplier = amount / namedMacros.amount
   def fat = namedMacros.fat * multiplier
   def carbs = namedMacros.carbs * multiplier
-  def protein = namedMacros.carbs * multiplier
+  def protein = namedMacros.protein * multiplier
   def calories = namedMacros.calories * multiplier
 }

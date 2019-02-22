@@ -139,7 +139,7 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach {
   test("recipe saving with unknown ingredients errors") {
     val recipe = NewRecipe("testRecipe", List(AmountOfIngredient(8, RecipeId("fake_uid"))), 100, 50, "g")
     val recipeMacros = Storage.save(recipe)
-    assert(recipeMacros === Left(List(MissingIngredientError("fake_uid"))))
+    assert(recipeMacros === Left(List(MissingIngredientError(RecipeId("fake_uid")))))
   }
 
   test("search returns some stuff") {
