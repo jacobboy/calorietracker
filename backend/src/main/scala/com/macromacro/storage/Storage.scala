@@ -136,6 +136,7 @@ object Storage {
     UsdaClient.foodReport(uid).left.map {
       case ReportNotFound(ndbno) => MissingIngredientError(uid)
       // TODO improve this error handling
+      //      ideally we'd like to short circuit on an unrecoverable connection error
       case UsdaApiError(code, errorMessage) => ConnectionError(errorMessage)
     }.map(_.toCompleteFood).flatMap(_.toRight(MissingIngredientError(uid)))
       .map(save(_)).map(_.toNamedMacros)
@@ -159,12 +160,14 @@ object Storage {
 
   protected def amountsToMacros(
     foods: List[AmountOfIngredient]): Either[List[StorageError], List[AmountOfNamedMacros]] = {
-    val possiblyMacros = foods.map(
+    val possiblyMacros: List[Either[StorageError, AmountOfNamedMacros]] = foods.map(
       amt => getIngredientOrSaveAndGetUsdaIngredient(amt.uid).map(AmountOfNamedMacros(amt.amount, _)))
 
+    // TODO there's a better way to do this, i'm sure of it
+    //      this ends up iterating over the collection twice
     possiblyMacros.partition(_.isLeft) match {
-      case (Nil, macros) => Right(for (Right(i) <- macros.view) yield i)
-      case (errors, _) => Left(for (Left(s) <- errors.view) yield s)
+      case (Nil, macros) => Right(for (Right(i) <- macros) yield i)
+      case (errors, _) => Left(for (Left(s) <- errors) yield s)
     }
   }
 
@@ -219,8 +222,7 @@ object Storage {
     getIngredientOrSaveAndGetUsdaIngredient(uid)
   }
 
-  def getRecipe(uid: String): Either[MissingIngredientError, Recipe] = {
-
+  def getRecipe(uid: String): Either[StorageError, Recipe] = {
     IngredientIndex.find(uid).map(doc => {
       val recipeJson = doc.getOnlyField("body").getText
       val recipe = read[StoredRecipe](recipeJson)
@@ -236,7 +238,7 @@ object Storage {
     })
   }
 
-  def getIngredientsAndRecipes(searchString: String, limit: Int = 10) = {
+  def getIngredientsAndRecipes(searchString: String, limit: Int = 10): Either[StorageError, List[NamedMacros]] = {
 
     val sortOptions =
       SortOptions.newBuilder()
@@ -262,7 +264,10 @@ object Storage {
       .build(queryString);
     val results = IngredientIndex.search(query);
 
-    asScalaIterator(results.iterator).map(readToNamedMacros(_)).toList
+    results match {
+      case Right(r) => Right(asScalaIterator(r.iterator).map(readToNamedMacros(_)).toList)
+      case Left(error) => Left(error)
+    }
   }
 
   def deleteItem(uid: String) = {
