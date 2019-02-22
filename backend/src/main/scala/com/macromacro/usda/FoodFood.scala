@@ -12,6 +12,7 @@
 
 package com.macromacro.usda
 
+import com.macromacro.schema.CompleteFood
 import org.openapitools.server.model.{ IncompleteNamedMacros, NamedMacros }
 
 case class FoodFood(
@@ -41,12 +42,11 @@ case class FoodFood(
   val calories = findNutrient(Nutrients.CALORIES_ID).map(_.value).map(BigDecimal(_))
   val unit = desc.ru
 
-  def toNamedMacros: Either[IncompleteNamedMacros, NamedMacros] = {
+  def toCompleteFood: Option[CompleteFood] = {
     // TODO sometimes, branded foods are missing nutrients.  How to handle?
-    IncompleteNamedMacros(uid, name, fat, carbs, protein, calories, Nutrients.DEFAULT_AMOUNT, unit).toComplete
-  }
-
-  def hasCompleteMacros = {
-    toNamedMacros.isRight
+    // TODO eventually will want to store more details
+    IncompleteNamedMacros(
+      uid, name, fat, carbs, protein, calories, Nutrients.DEFAULT_AMOUNT, unit).toComplete
+      .map(_.toCompleteFood)
   }
 }

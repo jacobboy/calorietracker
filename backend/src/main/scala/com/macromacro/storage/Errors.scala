@@ -1,5 +1,8 @@
 package com.macromacro.storage
 
-// TODO where should this be raised? from com.macromacro.usda?
-// should the report function return an Either[IncompleteReport, CompleteReport] ?
-case class IncompleteUsdaNutrient(ndbno: String)
+sealed abstract class StorageError
+
+case class MissingIngredientError(uid: String) extends StorageError
+
+// TODO expand this to handle USDAClient errors
+case class ConnectionError(message: String) extends StorageError

@@ -4,4 +4,10 @@ case class AmountOfNamedMacros(
 
   amount: BigDecimal,
 
-  namedMacros: NamedMacros)
+  namedMacros: NamedMacros) {
+  private def multiplier = amount / namedMacros.amount
+  def fat = namedMacros.fat * multiplier
+  def carbs = namedMacros.carbs * multiplier
+  def protein = namedMacros.carbs * multiplier
+  def calories = namedMacros.calories * multiplier
+}

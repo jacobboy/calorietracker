@@ -11,6 +11,8 @@
 
 package org.openapitools.server.model
 
+import com.macromacro.schema.CompleteFood
+
 case class NamedMacros(
 
   uid: String, // TODO should only SavedNamedMacros have a uid?
@@ -27,7 +29,18 @@ case class NamedMacros(
 
   amount: BigDecimal,
 
-  unit: String)
+  unit: String) {
+
+  def toCompleteFood: CompleteFood = {
+    CompleteFood(this.uid, this.name, this.fat, this.carbs, this.protein, this.calories, this.amount, this.unit)
+  }
+}
+
+object NamedMacros {
+  def fromCompleteFood(food: CompleteFood): NamedMacros = {
+    NamedMacros(food.uid, food.name, food.fat, food.carbs, food.protein, food.calories, food.amount, food.unit)
+  }
+}
 
 case class IncompleteNamedMacros(
 
@@ -55,14 +68,14 @@ case class IncompleteNamedMacros(
     NamedMacros(uid, name, thisFat.get, thisCarbs.get, thisProtein.get, thisCalories.get, amount, unit)
   }
 
-  def toComplete: Either[IncompleteNamedMacros, NamedMacros] = {
+  def toComplete: Option[NamedMacros] = {
     (fat, carbs, protein, calories) match {
-      case (Some(f), Some(c), Some(p), Some(kc)) => Right(makeCompleteMacros())
-      case (Some(f), Some(c), Some(p), None) => Right(makeCompleteMacros(thisCalories = Option(f * 9 + c * 4 + p * 4)))
-      case (Some(f), Some(c), None, Some(kc)) => Right(makeCompleteMacros(thisCalories = Option((kc - (f * 9 + c * 4)) / 4)))
-      case (Some(f), None, Some(p), Some(kc)) => Right(makeCompleteMacros(thisCalories = Option((kc - (f * 9 + p * 4)) / 4)))
-      case (None, Some(c), Some(p), Some(kc)) => Right(makeCompleteMacros(thisCalories = Option((kc - (c * 4 + p * 4)) / 9)))
-      case _ => Left(this)
+      case (Some(f), Some(c), Some(p), Some(kc)) => Some(makeCompleteMacros())
+      case (Some(f), Some(c), Some(p), None) => Some(makeCompleteMacros(thisCalories = Option(f * 9 + c * 4 + p * 4)))
+      case (Some(f), Some(c), None, Some(kc)) => Some(makeCompleteMacros(thisCalories = Option((kc - (f * 9 + c * 4)) / 4)))
+      case (Some(f), None, Some(p), Some(kc)) => Some(makeCompleteMacros(thisCalories = Option((kc - (f * 9 + p * 4)) / 4)))
+      case (None, Some(c), Some(p), Some(kc)) => Some(makeCompleteMacros(thisCalories = Option((kc - (c * 4 + p * 4)) / 9)))
+      case _ => None
     }
   }
 }

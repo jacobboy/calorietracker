@@ -99,7 +99,7 @@ paths:
                 $ref: '#/components/schemas/Error'
   /recipes:
     get:
-      description: Returns all ingredients the user has saved
+      description: Returns all recipes the user has saved
       operationId: findRecipes
       parameters:
         - name: sort
@@ -180,6 +180,45 @@ paths:
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/Recipe'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /search:
+    get:
+      description: Search for ingredients and recipes by name
+      operationId: searchByName
+      parameters:
+        - name: q
+          in: query
+          description: "search key"
+          required: true
+          style: form
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: "sort key. options: recent"
+          required: false
+          style: form
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: "maximum number of results to return. default: 10"
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: recipe response
+          content:
+            application/json:
+              schema:
                 $ref: '#/components/schemas/NamedMacros'
         default:
           description: unexpected error
@@ -242,13 +281,23 @@ components:
 
     AmountOfIngredient:
       required:
+        - uid
         - amount
-        - baseFood
       properties:
+        uid:
+          type: string
         amount:
           type: number
-        baseFood:
-          type: string
+
+    AmountOfNamedMacros:
+      required:
+        - namedMacros
+        - amount
+      properties:
+        namedMacros:
+          $ref: '#components/schemas/NamedMacros'
+        amount:
+          type: number
 
     NewRecipe:
       required:
@@ -282,7 +331,7 @@ components:
             foods:
               type: array
               items:
-                $ref: '#/components/schemas/NamedMacros'
+                $ref: '#/components/schemas/AmountOfNamedMacros'
             totalSize:
               type: number
             portionSize:

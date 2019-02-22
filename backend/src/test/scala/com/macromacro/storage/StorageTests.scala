@@ -2,6 +2,7 @@ package com.macromacro.storage
 
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper
 import com.google.appengine.tools.development.testing.LocalSearchServiceTestConfig
+import com.macromacro.schema._
 import org.openapitools.server.model.{ AmountOfIngredient, AmountOfNamedMacros, NamedMacros, NewIngredient, NewRecipe, Recipe }
 import org.scalatest.{ BeforeAndAfterEach, FunSuite }
 
@@ -30,7 +31,7 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach {
   test("saved ingredients can be retrieved") {
     val newIngredient = NewIngredient("test", 1, 2, 3, 4, 5, "g")
     val ingredient = Storage.save(newIngredient)
-    val namedMacro = Storage.getNamedMacros(ingredient.uid).getOrElse(
+    val namedMacro = Storage.getIngredient(ingredient.uid).getOrElse(
       throw new Exception(s"$ingredient.uid not found"))
 
     val foundNewIngredient = NewIngredient(
@@ -98,7 +99,11 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach {
     val newIngredient = NewIngredient("test", 1, 2, 3, 4, 5, "g")
     val ingredient = Storage.save(newIngredient)
     val testRecipe = NewRecipe("testRecipe", List(AmountOfIngredient(9, ingredient.uid)), 100, 50, "g")
-    val testRecipeMacros = Storage.save(testRecipe).getOrElse(
+
+    val savedMacros = Storage.save(testRecipe)
+    println(savedMacros)
+
+    val testRecipeMacros = savedMacros.getOrElse(
       throw new Exception(s"$testRecipe.uid not found"))
 
     val recipe = NewRecipe(
@@ -132,7 +137,7 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach {
   }
 
   test("recipe saving with unknown ingredients errors") {
-    val recipe = NewRecipe("testRecipe", List(AmountOfIngredient(8, "fake_uid")), 100, 50, "g")
+    val recipe = NewRecipe("testRecipe", List(AmountOfIngredient(8, RecipeId("fake_uid"))), 100, 50, "g")
     val recipeMacros = Storage.save(recipe)
     assert(recipeMacros === Left(MissingIngredientsError(List("fake_uid"))))
   }
@@ -166,4 +171,13 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach {
   test("getting a StoredRecipe with missing ingredients errorswith a MissingIngredientsError") {
     assert(false)
   }
+
+  test("creating a Recipe creates an unknown UsdaIngredient") {
+    assert(false)
+  }
+
+  test("creating a Recipe uses an existing UsdaIngredient if known") {
+    assert(false)
+  }
+
 }

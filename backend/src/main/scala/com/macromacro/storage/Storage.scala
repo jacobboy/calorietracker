@@ -9,22 +9,15 @@ import com.google.appengine.api.search.Field
 import com.google.appengine.api.search.PutException
 import com.google.appengine.api.search.SearchServiceFactory
 import com.google.appengine.api.search.StatusCode
-import com.macromacro.usda.FoodFood
+import com.macromacro.schema._
+import com.macromacro.usda.{ FoodFood, ReportNotFound, USDAError, UsdaApiError, UsdaClient }
 import java.util.Date
-import java.util.UUID.randomUUID
 import org.openapitools.server.model._
 import org.json4s._
 import org.json4s.ext.JavaTypesSerializers
 import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.{ read, write }
-
-trait StorageError
-case class MissingIngredientError(uid: String) extends StorageError
-case class MissingIngredientsError(uids: List[String]) extends StorageError {
-  protected def fromMissings(errors: List[MissingIngredientError]) = {
-    MissingIngredientsError(errors.map(_.uid))
-  }
-}
+import scala.util.{ Try, Success, Failure }
 
 protected object IngredientIndex {
   /** Wrapper around the SearchIndex to return Option instead of a possibly null value from get */
@@ -35,28 +28,55 @@ protected object IngredientIndex {
     SearchServiceFactory.getSearchService().getIndex(indexSpec)
   }
 
-  def get(uid: String): Option[Document] = {
-    Option(ingredientIndex.get(uid))
-  }
+  protected def retryIfTransientError[T](f: () => T): Either[StorageError, T] = {
+    // val x = Try(f).recoverWith({
+    //   case e: SearchBaseException if StatusCode.TRANSIENT_ERROR.equals(e.getOperationResult().getCode()) => {
+    //     Try(f)
+    //   }
+    // }).
 
-  def find(uid: String): Either[MissingIngredientError, Document] = {
-    get(uid).toRight(MissingIngredientError(uid))
-  }
+    // match {
+    //   case Success(v) => Right(v)
+    //   case Failure(e) => Left(ConnectionError("Shit"))
+    // }
 
-  def put(doc: Document) = {
+    // Either.catch[SearchBaseException](f).left.map(
+    //   e => ConnectionError("shit")
+    // )
+
     try {
-      ingredientIndex.put(doc);
+      Right(f())
     } catch {
-      case e: PutException => {
+      case e: SearchBaseException => {
         if (StatusCode.TRANSIENT_ERROR.equals(e.getOperationResult().getCode())) {
-          ingredientIndex.put(doc);
+          try {
+            Right(f())
+          } catch {
+            case e: SearchBaseException => {
+              Left(ConnectionError("shit"))
+            }
+          }
+        } else {
+          Left(ConnectionError("shit"))
         }
       }
     }
   }
 
-  def search(query: Query) = {
-    ingredientIndex.search(query)
+  def find(uid: String): Either[StorageError, Document] = {
+    retryIfTransientError(
+      () => Option(ingredientIndex.get(uid)).toRight(MissingIngredientError(uid))).joinRight
+  }
+
+  def put(doc: Document): Option[StorageError] = {
+    retryIfTransientError(() => ingredientIndex.put(doc)) match {
+      case Left(e) => Some(e)
+      case _ => None
+    }
+  }
+
+  def search(query: Query): Either[StorageError, Results[ScoredDocument]] = {
+    retryIfTransientError(() => ingredientIndex.search(query))
   }
 
   def delete(uid: String) = {
@@ -65,6 +85,9 @@ protected object IngredientIndex {
 }
 
 object Storage {
+
+  private implicit val jsonFormats = Serialization.formats(NoTypeHints) ++ JavaTypesSerializers.all
+  private val typeFacet = "type"
 
   protected case class StoredRecipe(
     uid: String,
@@ -82,14 +105,6 @@ object Storage {
       NamedMacros(uid, name, fat, carbs, protein, calories, portionSize, unit)
     }
   }
-
-  private val ingredientIndexName = "ingredients"
-  private implicit val jsonFormats = Serialization.formats(NoTypeHints) ++ JavaTypesSerializers.all
-
-  private def ingredientId = "ingredient::v1::" + randomUUID.toString
-  private def recipeId = "recipe::v1::" + randomUUID.toString
-
-  private val typeFacet = "type"
 
   private def document(id: String, t: String, keyValues: (String, String)*) = {
     val doc = Document.newBuilder
@@ -117,46 +132,58 @@ object Storage {
     }
   }
 
+  protected def saveAndGetUsdaIngredient(uid: String): Either[StorageError, NamedMacros] = {
+    UsdaClient.foodReport(uid).left.map {
+      case ReportNotFound(ndbno) => MissingIngredientError(uid)
+      // TODO improve this error handling
+      case UsdaApiError(code, errorMessage) => ConnectionError(errorMessage)
+    }.map(_.toCompleteFood).flatMap(_.toRight(MissingIngredientError(uid)))
+      .map(save(_)).map(_.toNamedMacros)
+  }
+
+  protected def getIngredientOrSaveAndGetUsdaIngredient(
+    uid: String): Either[StorageError, NamedMacros] = {
+
+    def getNamedMacros(uid: String) = IngredientIndex.find(uid).map(readToNamedMacros(_))
+
+    uid match {
+      case IngredientId() => getNamedMacros(uid)
+      case RecipeId() => getNamedMacros(uid)
+      case UsdaId(ndbno) => {
+        getNamedMacros(uid).left.map(
+          e => saveAndGetUsdaIngredient(uid)).joinLeft
+      }
+      case _ => Left(MissingIngredientError(uid))
+    }
+  }
+
   protected def amountsToMacros(
-    foods: List[AmountOfIngredient]): Either[MissingIngredientsError, List[Tuple2[BigDecimal, NamedMacros]]] = {
-    // TODO here's where we'd need to map calls to the USDA client to get unknown ndbnos
-    val foodDocs: List[Tuple2[AmountOfIngredient, Option[Document]]] = {
-      foods.map(f => (f, IngredientIndex.get(f.uid)))
-    }
-    val foundFoodDocs: List[Tuple2[AmountOfIngredient, Document]] = foodDocs.flatMap {
-      case (f, Some(doc)) => Some((f, doc))
-      case (f, None) => None
-    }
-    if (foundFoodDocs.length == foodDocs.length) {
-      val _foods: List[Tuple2[BigDecimal, NamedMacros]] = foundFoodDocs.map {
-        case (f: AmountOfIngredient, doc: Document) => (f.amount, readToNamedMacros(doc))
-      }
-      Right(_foods)
-    } else {
-      val missing: List[String] = foodDocs.flatMap {
-        case (f, Some(doc)) => None
-        case (f, None) => Some(f.uid)
-      }
-      Left(MissingIngredientsError(missing))
+    foods: List[AmountOfIngredient]): Either[List[StorageError], List[AmountOfNamedMacros]] = {
+    val possiblyMacros = foods.map(
+      amt => getIngredientOrSaveAndGetUsdaIngredient(amt.uid).map(AmountOfNamedMacros(amt.amount, _)))
+
+    possiblyMacros.partition(_.isLeft) match {
+      case (Nil, macros) => Right(for (Right(i) <- macros.view) yield i)
+      case (errors, _) => Left(for (Left(s) <- errors.view) yield s)
     }
   }
 
   protected def calculateStoredRecipe(
     uid: String, name: String, foods: List[AmountOfIngredient], totalSize: BigDecimal,
-    portionSize: BigDecimal, unit: String): Either[MissingIngredientsError, StoredRecipe] = {
+    portionSize: BigDecimal, unit: String): Either[List[StorageError], StoredRecipe] = {
+    val multiplier = portionSize / totalSize
     amountsToMacros(foods).map(ingredients => {
-      val multiplier = portionSize / totalSize
-      val fat = ingredients.map(f => f._2.fat * f._1 / f._2.amount).sum * multiplier
-      val carbs = ingredients.map(f => f._2.carbs * f._1 / f._2.amount).sum * multiplier
-      val protein = ingredients.map(f => f._2.protein * f._1 / f._2.amount).sum * multiplier
-      val calories = ingredients.map(f => f._2.calories * f._1 / f._2.amount).sum * multiplier
+      val fat = ingredients.map(_.fat).sum * multiplier
+      val carbs = ingredients.map(_.carbs).sum * multiplier
+      val protein = ingredients.map(_.protein).sum * multiplier
+      val calories = ingredients.map(_.calories).sum * multiplier
       StoredRecipe(uid, name, fat, carbs, protein, calories, unit, foods, totalSize, portionSize)
     })
   }
 
   def save(newIngredient: NewIngredient): NamedMacros = {
     val ingredient = NamedMacros(
-      ingredientId,
+      IngredientId(),
       newIngredient.name,
       newIngredient.fat,
       newIngredient.carbs,
@@ -168,9 +195,9 @@ object Storage {
     ingredient
   }
 
-  def save(newRecipe: NewRecipe): Either[StorageError, NamedMacros] = {
+  def save(newRecipe: NewRecipe): Either[List[StorageError], NamedMacros] = {
     calculateStoredRecipe(
-      recipeId, newRecipe.name, newRecipe.foods, newRecipe.totalSize,
+      RecipeId(), newRecipe.name, newRecipe.foods, newRecipe.totalSize,
       newRecipe.portionSize, newRecipe.unit).map(r => {
         val recipeJson = write(r)
         val document = nameBodyDoc(r.uid, "recipe", r.name, recipeJson)
@@ -181,19 +208,15 @@ object Storage {
       })
   }
 
-  def save(food: FoodFood): Either[IncompleteUsdaNutrient, NamedMacros] = {
-    val namedMacros = food.toNamedMacros
-    namedMacros.foreach(
-      food => {
-        val foodJson = write(food)
-        val document = nameBodyDoc(food.uid, "usda", food.name, foodJson)
-        IngredientIndex.put(document);
-      })
-    namedMacros.left.map(_ => IncompleteUsdaNutrient(food.ndbno))
+  def save(food: CompleteFood): CompleteFood = {
+    val foodJson = write(food)
+    val document = nameBodyDoc(food.uid, "usda", food.name, foodJson)
+    IngredientIndex.put(document);
+    food
   }
 
-  def getNamedMacros(uid: String): Either[MissingIngredientError, NamedMacros] = {
-    IngredientIndex.find(uid).map(readToNamedMacros(_))
+  def getIngredient(uid: String): Either[StorageError, NamedMacros] = {
+    getIngredientOrSaveAndGetUsdaIngredient(uid)
   }
 
   def getRecipe(uid: String): Either[MissingIngredientError, Recipe] = {
@@ -204,7 +227,7 @@ object Storage {
       val foods = recipe.foods
         .map(
           f => {
-            val macrosDoc = IngredientIndex.get(f.uid).getOrElse(throw new Exception("Oh damn"))
+            val macrosDoc = IngredientIndex.find(f.uid).getOrElse(throw new Exception("Oh damn"))
             val macros = readToNamedMacros(macrosDoc)
             AmountOfNamedMacros(f.amount, macros)
           })

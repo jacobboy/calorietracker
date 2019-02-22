@@ -30,7 +30,7 @@ import com.macromacro.storage._
 class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
   with JacksonJsonSupport
   with SwaggerSupport {
-
+x
   // protected implicit val jsonFormats: Formats = DefaultFormats
   protected implicit val jsonFormats: Formats = Serialization.formats(NoTypeHints) ++ JavaTypesSerializers.all
 
@@ -41,7 +41,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
     response.headers += ("Access-Control-Allow-Origin" -> "*")
   }
 
-  val createIngredientOperation = (apiOperation[NamedMacros]("createIngredient")
+ val createIngredientOperation = (apiOperation[NamedMacros]("createIngredient")
     summary "Creates a new ingredient.  Duplicates are allowed."
     parameters (bodyParam[NewIngredient]("newIngredient").description("Ingredient to create")))
 
@@ -65,7 +65,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
 
   get("/ingredients/:uid", operation(findIngredientByUIDOperation)) {
     val uid = params.getOrElse("uid", halt(400))
-    Storage.getNamedMacros(uid)
+    Storage.getIngredient(uid)
   }
 
   val findIngredientsOperation = (apiOperation[List[NamedMacros]]("findIngredients")
