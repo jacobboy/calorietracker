@@ -8,9 +8,10 @@ object UsdaClient {
   private val usdaUrl = "https://api.nal.usda.gov/ndb/V2/reports"
 
   private implicit val serialization = org.json4s.native.Serialization
-  private implicit val backend = HttpURLConnectionBackend()
+  // TODO can this be lazy?
+  private val httpBackend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend()
 
-  def foodReport(ndbnoOrUid: String): Either[USDAError, FoodFood] = {
+  def foodReport(ndbnoOrUid: String)(implicit backend: SttpBackend[Id, Nothing] = httpBackend): Either[USDAError, FoodFood] = {
     val ndbno = ndbnoOrUid match {
       case UsdaId(ndbno) => ndbno
       case ndbno => ndbno

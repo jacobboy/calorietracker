@@ -129,17 +129,18 @@ object Storage {
     t match {
       case "ingredient" => read[NamedMacros](body)
       case "recipe" => read[StoredRecipe](body).toNamedMacros
+      case "usda" => read[CompleteFood](body).toNamedMacros
     }
   }
 
-  protected def saveAndGetUsdaIngredient(uid: String): Either[StorageError, NamedMacros] = {
+  protected def saveAndGetUsdaIngredient(uid: String): Either[StorageError, CompleteFood] = {
     UsdaClient.foodReport(uid).left.map {
       case ReportNotFound(ndbno) => MissingIngredientError(uid)
       // TODO improve this error handling
       //      ideally we'd like to short circuit on an unrecoverable connection error
       case UsdaApiError(code, errorMessage) => ConnectionError(errorMessage)
     }.map(_.toCompleteFood).flatMap(_.toRight(MissingIngredientError(uid)))
-      .map(save(_)).map(_.toNamedMacros)
+      .map(save(_))
   }
 
   protected def getIngredientOrSaveAndGetUsdaIngredient(
@@ -152,7 +153,7 @@ object Storage {
       case RecipeId() => getNamedMacros(uid)
       case UsdaId(ndbno) => {
         getNamedMacros(uid).left.map(
-          e => saveAndGetUsdaIngredient(uid)).joinLeft
+          e => saveAndGetUsdaIngredient(uid).map(_.toNamedMacros)).joinLeft
       }
       case _ => Left(MissingIngredientError(uid))
     }
@@ -180,11 +181,7 @@ object Storage {
       val carbs = ingredients.map(_.carbs).sum * multiplier
       val protein = ingredients.map(_.protein).sum * multiplier
       val calories = ingredients.map(_.calories).sum * multiplier
-      println(ingredients)
-      println(protein)
-      val x = StoredRecipe(uid, name, fat, carbs, protein, calories, unit, foods, totalSize, portionSize)
-      println(x)
-      x
+      StoredRecipe(uid, name, fat, carbs, protein, calories, unit, foods, totalSize, portionSize)
     })
   }
 

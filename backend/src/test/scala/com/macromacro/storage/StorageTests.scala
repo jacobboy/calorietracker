@@ -4,18 +4,24 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper
 import com.google.appengine.tools.development.testing.LocalSearchServiceTestConfig
 import com.macromacro.schema._
 import org.openapitools.server.model.{ AmountOfIngredient, AmountOfNamedMacros, NamedMacros, NewIngredient, NewRecipe, Recipe }
-import org.scalatest.{ BeforeAndAfterEach, FunSuite }
+import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach, FunSuite }
 
-class StorageSpec extends FunSuite with BeforeAndAfterEach {
-  val helper = new LocalServiceTestHelper(new LocalSearchServiceTestConfig())
+class StorageSpec extends FunSuite with BeforeAndAfterEach with BeforeAndAfterAll {
+  var helper = new LocalServiceTestHelper(new LocalSearchServiceTestConfig())
 
   override def beforeEach {
+    helper = new LocalServiceTestHelper(new LocalSearchServiceTestConfig())
     helper.setUp
   }
 
   override def afterEach {
     helper.tearDown
+    helper = null
   }
+
+  // override def afterAll {
+  //   helper = null
+  // }
 
   test("ingredient returned by save matches input") {
     val newIngredient = NewIngredient("test", 1, 2, 3, 4, 5, "g")
@@ -101,7 +107,6 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach {
     val testRecipe = NewRecipe("testRecipe", List(AmountOfIngredient(9, ingredient.uid)), 100, 50, "g")
 
     val savedMacros = Storage.save(testRecipe)
-    println(savedMacros)
 
     val testRecipeMacros = savedMacros.getOrElse(
       throw new Exception(s"$testRecipe.uid not found"))
@@ -161,24 +166,27 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach {
     assert(results.right.getOrElse(null).length === 3)
   }
 
-  test("saving a USDA Ingredient saves as an Ingredient") {
-    assert(false)
+  test("a USDA ingredient can be saved and retrieved") {
+    val food = CompleteFood(UsdaId("uid"), "name", 1, 2, 3, 29, 100, "g")
+    Storage.save(food)
+    val foundFood = Storage.getIngredient(food.uid)
+    assert(foundFood.isRight)
+    assert(foundFood === Right(food.toNamedMacros))
   }
 
   test("getting a non-existent ingredient fails gracefully") {
-    assert(false)
-  }
-
-  test("getting a StoredRecipe with missing ingredients errorswith a MissingIngredientsError") {
-    assert(false)
+    val uid = IngredientId("snarf")
+    val ingredientOption = Storage.getIngredient(uid)
+    assert(ingredientOption.isLeft)
+    assert(ingredientOption === Left(MissingIngredientError(uid)))
   }
 
   test("creating a Recipe creates an unknown UsdaIngredient") {
-    assert(false)
+    assert(false, "Need to figure out how to patch UsdaClient, or pass it in. Getting a Usda Food is untested.")
   }
 
-  test("creating a Recipe uses an existing UsdaIngredient if known") {
-    assert(false)
-  }
+  // test("creating a Recipe uses an existing UsdaIngredient if known") {
+  //   assert(false)
+  // }
 
 }

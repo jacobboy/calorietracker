@@ -72,9 +72,9 @@ case class IncompleteNamedMacros(
     (fat, carbs, protein, calories) match {
       case (Some(f), Some(c), Some(p), Some(kc)) => Some(makeCompleteMacros())
       case (Some(f), Some(c), Some(p), None) => Some(makeCompleteMacros(thisCalories = Option(f * 9 + c * 4 + p * 4)))
-      case (Some(f), Some(c), None, Some(kc)) => Some(makeCompleteMacros(thisCalories = Option((kc - (f * 9 + c * 4)) / 4)))
-      case (Some(f), None, Some(p), Some(kc)) => Some(makeCompleteMacros(thisCalories = Option((kc - (f * 9 + p * 4)) / 4)))
-      case (None, Some(c), Some(p), Some(kc)) => Some(makeCompleteMacros(thisCalories = Option((kc - (c * 4 + p * 4)) / 9)))
+      case (Some(f), Some(c), None, Some(kc)) => Some(makeCompleteMacros(thisProtein = Option((kc - (f * 9 + c * 4)) / 4)))
+      case (Some(f), None, Some(p), Some(kc)) => Some(makeCompleteMacros(thisCarbs = Option((kc - (f * 9 + p * 4)) / 4)))
+      case (None, Some(c), Some(p), Some(kc)) => Some(makeCompleteMacros(thisFat = Option((kc - (c * 4 + p * 4)) / 9)))
       case _ => None
     }
   }
