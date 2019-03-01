@@ -2,28 +2,35 @@
 #
 
 :api = http://localhost:8080/Default
-
+# :api = https://macromacro.appspot.com/Default
 
 # Make an Ingredient
 POST :api/ingredients
 Content-Type: application/json
 {
-    "name": "ingredient",
+    "name": "donklage the man234",
     "carbs": 1,
-    "fat": 2,
+    "fat": 3,
     "protein": 3,
-    "calories": 4,
+    "calories": 10,
     "amount": 5,
     "unit": "g"
 }
 
 
-:ingredient = ingredient::v1::204c1f1d-3540-4658-b1ca-6ce92c4bdf5e
+:ingredient = ingredient::v1::a6ad4e1a-a89e-44b7-a52c-507ea02fd15e
 
 
 # Check if we can get it back
 GET :api/ingredients/:ingredient
 
+# Search for it
+GET :api/search?q=macho
+
+# Get a Usda ingredient
+:ndbno = ndbno::v1::01011
+
+GET :api/ingredients/:ndbno
 
 # Make a recipe from it
 POST :api/recipes
@@ -32,7 +39,10 @@ Content-Type: application/json
     "name": "recipe",
     "foods": [{
         "amount": 112,
-        "baseFood": ":ingredient"
+        "uid": ":ingredient"
+    },{
+        "amount": 10,
+        "uid": ":ndbno"
     }],
     "totalSize": 300,
     "portionSize": 100,
@@ -40,8 +50,28 @@ Content-Type: application/json
 }
 
 
-:recipe = recipe::v1::f369d1a6-caad-4150-91a7-d4d5a5c4a53f
+:recipe = recipe::v1::c2d31ca1-21ae-4b9f-ab45-7904e3df0c47
 
 
 # Check if we can get it back
 GET :api/recipes/:recipe
+
+
+# MissingIngredientError
+GET :api/ingredients/spoonman
+
+# Get latest ingredients
+GET :api/ingredients
+
+# Get latest recipes
+GET :api/recipes
+
+# USDA report
+
+:GOV_API_KEY := (getenv "GOV_API_KEY")
+
+GET https://api.nal.usda.gov/ndb/V2/reports?ndbno=40&type=b&format=json&api_key=:GOV_API_KEY
+
+
+# Search USDA
+GET https://api.nal.usda.gov/ndb/search/?format=json&q=butter&sort=n&max=25&offset=0&api_key=:GOV_API_KEY

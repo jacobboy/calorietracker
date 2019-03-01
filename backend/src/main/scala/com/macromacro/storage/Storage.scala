@@ -17,6 +17,7 @@ import org.json4s._
 import org.json4s.ext.JavaTypesSerializers
 import org.json4s.jackson.Serialization
 import org.json4s.jackson.Serialization.{ read, write }
+import scala.collection.mutable.ListBuffer
 import scala.util.{ Try, Success, Failure }
 
 protected object IngredientIndex {
@@ -140,7 +141,7 @@ object Storage {
       //      ideally we'd like to short circuit on an unrecoverable connection error
       case UsdaApiError(code, errorMessage) => ConnectionError(errorMessage)
     }.map(_.toCompleteFood).flatMap(_.toRight(MissingIngredientError(uid)))
-      .map(save(_))
+      .flatMap(save(_))
   }
 
   protected def getIngredientOrSaveAndGetUsdaIngredient(
@@ -160,32 +161,40 @@ object Storage {
   }
 
   protected def amountsToMacros(
-    foods: List[AmountOfIngredient]): Either[List[StorageError], List[AmountOfNamedMacros]] = {
-    val possiblyMacros: List[Either[StorageError, AmountOfNamedMacros]] = foods.map(
-      amt => getIngredientOrSaveAndGetUsdaIngredient(amt.uid).map(AmountOfNamedMacros(amt.amount, _)))
-
-    // TODO there's a better way to do this, i'm sure of it
-    //      this ends up iterating over the collection twice
-    possiblyMacros.partition(_.isLeft) match {
-      case (Nil, macros) => Right(for (Right(i) <- macros) yield i)
-      case (errors, _) => Left(for (Left(s) <- errors) yield s)
+    foods: List[AmountOfIngredient]): Either[ConnectionError, Either[List[MissingIngredientError], List[AmountOfNamedMacros]]] = {
+    val missing = new ListBuffer[MissingIngredientError]()
+    val macros = new ListBuffer[AmountOfNamedMacros]()
+    for (food <- foods) {
+      val ingred = getIngredientOrSaveAndGetUsdaIngredient(food.uid).map(AmountOfNamedMacros(food.amount, _))
+      ingred match {
+        // TODO there's gotta be a better way
+        //      also matching on error type seems fraught, what if I add one?
+        case Left(ConnectionError(message)) => return Left(ConnectionError(message))
+        case Left(MissingIngredientError(uid)) => missing += MissingIngredientError(uid)
+        case Right(food) => macros += food
+      }
+    }
+    if (!missing.isEmpty) {
+      Right(Left(missing.toList))
+    } else {
+      Right(Right(macros.toList))
     }
   }
 
   protected def calculateStoredRecipe(
     uid: String, name: String, foods: List[AmountOfIngredient], totalSize: BigDecimal,
-    portionSize: BigDecimal, unit: String): Either[List[StorageError], StoredRecipe] = {
-    val multiplier = portionSize / totalSize
-    amountsToMacros(foods).map(ingredients => {
-      val fat = ingredients.map(_.fat).sum * multiplier
-      val carbs = ingredients.map(_.carbs).sum * multiplier
-      val protein = ingredients.map(_.protein).sum * multiplier
-      val calories = ingredients.map(_.calories).sum * multiplier
+    portionSize: BigDecimal, unit: String): Either[ConnectionError, Either[List[MissingIngredientError], StoredRecipe]] = {
+    val portionMultiplier = portionSize / totalSize
+    amountsToMacros(foods).map(_.map(ingredients => {
+      val fat = ingredients.map(_.fat).sum * portionMultiplier
+      val carbs = ingredients.map(_.carbs).sum * portionMultiplier
+      val protein = ingredients.map(_.protein).sum * portionMultiplier
+      val calories = ingredients.map(_.calories).sum * portionMultiplier
       StoredRecipe(uid, name, fat, carbs, protein, calories, unit, foods, totalSize, portionSize)
-    })
+    }))
   }
 
-  def save(newIngredient: NewIngredient): NamedMacros = {
+  def save(newIngredient: NewIngredient): Either[StorageError, NamedMacros] = {
     val ingredient = NamedMacros(
       IngredientId(),
       newIngredient.name,
@@ -195,28 +204,28 @@ object Storage {
       newIngredient.calories,
       newIngredient.amount,
       newIngredient.unit)
-    IngredientIndex.put(nameBodyDoc(ingredient.uid, "ingredient", ingredient.name, write(ingredient)))
-    ingredient
+    IngredientIndex
+      .put(nameBodyDoc(ingredient.uid, "ingredient", ingredient.name, write(ingredient)))
+      .toLeft(ingredient)
   }
 
-  def save(newRecipe: NewRecipe): Either[List[StorageError], NamedMacros] = {
+  def save(newRecipe: NewRecipe): Either[ConnectionError, Either[List[MissingIngredientError], NamedMacros]] = {
     calculateStoredRecipe(
       RecipeId(), newRecipe.name, newRecipe.foods, newRecipe.totalSize,
-      newRecipe.portionSize, newRecipe.unit).map(r => {
+      newRecipe.portionSize, newRecipe.unit).map(_.map(r => {
         val recipeJson = write(r)
         val document = nameBodyDoc(r.uid, "recipe", r.name, recipeJson)
         IngredientIndex.put(document);
         NamedMacros(
           r.uid, r.name, r.fat, r.carbs, r.protein,
           r.calories, r.portionSize, r.unit)
-      })
+      }))
   }
 
-  def save(food: CompleteFood): CompleteFood = {
+  def save(food: CompleteFood): Either[StorageError, CompleteFood] = {
     val foodJson = write(food)
     val document = nameBodyDoc(food.uid, "usda", food.name, foodJson)
-    IngredientIndex.put(document);
-    food
+    IngredientIndex.put(document).toLeft(food)
   }
 
   def getIngredient(uid: String): Either[StorageError, NamedMacros] = {
@@ -239,8 +248,7 @@ object Storage {
     })
   }
 
-  def getIngredientsAndRecipes(searchString: String, limit: Int = 10): Either[StorageError, List[NamedMacros]] = {
-
+  protected def getMacrosFromQuery(queryString: String, limit: Int = 10): Either[StorageError, List[NamedMacros]] = {
     val sortOptions =
       SortOptions.newBuilder()
         .addSortExpression(
@@ -257,8 +265,6 @@ object Storage {
         .setSortOptions(sortOptions)
         .build();
 
-    val queryString = s"name:($searchString)"
-
     //  Build the Query and run the search
     val query = Query.newBuilder
       .setOptions(options)
@@ -269,6 +275,19 @@ object Storage {
       case Right(r) => Right(asScalaIterator(r.iterator).map(readToNamedMacros(_)).toList)
       case Left(error) => Left(error)
     }
+
+  }
+
+  def getLatestIngredients(limit: Int = 10) = {
+    getMacrosFromQuery(s"type:(ingredient OR usda)", limit = limit)
+  }
+
+  def getLatestRecipes(limit: Int = 10) = {
+    getMacrosFromQuery(s"type:recipe", limit = limit)
+  }
+
+  def getIngredientsAndRecipes(searchString: String, limit: Int = 10): Either[StorageError, List[NamedMacros]] = {
+    getMacrosFromQuery(s"name:($searchString)", limit = limit)
   }
 
   def deleteItem(uid: String) = {

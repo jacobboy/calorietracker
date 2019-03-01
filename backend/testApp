@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# sbt appengineDevServer --runtime=java8 --generated_dir=/Users/jake/code/calorietracker/backend/NOT-WEB-INF
+sbt appengineDevServer --runtime=java8 

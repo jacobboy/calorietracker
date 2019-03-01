@@ -13,6 +13,7 @@
   in Recipe response
 * TODO don't allow empty recipes
 * TODO error handling
+* TODO 400 handling
 * User stories
 ** Auth to save state
 ** on start, load recently used CustomIngredients, Recipes, USDA Ingredients

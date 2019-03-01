@@ -25,7 +25,7 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach with BeforeAndAfterAl
 
   test("ingredient returned by save matches input") {
     val newIngredient = NewIngredient("test", 1, 2, 3, 4, 5, "g")
-    val ingredient = Storage.save(newIngredient)
+    val ingredient = Storage.save(newIngredient).getOrElse(throw new Exception("could not save ingredient"))
 
     val foundNewIngredient = NewIngredient(
       ingredient.name, ingredient.fat, ingredient.carbs, ingredient.protein,
@@ -36,7 +36,7 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach with BeforeAndAfterAl
 
   test("saved ingredients can be retrieved") {
     val newIngredient = NewIngredient("test", 1, 2, 3, 4, 5, "g")
-    val ingredient = Storage.save(newIngredient)
+    val ingredient = Storage.save(newIngredient).getOrElse(throw new Exception("could not save ingredient"))
     val namedMacro = Storage.getIngredient(ingredient.uid).getOrElse(
       throw new Exception(s"$ingredient.uid not found"))
 
@@ -49,9 +49,9 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach with BeforeAndAfterAl
 
   test("macro returned by save matches input") {
     val newIngredient1 = NewIngredient("test", 10, 20, 30, 40, 50, "g")
-    val ingredient1 = Storage.save(newIngredient1)
+    val ingredient1 = Storage.save(newIngredient1).getOrElse(throw new Exception("could not save ingredient"))
     val newIngredient2 = NewIngredient("test", 1, 2, 3, 4, 5, "g")
-    val ingredient2 = Storage.save(newIngredient2)
+    val ingredient2 = Storage.save(newIngredient2).getOrElse(throw new Exception("could not save ingredient"))
 
     val foods = List(
       AmountOfIngredient(ingredient1.amount * 2, ingredient1.uid),
@@ -60,8 +60,9 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach with BeforeAndAfterAl
     val totalSize = 100
     val portionSize = 50
     val newRecipe = NewRecipe("test", foods, totalSize, portionSize, "g")
-    val namedMacros = Storage.save(newRecipe).getOrElse(
-      throw new Exception(s"$newRecipe.uid not found"))
+    val namedMacros = Storage.save(newRecipe)
+      .getOrElse(throw new Exception("Somehow threw a connection error"))
+      .getOrElse(throw new Exception(s"$newRecipe.uid not found"))
 
     val expectedMacros = NamedMacros(
       namedMacros.uid,
@@ -75,11 +76,12 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach with BeforeAndAfterAl
   test("saved recipes can be retrieved") {
     val testAmount = 8
     val newIngredient = NewIngredient("test", 1, 2, 3, 4, 5, "g")
-    val ingredient = Storage.save(newIngredient)
+    val ingredient = Storage.save(newIngredient).getOrElse(throw new Exception("could not save ingredient"))
     val newRecipe = NewRecipe("test", List(AmountOfIngredient(testAmount, ingredient.uid)), 100, 50, "g")
 
-    val recipeMacros = Storage.save(newRecipe).getOrElse(
-      throw new Exception(s"$newRecipe.uid not found"))
+    val recipeMacros = Storage.save(newRecipe)
+      .getOrElse(throw new Exception("Somehow threw a connection error"))
+      .getOrElse(throw new Exception(s"$newRecipe.uid not found"))
 
     val foundRecipe = Storage.getRecipe(recipeMacros.uid).getOrElse(
       throw new Exception(s"$recipeMacros.uid not found"))
@@ -103,13 +105,14 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach with BeforeAndAfterAl
     val testIAmount = 8
     val testRAmount = 10
     val newIngredient = NewIngredient("test", 1, 2, 3, 4, 5, "g")
-    val ingredient = Storage.save(newIngredient)
+    val ingredient = Storage.save(newIngredient).getOrElse(throw new Exception("could not save ingredient"))
     val testRecipe = NewRecipe("testRecipe", List(AmountOfIngredient(9, ingredient.uid)), 100, 50, "g")
 
     val savedMacros = Storage.save(testRecipe)
 
-    val testRecipeMacros = savedMacros.getOrElse(
-      throw new Exception(s"$testRecipe.uid not found"))
+    val testRecipeMacros = savedMacros
+      .getOrElse(throw new Exception("Somehow threw a connection error"))
+      .getOrElse(throw new Exception(s"$testRecipe.uid not found"))
 
     val recipe = NewRecipe(
       "recipe",
@@ -120,8 +123,9 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach with BeforeAndAfterAl
       50,
       "g")
 
-    val recipeMacros = Storage.save(recipe).getOrElse(
-      throw new Exception(s"$recipe.uid not found"))
+    val recipeMacros = Storage.save(recipe)
+      .getOrElse(throw new Exception("Somehow threw a connection error"))
+      .getOrElse(throw new Exception(s"$recipe.uid not found"))
 
     val foundRecipe = Storage.getRecipe(recipeMacros.uid).getOrElse(
       throw new Exception(s"$recipeMacros.uid not found"))
@@ -144,14 +148,14 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach with BeforeAndAfterAl
   test("recipe saving with unknown ingredients errors") {
     val recipe = NewRecipe("testRecipe", List(AmountOfIngredient(8, RecipeId("fake_uid"))), 100, 50, "g")
     val recipeMacros = Storage.save(recipe)
-    assert(recipeMacros === Left(List(MissingIngredientError(RecipeId("fake_uid")))))
+    assert(recipeMacros === Right(Left(List(MissingIngredientError(RecipeId("fake_uid"))))))
   }
 
   test("search returns some stuff") {
     val newIngredient1 = NewIngredient("search test 1", 10, 20, 30, 40, 50, "g")
-    val ingredient1 = Storage.save(newIngredient1)
+    val ingredient1 = Storage.save(newIngredient1).getOrElse(throw new Exception("could not save ingredient"))
     val newIngredient2 = NewIngredient("search test 2", 1, 2, 3, 4, 5, "g")
-    val ingredient2 = Storage.save(newIngredient2)
+    val ingredient2 = Storage.save(newIngredient2).getOrElse(throw new Exception("could not save ingredient"))
     val foods = List(
       AmountOfIngredient(ingredient1.amount * 2, ingredient1.uid),
       AmountOfIngredient(ingredient2.amount * 2, ingredient2.uid))
