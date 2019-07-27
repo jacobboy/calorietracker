@@ -1,26 +1,25 @@
-import { Meal, Ingredient, Named, NDBed, AmountOf } from '../classes';
+import { Named, UIDed } from '../classes';
 import { DataSource } from '../ndbapi';
 import {
   getAllCustomIngredients,
-  getAllStoredIngredients,
   getAllRecipes,
  } from '../storage';
+import { AmountOfNamedMacros, NamedMacros, Meal } from 'src/client';
 
 export interface SavedState {
-  ndbs: Ingredient[];
-  ingredients: Ingredient[];
-  recipes: Ingredient[];
+  ingredients: NamedMacros[];
+  recipes: NamedMacros[];
 }
 
 export interface SearchState {
   searchString: string;
-  dataSource: DataSource;
-  items: (NDBed & Named)[];
+  dataSource: string;
+  items: (UIDed & Named)[];
 }
 
 export interface TrackingState {
   mealIdx?: number;
-  ingredient?: Ingredient;
+  ingredient?: NamedMacros;
 }
 
 export enum TopBitDisplay {
@@ -34,7 +33,7 @@ export enum Modals {
 export class TopBitState {
   display: TopBitDisplay;
   recipe: {
-    foods: AmountOf<Ingredient>[],
+    foods: AmountOfNamedMacros[],
     /* amount: number,
     unit: FOOD_UNIT */
   };
@@ -68,7 +67,6 @@ export const emptyState: StoreState = {
   },
   today: [],
   saved: {
-    ndbs: [],
     ingredients: [],
     recipes: []
   }
@@ -78,7 +76,6 @@ export const initialState: StoreState = {
   ...emptyState,
   saved: {
     ...emptyState.saved,
-    ndbs: getAllStoredIngredients(),
     ingredients: getAllCustomIngredients(),
     recipes: getAllRecipes()
   }

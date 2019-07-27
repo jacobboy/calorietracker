@@ -1,5 +1,6 @@
 * TODO Bugs
 ** copy recipe in, removing last ingredients, removes wrong amounts
+** clicking add to meal causes focus reset and amount reverts to 100
 ** enter on save recipe should submit
 ** Copy recipe doesn't keep total
 ** Adding to recipe via submit button does not keep ingredient amount
@@ -62,3 +63,11 @@
 ** will setting client.sendIngredient = jest.fn() affect other tests?
 ** how to patch a function in a tsx file?
 *** using jsx files to avoid TS not letting me overwrite client.saveIngredient
+
+* Course of actions
+** Create ingredient saga
+** Create recipe saga
+** Get most recent recipes and ingredients in front
+** Search in front
+** Meal support on backend
+** Track food saga adds to meal

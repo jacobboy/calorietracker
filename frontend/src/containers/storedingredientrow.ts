@@ -3,7 +3,7 @@ import { actions, Actions } from '../actions';
 import { StoreState, TopBitDisplay } from '../types/index';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { Ingredient, AmountOf } from '../classes';
+import { AmountOfNamedMacros } from 'src/client';
 
 function mapStateToProps(state: StoreState) {
   let foodComboNames: string[];
@@ -25,7 +25,7 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
     //       the dispatch on state?
     //       Or should it be the same action, and the reducer handles it differently?
     onTrackClick: (
-      ingredient: AmountOf<Ingredient>,
+      ingredient: AmountOfNamedMacros,
       topbitDisplay: TopBitDisplay,
       foodComboIdx: number
     ) => {

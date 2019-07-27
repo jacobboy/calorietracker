@@ -11,6 +11,7 @@
     "@types/redux-promise": "^0.5.28",
     "@types/uuid": "^3.4.4",
     "npm": "^6.4.1",
+    "portable-fetch": "^3.0.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-modal": "^3.6.1",

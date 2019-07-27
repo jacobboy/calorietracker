@@ -295,7 +295,7 @@ components:
         - amount
       properties:
         namedMacros:
-          $ref: '#components/schemas/NamedMacros'
+          $ref: '#/components/schemas/NamedMacros'
         amount:
           type: number
 
@@ -324,6 +324,7 @@ components:
       allOf:
         - $ref: '#/components/schemas/NamedMacros'
         - required:
+          - uid
           - foods
           - totalSize
           - portionSize
@@ -339,12 +340,13 @@ components:
 
     Meal:
       required:
+        - uid
         - foods
       properties:
         foods:
           type: array
           items:
-            $ref: '#/components/schemas/NamedMacros'
+            $ref: '#/components/schemas/AmountOfNamedMacros'
 
     Error:
       required:

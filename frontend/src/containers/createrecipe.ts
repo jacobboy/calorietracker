@@ -3,7 +3,7 @@ import { actions, Actions } from '../actions/';
 import { StoreState } from '../types/index';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { Ingredient, AmountOf } from '../classes';
+import { AmountOfNamedMacros } from 'src/client';
 
 function mapStateToProps(state: StoreState) {
   return {
@@ -13,14 +13,14 @@ function mapStateToProps(state: StoreState) {
 
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
-    handleFoodAmountChange: (food: AmountOf<Ingredient>, newAmount: number) => {
+    handleFoodAmountChange: (food: AmountOfNamedMacros, newAmount: number) => {
       dispatch(actions.changeRecipeFoodAmount(food, newAmount));
     },
-    handleRemoveFoodClick: (food: Ingredient) => {
+    handleRemoveFoodClick: (food: AmountOfNamedMacros) => {
       dispatch(actions.removeFoodFromRecipe(food));
     },
     handleSaveRecipeClick: (
-      name: string, foods: AmountOf<Ingredient>[], portionSize: number, totalSize: number, unit: string
+      name: string, foods: AmountOfNamedMacros[], portionSize: number, totalSize: number, unit: string
     ) => {
         dispatch(actions.saveRecipe(name, foods, portionSize, totalSize, unit));
     }

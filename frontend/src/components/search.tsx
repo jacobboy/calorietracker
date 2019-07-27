@@ -1,16 +1,16 @@
 import * as React from 'react';
-import { Named, NDBed } from '../classes';
 import { SearchIngredientRow } from '../components/searchingredientrow';
 import SearchIngredientRowContainer from '../containers/searchingredientrow';
 import { DataSource } from '../ndbapi';
 import StoredIngredients from '../containers/storedingredients';
 import StoredRecipes from '../containers/storedrecipes';
 import { tableStyle } from 'src/style';
+import { NamedMacros } from 'src/client';
 
 interface SearchComponentProps {
   searchString: string;
   dataSource: DataSource;
-  items: (NDBed & Named)[];
+  items: NamedMacros[];
   onDataSourceSelect: (ds: DataSource) => void;
   onFoodSearchInput: (searchString: string) => void;
   onFoodSearchSubmit: (searchString: string, ds: DataSource) => void;
@@ -87,12 +87,12 @@ export class SearchComponent extends React.Component<
           searchText={this.props.searchString || ''}
           focusRef={this.searchRef}
         />
-        USDA:
+        Search:
         <table style={tableStyle}>
           <tbody>
             {SearchIngredientRow.HEADER}
             {this.props.items.map(
-              (item) => <SearchIngredientRowContainer key={item.ndbno} item={item} />
+              (item) => <SearchIngredientRowContainer key={item.uid} item={item} />
             )}
           </tbody>
         </table>

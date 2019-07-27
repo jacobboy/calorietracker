@@ -3,8 +3,7 @@ import { actions, Actions } from '../actions/';
 import { StoreState } from '../types/index';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { NDBed } from '../classes';
-import { getIngredient } from '../lookup';
+import { NamedMacros } from 'src/client';
 
 function mapStateToProps(state: StoreState) {
   return {};
@@ -12,9 +11,7 @@ function mapStateToProps(state: StoreState) {
 
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
-    onSaveClick: (ndbed: NDBed) => {
-      getIngredient(ndbed).then((ingred) => dispatch(actions.saveIngredient(ingred)));
-    }
+    onSaveClick: (namedMacros: NamedMacros) => dispatch(actions.saveIngredient(namedMacros))
   };
 }
 

@@ -1,3 +1,5 @@
+import { AmountOfNamedMacros, Macros } from './client';
+
 export function scaleQuantity(q: number, from: number, to: number): number {
   const toPlace = .01;
   const newQ = round(q * to / from, toPlace);
@@ -15,4 +17,13 @@ export function round(value: number, toPlace: number) {
   } else {
     return 0.0;
   }
+}
+
+export function macrosFromAmount(food: AmountOfNamedMacros): Macros {
+  return {
+    protein: scaleQuantity(food.namedMacros.protein, food.namedMacros.amount, food.amount),
+    fat: scaleQuantity(food.namedMacros.fat, food.namedMacros.amount, food.amount),
+    carbs: scaleQuantity(food.namedMacros.carbs, food.namedMacros.amount, food.amount),
+    calories: scaleQuantity(food.namedMacros.calories, food.namedMacros.amount, food.amount),
+  };
 }

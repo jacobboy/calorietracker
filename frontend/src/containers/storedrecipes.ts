@@ -1,7 +1,6 @@
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { actions, Actions } from '../actions';
-import { Ingredient } from '../classes';
 import { StoredRecipes } from '../components/storedrecipes';
 import { StoreState } from '../types/index';
 
@@ -13,8 +12,8 @@ function mapStateToProps(state: StoreState) {
 
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
-    onCopyRecipeClick: (recipe: Ingredient) => {
-      dispatch(actions.addFoodsToRecipe(recipe));
+    onCopyRecipeClick: (recipeUid: string) => {
+      dispatch(actions.addFoodsToRecipe(recipeUid));
       dispatch(actions.createRecipeOpen());
     }
   };

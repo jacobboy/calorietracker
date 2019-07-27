@@ -1,8 +1,8 @@
 import { Actions } from '../actions';
 import { StoreState, TopBitDisplay } from '../types/index';
 import {
+  CREATE_INGREDIENT_SUCCEEDED,
   CREATE_INGREDIENT_TOGGLE,
-  CREATE_INGREDIENT_SUBMIT,
   CREATE_RECIPE_OPEN,
   ADD_FOOD_TO_RECIPE,
   REMOVE_FOOD_FROM_RECIPE,
@@ -21,7 +21,7 @@ import {
   ADD_FOODS_TO_RECIPE
 } from '../constants/index';
 import { dropIndex, replaceElement, replaceObject } from '../datautil';
-import { meal, Ingredient, Meal, AmountOf } from '../classes';
+import { AmountOfNamedMacros, Meal } from 'src/client';
 
 function mealIdxOrLast(state: StoreState, mealIdx?: number) {
   return mealIdx === undefined ? state.today.length - 1 : mealIdx;
@@ -29,7 +29,7 @@ function mealIdxOrLast(state: StoreState, mealIdx?: number) {
 
 function addFoodToMeal(
   state: StoreState,
-  payload: { mealIdx?: number; food: AmountOf<Ingredient> }
+  payload: { mealIdx?: number; food: AmountOfNamedMacros }
 ): StoreState {
   const idx = mealIdxOrLast(state, payload.mealIdx);
   const newMeal: Meal = state.today[idx].withFood(payload.food);
@@ -39,7 +39,7 @@ function addFoodToMeal(
 
 function removeFoodFromMeal(
   state: StoreState,
-  payload: { mealIdx: number; food: AmountOf<Ingredient> }
+  payload: { mealIdx: number; food: AmountOfNamedMacros }
 ) {
   const idx = mealIdxOrLast(state, payload.mealIdx);
   // console.log(`removing food ${JSON.stringify(payload.food)} from meal ${idx}`);
@@ -78,7 +78,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
     case ADD_MEAL:
       return {
         ...state,
-        today: [...state.today, meal([])]
+        today: [...state.today, {foods: []}]
       };
     case REMOVE_MEAL:
       return {
@@ -103,7 +103,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
           display: action.payload
         }
       };
-    case CREATE_INGREDIENT_SUBMIT:
+    case CREATE_INGREDIENT_SUCCEEDED:
       return {
         ...state,
         saved: {
