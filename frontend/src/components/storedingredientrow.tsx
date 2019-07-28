@@ -1,9 +1,11 @@
+
 import * as React from 'react';
-import { Ingredient, scaleFoodTo, AmountOf, amountOf } from '../classes';
 import { TopBitDisplay } from '../types';
 import { tdStyle, thStyle } from '../style';
 import { toTitleCase } from '../datautil';
 import { MathInput } from './mathinput';
+import { AmountOfNamedMacros, NamedMacros } from 'src/client';
+import { round } from 'src/transforms';
 
 export const Header = (
   <tr style={thStyle}>
@@ -20,44 +22,44 @@ export const Header = (
   </tr>
 );
 
-interface IngredientRowProps<T extends Ingredient> {
-  item: T;
+interface IngredientRowProps {
+  item: NamedMacros;
   topbitDisplay: TopBitDisplay;
   // TODO This is a weird approach - sending in a list of display names of recipes/meals,
   // and passing the index of that to the track handler to determine which recipe/meal to
   // add an ingredient to
   foodComboNames: string[];
   onTrackClick: (
-    ingredient: AmountOf<T>,
+    ingredient: AmountOfNamedMacros,
     topbitDisplay: TopBitDisplay,
     foodComboIdx: number
   ) => void;
-  onCopyClick?: (item: T) => void;
+  onCopyClick?: (item: NamedMacros) => void;
   focusRef: React.RefObject<HTMLElement>;
 }
 
-interface IngredientRowState<T extends Ingredient> {
-  scaledIngredient: AmountOf<T>;
+interface IngredientRowState {
+  scaledIngredient: AmountOfNamedMacros;
 }
 
-export class StoredIngredientRow<T extends Ingredient> extends React.Component<
-  IngredientRowProps<T>,
-  IngredientRowState<T>
+export class StoredIngredientRow extends React.Component<
+  IngredientRowProps,
+  IngredientRowState
 > {
-  constructor(props: IngredientRowProps<T>) {
+  constructor(props: IngredientRowProps) {
     super(props);
     this.state = {
-      scaledIngredient: amountOf(this.props.item)
+      scaledIngredient: {amount: this.props.item.amount, namedMacros: this.props.item}
     };
   }
 
   handleAmount(amount: number) {
-    this.setState({ scaledIngredient: scaleFoodTo(this.state.scaledIngredient, amount) });
+    this.setState({ scaledIngredient: {amount: amount, namedMacros: this.props.item}});
   }
 
   handleTrackFood(foodComboIdx: number, e?: React.FormEvent<HTMLFormElement>) {
     this.props.onTrackClick(this.state.scaledIngredient, this.props.topbitDisplay, foodComboIdx);
-    this.setState({ scaledIngredient: amountOf(this.props.item) });
+    this.setState({ scaledIngredient: {amount: this.props.item.amount, namedMacros: this.props.item }});
     if (e) {
       e.preventDefault();
     }
@@ -86,9 +88,14 @@ export class StoredIngredientRow<T extends Ingredient> extends React.Component<
     } else {
       copyCell = null; // this has gotta be bad form, right?
     }
+    const calcedCalories = (
+      this.state.scaledIngredient.namedMacros.protein * 4 +
+      this.state.scaledIngredient.namedMacros.fat * 9 +
+      this.state.scaledIngredient.namedMacros.carbs * 4
+    );
     return (
       <tr key={this.props.item.uid}>
-        {ingredientCell(toTitleCase(this.state.scaledIngredient.name))}
+        {ingredientCell(toTitleCase(this.state.scaledIngredient.namedMacros.name))}
         {ingredientCell(
           <form
             id={`trackFoodAmountForm_${this.props.item.uid}`}
@@ -104,14 +111,14 @@ export class StoredIngredientRow<T extends Ingredient> extends React.Component<
           </form>,
           'Amount input'
         )}
-        {ingredientCell(this.state.scaledIngredient.unit)}
-        {ingredientCell(this.state.scaledIngredient.fat.toFixed())}
-        {ingredientCell(this.state.scaledIngredient.fatPct)}
-        {ingredientCell(this.state.scaledIngredient.carbs.toFixed())}
-        {ingredientCell(this.state.scaledIngredient.carbsPct)}
-        {ingredientCell(this.state.scaledIngredient.protein.toFixed())}
-        {ingredientCell(this.state.scaledIngredient.proteinPct)}
-        {ingredientCell(this.state.scaledIngredient.calories.toFixed())}
+        {ingredientCell(this.state.scaledIngredient.namedMacros.unit)}
+        {ingredientCell(this.state.scaledIngredient.namedMacros.fat.toFixed())}
+        {ingredientCell(round(this.state.scaledIngredient.namedMacros.fat * 9 / calcedCalories, 1))}
+        {ingredientCell(this.state.scaledIngredient.namedMacros.carbs.toFixed())}
+        {ingredientCell(round(this.state.scaledIngredient.namedMacros.carbs * 4 / calcedCalories, 1))}
+        {ingredientCell(this.state.scaledIngredient.namedMacros.protein.toFixed())}
+        {ingredientCell(round(this.state.scaledIngredient.namedMacros.protein * 4 / calcedCalories, 1))}
+        {ingredientCell(this.state.scaledIngredient.namedMacros.calories.toFixed())}
         <td title="Add to" style={tdStyle}>
           Add to
           {this.props.foodComboNames.map((name, idx) =>

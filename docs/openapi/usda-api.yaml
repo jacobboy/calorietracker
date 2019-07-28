@@ -25,6 +25,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int32
         - name: ndbno
           in: query
           description: A list of up to 25 NDB numbers
@@ -176,7 +177,7 @@ components:
           type: string
         eqv:
           description: equivalent of the measure expressed as an eunit
-          type: number
+          type: integer
           format: int32
         eunit:
           description: >
@@ -188,7 +189,7 @@ components:
           type: string
         qty:
           description: Dunno, not in the docs
-          type: number
+          type: integer
           format: int32
       required:
         - label

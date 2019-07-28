@@ -1,19 +1,19 @@
 import * as React from 'react';
-import { Ingredient } from '../classes';
 import { tableStyle } from '../style';
 /* TODO pretty sure the below is definitely not how to import both */
 import { Header } from '../components/storedingredientrow';
 import StoredIngredientRow from '../containers/storedingredientrow';
 import { nameMatches } from '../datautil';
+import { NamedMacros } from 'src/client';
 
 type StoredRecipesProps = {
-  recipes: Ingredient[];
-  onCopyRecipeClick: (recipeIngredient: Ingredient) => void;
+  recipes: NamedMacros[];
+  onCopyRecipeClick: (recipeIngredient: NamedMacros) => void;
   searchText: string;
   focusRef: React.RefObject<HTMLElement>;
 };
 
-function findRecipes(recipes: Ingredient[], searchText: string) {
+function findRecipes(recipes: NamedMacros[], searchText: string) {
   return nameMatches(recipes, searchText);
 }
 

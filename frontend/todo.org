@@ -32,6 +32,7 @@
 ** find consistent solution to conversion/portion nomenclature
 
 * TODO Features
+** Account for fiber in carbs and carbs pct
 ** Recipe copy copies total amount if current recipe is empty
 ** Add notes to recipes
 ** should I be passing around objects that are an ingredient + an amount?
