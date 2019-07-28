@@ -703,7 +703,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchByName(q: string, sort?: string, limit?: number, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<NamedMacros> {
+        searchByName(q: string, sort?: string, limit?: number, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<NamedMacros[]> {
             const localVarFetchArgs = DefaultApiFetchParamCreator(configuration).searchByName(q, sort, limit, options);
             return (fetch: FetchAPI = portableFetch, basePath: string = BASE_PATH) => {
                 return fetch(basePath + localVarFetchArgs.url, localVarFetchArgs.options).then((response) => {

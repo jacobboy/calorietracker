@@ -4,12 +4,12 @@ import {
   CREATE_INGREDIENT_SUCCEEDED,
   CREATE_INGREDIENT_TOGGLE,
   CREATE_RECIPE_OPEN,
+  CREATE_RECIPE_SUCCEEDED,
   ADD_FOOD_TO_RECIPE,
   REMOVE_FOOD_FROM_RECIPE,
-  CREATE_RECIPE_SUBMIT,
   SELECT_DATASOURCE,
   FOODSEARCH_INPUT,
-  FOODSEARCH_SUBMIT,
+  FOODSEARCH_SUCCESS,
   ADD_FOOD_TO_MEAL,
   REMOVE_FOOD_FROM_MEAL,
   ADD_MEAL,
@@ -32,7 +32,8 @@ function addFoodToMeal(
   payload: { mealIdx?: number; food: AmountOfNamedMacros }
 ): StoreState {
   const idx = mealIdxOrLast(state, payload.mealIdx);
-  const newMeal: Meal = state.today[idx].withFood(payload.food);
+  const currentMeal = state.today[idx];
+  const newMeal: Meal = {uid: currentMeal.uid, foods: [...state.today[idx].foods, payload.food]};
   const today = replaceElement(state.today, idx, newMeal);
   return { ...state, today };
 }
@@ -42,8 +43,9 @@ function removeFoodFromMeal(
   payload: { mealIdx: number; food: AmountOfNamedMacros }
 ) {
   const idx = mealIdxOrLast(state, payload.mealIdx);
+  const currentMeal = state.today[idx];
   // console.log(`removing food ${JSON.stringify(payload.food)} from meal ${idx}`);
-  const newMeal = state.today[idx].withoutFood(payload.food);
+  const newMeal = {uid: currentMeal.uid, foods: state.today[idx].foods.filter(f => f !== payload.food)};
   const today = replaceElement(state.today, idx, newMeal);
   return { ...state, today };
 }
@@ -67,18 +69,19 @@ export function reducer(state: StoreState, action: Actions): StoreState {
           searchString: action.payload
         }
       };
-    case FOODSEARCH_SUBMIT:
+    case FOODSEARCH_SUCCESS:
       return {
         ...state,
         search: {
           ...state.search,
-          items: action.payload
+          items: action.payload.searchResults
         }
       };
     case ADD_MEAL:
       return {
         ...state,
-        today: [...state.today, {foods: []}]
+        // TODO lol
+        today: [...state.today, {uid: '12', foods: []}]
       };
     case REMOVE_MEAL:
       return {
@@ -154,6 +157,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
           ...state.topbit,
           recipe: {
             ...state.topbit.recipe,
+            // TODO copy total amount and all that if current recipe is empty
             foods: [...state.topbit.recipe.foods, ...action.payload.foods]
           }
         }
@@ -169,7 +173,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
           }
         }
       };
-    case CREATE_RECIPE_SUBMIT:
+    case CREATE_RECIPE_SUCCEEDED:
       return {
         ...state,
         topbit: {
@@ -186,7 +190,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
         ...state,
         saved: {
           ...state.saved,
-          ndbs: [...state.saved.ndbs, action.payload]
+          ingredients: [...state.saved.ingredients, action.payload]
         }
       };
     case CHANGE_DAY:

@@ -17,10 +17,13 @@ import {
   ADD_MEAL,
   REMOVE_MEAL,
   CHANGE_DAY,
-  CREATE_INGREDIENT_SUCCEEDED
+  CREATE_INGREDIENT_SUCCEEDED,
+  FOODSEARCH_SUCCESS,
+  COPY_RECIPE,
+  CREATE_RECIPE_SUCCEEDED
 } from '../constants/index';
 import { TopBitDisplay } from '../types';
-import { NamedMacros, AmountOfNamedMacros, NewIngredient } from 'src/client';
+import { NamedMacros, AmountOfNamedMacros, NewIngredient, Recipe } from 'src/client';
 import { FOOD_UNIT } from 'src/classes';
 
 export interface Action<T extends string> {
@@ -67,7 +70,7 @@ function createIngredientSubmit(
 }
 
 function changeRecipeFoodAmount(food: AmountOfNamedMacros, newAmount: number) {
-  const newFood = scaleFoodTo(food, newAmount);
+  const newFood: AmountOfNamedMacros = {amount: newAmount, namedMacros: food.namedMacros};
   return createAction(REPLACE_FOOD_IN_RECIPE, {from: food, to: newFood});
 }
 
@@ -75,35 +78,16 @@ function addFoodToRecipe(ingredient: AmountOfNamedMacros) {
   return createAction(ADD_FOOD_TO_RECIPE, ingredient);
 }
 
-function addFoodsToRecipe(recipeUid: string) {
-  /* loadRecipe(recipe.uid).then((r) => createAction(ADD_FOODS_TO_RECIPE, r.foods)); */
-  const recipe = loadRecipe(recipeIngredient.uid);
-  return createAction(ADD_FOODS_TO_RECIPE, recipe);
-}
-
-function removeFoodFromRecipe(food: AmountOfNamedMacros) {
-  return createAction(REMOVE_FOOD_FROM_RECIPE, food);
-}
-
 function saveRecipe(
   name: string, foods: AmountOfNamedMacros[], portionSize: number, totalSize?: number, unit?: string
 ) {
-  const recipe = makeRecipe(name, foods, portionSize, totalSize, unit);
-  return createAction(CREATE_RECIPE_SUBMIT, recipe);
-}
-
-function saveIngredient(ingredient: NamedMacros) {
-  return createAction(SAVE_INGREDIENT, ingredient);
+  return createAction(CREATE_RECIPE_SUBMIT, {name, foods, portionSize, totalSize, unit});
 }
 
 function changeMealFoodAmount(mealIdx: number, food: AmountOfNamedMacros, newAmount: number) {
-  const newFood = scaleFoodTo(food, newAmount);
+  const newFood: AmountOfNamedMacros = {amount: newAmount, namedMacros: food.namedMacros};
   return createAction(REPLACE_FOOD_IN_MEAL, {mealIdx, from: food, to: newFood});
 }
-
-/* function saveDay() {
-
-} */
 
 // TODO should actions be UI-driven or business logic driven?
 // perhaps business-driven and have the containers perform business/ui mapping?
@@ -111,6 +95,7 @@ export const actions = {
   selectDataSource: (dataSource: string) => createAction(SELECT_DATASOURCE, dataSource),
   foodSearchInput: (searchString: string) => createAction(FOODSEARCH_INPUT, searchString),
   foodSearchSubmit: (searchString: String, ds: String) => createAction(FOODSEARCH_SUBMIT, {searchString, ds}),
+  foodSearchSucceeded: (searchResults: NamedMacros[]) => createAction(FOODSEARCH_SUCCESS, {searchResults}),
   addMeal: () => createAction(ADD_MEAL),
   removeMeal: (mealIdx: number) => createAction(REMOVE_MEAL, mealIdx),
   changeMealFoodAmount,
@@ -123,12 +108,13 @@ export const actions = {
   createRecipeOpen: () => createAction(CREATE_RECIPE_OPEN),
   changeRecipeFoodAmount,
   addFoodToRecipe,
-  addFoodsToRecipe,
-  removeFoodFromRecipe,
+  copyRecipe: (recipeUid: string) => createAction(COPY_RECIPE, recipeUid),
+  createRecipeSucceeded: (recipe: Recipe) => createAction(CREATE_RECIPE_SUCCEEDED, recipe),
+  addFoodsToRecipe: (recipe: Recipe) => createAction(ADD_FOODS_TO_RECIPE, recipe),
+  removeFoodFromRecipe: (food: AmountOfNamedMacros) => createAction(REMOVE_FOOD_FROM_RECIPE, food),
   saveRecipe,
-  saveIngredient,
+  saveIngredient: (ingredient: NamedMacros) => createAction(SAVE_INGREDIENT, ingredient),
   setDay: (day: Date) => createAction(CHANGE_DAY, day),
-  /* saveDay */
 };
 
 // tslint:disable-next-line:no-any

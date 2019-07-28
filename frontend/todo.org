@@ -32,6 +32,7 @@
 ** find consistent solution to conversion/portion nomenclature
 
 * TODO Features
+** Recipe copy copies total amount if current recipe is empty
 ** Add notes to recipes
 ** should I be passing around objects that are an ingredient + an amount?
    then i won't need to be careful about scaling foods to 0, can always just take the original food

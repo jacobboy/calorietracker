@@ -1,4 +1,3 @@
-import { Named, UIDed } from '../classes';
 import { DataSource } from '../ndbapi';
 import {
   getAllCustomIngredients,
@@ -14,7 +13,7 @@ export interface SavedState {
 export interface SearchState {
   searchString: string;
   dataSource: string;
-  items: (UIDed & Named)[];
+  items: NamedMacros[];
 }
 
 export interface TrackingState {

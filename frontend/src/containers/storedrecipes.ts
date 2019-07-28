@@ -13,7 +13,7 @@ function mapStateToProps(state: StoreState) {
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
     onCopyRecipeClick: (recipeUid: string) => {
-      dispatch(actions.addFoodsToRecipe(recipeUid));
+      dispatch(actions.copyRecipe(recipeUid));
       dispatch(actions.createRecipeOpen());
     }
   };

@@ -219,7 +219,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NamedMacros'
+                type: array
+                items:
+                  $ref: '#/components/schemas/NamedMacros'
         default:
           description: unexpected error
           content:
