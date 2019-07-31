@@ -12,9 +12,83 @@ info:
   #   name: Apache 2.0
   #   url: https://www.apache.org/licenses/LICENSE-2.0.html
 servers:
-  - url: https://api.nal.usda.gov/ndb/V2/
+  - url: https://api.nal.usda.gov/ndb/
 paths:
-  /reports:
+  /search:
+    get:
+      description: |
+        A search request sends keyword queries and returns lists of foods
+        which contain one or more of the keywords in the food description,
+        scientific name, or commerical name fields. Search requests are a
+        good way to locate NDB numbers (NDBno) for the reports API as well
+        as for general discovery.
+      operationId: search
+      parameters:
+        - name: api_key
+          in: query
+          description: Must be a data.gov registered API key
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: q
+          in: query
+          description: Search terms
+          required: false
+          schema:
+            type: string
+        - name: ds
+          in: query
+          description: Data source. Must be either 'Branded Food Products' or 'Standard Reference'
+          required: false
+          schema:
+            type: string
+            enum: ['Branded Food Products', 'Standard Reference']
+        - name: fg
+          in: query
+          description: Food group ID
+          required: false
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Sort the results by food name (n) or by search relevance (r). Default 'r'.
+          required: false
+          schema:
+            type: string
+            enum: ['n', 'r']
+        - name: max
+          in: query
+          description: maximum rows to return. Default 50.
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: offset
+          in: query
+          description: beginning row in the result set to begin. Default 0.
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: format
+          in: query
+          description: >
+            json or xml. default JSON.
+            Format can also be sent in the request header: Content-Type: application/json or Content-Type:application/xml.
+          required: false
+          schema:
+            type: string
+            enum: ['json', 'xml']
+      responses:
+        '200':
+          description: Search response
+          content:
+            application/json:
+              schema:
+                $ref: SearchResponse
+
+  /V2/reports:
     get:
       description: Get a food report
       operationId: reports
@@ -24,13 +98,11 @@ paths:
           description: Must be a data.gov registered API key
           required: true
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: ndbno
           in: query
           description: A list of up to 25 NDB numbers
           required: true
-          style: form
           schema:
             type: array
             items:
@@ -39,16 +111,16 @@ paths:
           in: query
           description: "Report type: [b]asic or [f]ull or [s]tats. Default: basic"
           required: false
-          style: form
           schema:
             type: string
+            enum: ['b', 'f', 's']
         - name: format
           in: query
           description: "Report format: xml or json"
           required: false
-          style: form
           schema:
             type: string
+            enum: ['xml', 'json']
       responses:
         '200':
           description: Food reports
@@ -59,6 +131,87 @@ paths:
 
 components:
   schemas:
+    SearchResponse:
+      description: |
+        A search response consists of information about the results of the search such as the
+        total hits matching the query and the starting and ending points in the results list,
+        followed by a list of foods. Metadata for each food in the returned list includes the
+        food's description (name) and NDBno.
+      type: object
+      properties:
+        list:
+          $ref: '#/components/schemas/SearchList'
+
+    SearchList:
+      type: object
+      properties:
+        q:
+          description: terms requested and used in the search
+          type: string
+        sr:
+          description: Standard Release version of the data being reported
+          type: string
+        ds:
+          description: undocumented. anecdotally, has returned "all"
+          type: string
+        start:
+          description: beginning item in the list
+          type: integer
+          format: int32
+        end:
+          description: last item in the list
+          type: integer
+          format: int32
+        total:
+          description: >
+            total # of items returned by the search
+          type: integer
+          format: int32
+        group:
+          description: food group to which the food belongs
+          type: string
+        sort:
+          description: requested sort order (r=relevance or n=name)
+          type: string
+          enum: ['r', 'n']
+        item:
+          description: individual items on the list
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchItem'
+
+    SearchItem:
+      description: individual item in a response to a search
+      type: object
+      properties:
+        ndbno:
+          description: the food’s NDB Number
+          type: string
+        name:
+          description: the food’s name
+          type: string
+        offset:
+          description: beginning offset into the results list for the items in the list requested
+          type: integer
+          format: int32
+        group:
+          description: food group to which the food belongs
+          type: string
+        ds:
+          description: >
+            Data source: BL=Branded Food Products or SR=Standard Release
+          type: string
+        manu:
+          description: The foods manufacturer
+          type: string
+      required:
+        - ndbno
+        - name
+        - offset
+        - group
+        - ds
+        - manu
+
     FoodReport:
       properties:
         foods:
