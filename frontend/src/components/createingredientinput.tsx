@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { FOOD_UNIT } from '../classes';
+import { macroCalories } from 'src/transforms';
 
 interface CreateIngredientInputProps {
   handleSubmit: (
@@ -56,7 +57,7 @@ export class CreateIngredientInput extends React.Component<
       const value = Number(event.target.value);
       var newState: CreateIngredientInputState = {...this.state};
       newState[macronutrient] = value;
-      newState.calories = newState.fat * 9 + newState.carbs * 4 + newState.protein * 4;
+      newState.calories = macroCalories(newState);
       this.setState(newState);
     };
   }

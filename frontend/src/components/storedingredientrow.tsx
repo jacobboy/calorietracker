@@ -5,7 +5,7 @@ import { tdStyle, thStyle } from '../style';
 import { toTitleCase } from '../datautil';
 import { MathInput } from './mathinput';
 import { AmountOfNamedMacros, NamedMacros } from 'src/client';
-import { round } from 'src/transforms';
+import { round, macroPercents, macrosFromAmountOf } from 'src/transforms';
 
 export const Header = (
   <tr style={thStyle}>
@@ -88,11 +88,7 @@ export class StoredIngredientRow extends React.Component<
     } else {
       copyCell = null; // this has gotta be bad form, right?
     }
-    const calcedCalories = (
-      this.state.scaledIngredient.namedMacros.protein * 4 +
-      this.state.scaledIngredient.namedMacros.fat * 9 +
-      this.state.scaledIngredient.namedMacros.carbs * 4
-    );
+    const thisMacroPercents = macrosFromAmountOf(this.state.scaledIngredient);
     return (
       <tr key={this.props.item.uid}>
         {ingredientCell(toTitleCase(this.state.scaledIngredient.namedMacros.name))}
@@ -112,13 +108,13 @@ export class StoredIngredientRow extends React.Component<
           'Amount input'
         )}
         {ingredientCell(this.state.scaledIngredient.namedMacros.unit)}
-        {ingredientCell(this.state.scaledIngredient.namedMacros.fat.toFixed())}
-        {ingredientCell(round(this.state.scaledIngredient.namedMacros.fat * 9 / calcedCalories, 1))}
-        {ingredientCell(this.state.scaledIngredient.namedMacros.carbs.toFixed())}
-        {ingredientCell(round(this.state.scaledIngredient.namedMacros.carbs * 4 / calcedCalories, 1))}
-        {ingredientCell(this.state.scaledIngredient.namedMacros.protein.toFixed())}
-        {ingredientCell(round(this.state.scaledIngredient.namedMacros.protein * 4 / calcedCalories, 1))}
-        {ingredientCell(this.state.scaledIngredient.namedMacros.calories.toFixed())}
+        {ingredientCell(thisMacroPercents.fat)}
+        {ingredientCell(thisMacroPercents.fatPct)}
+        {ingredientCell(thisMacroPercents.carbs)}
+        {ingredientCell(thisMacroPercents.carbsPct)}
+        {ingredientCell(thisMacroPercents.protein)}
+        {ingredientCell(thisMacroPercents.proteinPct)}
+        {ingredientCell(thisMacroPercents.calories)}
         <td title="Add to" style={tdStyle}>
           Add to
           {this.props.foodComboNames.map((name, idx) =>

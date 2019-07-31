@@ -18,42 +18,6 @@ export enum FOOD_UNIT {
   'ml' = 'ml'
 }
 
-/* export interface Nutritional {
-  readonly fat: number;
-  readonly carbs: number;
-  readonly protein: number;
-  readonly calories: number;
-  readonly fatPct: number;
-  readonly carbsPct: number;
-  readonly proteinPct: number;
-} */
-
-/* abstract class AbstractNutritional implements Nutritional {
-  readonly fat: number;
-  readonly carbs: number;
-  readonly protein: number;
-  readonly calories: number;
-
-  get fatPct() {
-    return round(this.fat * 9 / this.calories, .01);
-  }
-  get carbsPct() {
-    return round(this.carbs * 4 / this.calories, .01);
-  }
-  get proteinPct() {
-    return round(this.protein * 4 / this.calories, .01);
-  }
-} */
-
-/* class NutritionalImpl extends AbstractNutritional {
-  constructor(
-    readonly fat: number,
-    readonly carbs: number,
-    readonly protein: number,
-    readonly calories: number
-  ) { super(); }
-} */
-
 export interface Named { readonly name: string; }
 
 export interface UIDed { readonly uid: string; }

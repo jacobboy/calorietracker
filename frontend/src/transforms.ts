@@ -1,5 +1,39 @@
 import { AmountOfNamedMacros, Macros } from './client';
 
+export function macrosFromAmountOf(macros: AmountOfNamedMacros): {
+  protein: number, fat: number, carbs: number, calories: number,
+  proteinPct: number, fatPct: number, carbsPct: number
+} {
+  const percents = macroPercents(macros.namedMacros);
+  return {
+    protein: scaleQuantity(macros.namedMacros.protein, macros.namedMacros.amount, macros.amount),
+    fat: scaleQuantity(macros.namedMacros.fat, macros.namedMacros.amount, macros.amount),
+    carbs: scaleQuantity(macros.namedMacros.carbs, macros.namedMacros.amount, macros.amount),
+    calories: scaleQuantity(macros.namedMacros.calories, macros.namedMacros.amount, macros.amount),
+    proteinPct: percents.proteinPct,
+    fatPct: percents.fatPct,
+    carbsPct: percents.carbsPct
+  };
+}
+
+export function macroPercents(macros: Macros): {
+  proteinPct: number, fatPct: number, carbsPct: number
+} {
+  // use calculated calories because otherwise you can get your math off if
+  // declared calories is rounded, or fiber taken into account.  there's a todo for
+  // handling fiber.
+  const calories = macroCalories(macros);
+  return {
+    proteinPct: round(macros.protein * 9 / calories, 1),
+    fatPct: round(macros.fat * 9 / calories, 1),
+    carbsPct: round(macros.carbs * 9 / calories, 1)
+  };
+}
+
+export function macroCalories(macros: Macros): number {
+  return macros.protein * 9 + macros.fat * 4 + macros.carbs * 4;
+}
+
 export function scaleQuantity(q: number, from: number, to: number): number {
   const toPlace = .01;
   const newQ = round(q * to / from, toPlace);
@@ -17,13 +51,4 @@ export function round(value: number, toPlace: number) {
   } else {
     return 0.0;
   }
-}
-
-export function macrosFromAmount(food: AmountOfNamedMacros): Macros {
-  return {
-    protein: scaleQuantity(food.namedMacros.protein, food.namedMacros.amount, food.amount),
-    fat: scaleQuantity(food.namedMacros.fat, food.namedMacros.amount, food.amount),
-    carbs: scaleQuantity(food.namedMacros.carbs, food.namedMacros.amount, food.amount),
-    calories: scaleQuantity(food.namedMacros.calories, food.namedMacros.amount, food.amount),
-  };
 }

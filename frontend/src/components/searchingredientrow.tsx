@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { Named, NDBed, Ingredient } from '../classes';
-import { getIngredient } from '../lookup';
 import { tdStyle, thStyle, searchLinkStyle } from 'src/style';
 import { toTitleCase } from 'src/datautil';
+import { SearchItem } from 'src/usdaclient';
+import { Macros } from 'src/client';
+import { getMacrosFromSearchItem } from 'src/ndbapi';
 
 function ingredientCell(contents: string | number | JSX.Element, title?: string) {
   title = title || contents.toString();
@@ -10,12 +11,12 @@ function ingredientCell(contents: string | number | JSX.Element, title?: string)
 }
 
 interface SearchIngredientRowProps {
-  item: NDBed & Named;
-  onSaveClick: (ingredientable: NDBed) => void;
+  item: SearchItem;
+  onSaveClick: (searchItem: SearchItem) => void;
 }
 
 interface SearchIngredientRowState {
-  ingred?: Ingredient;
+  ndbNoAndMacros?: {ndbNo: string, macros: Macros};
  }
 
 export class SearchIngredientRow extends React.Component<
@@ -43,7 +44,7 @@ export class SearchIngredientRow extends React.Component<
   }
 
   handleDetailsClick() {
-    getIngredient(this.props.item, false).then((ingred) => this.setState({ ingred }));
+    getMacrosFromSearchItem(this.props.item).then((ingred) => this.setState({ndbNoAndMacros: ingred}));
   }
 
   render() {
@@ -55,7 +56,7 @@ export class SearchIngredientRow extends React.Component<
     >
       {toTitleCase(this.props.item.name)}
     </a>);
-    if (this.state.ingred === undefined) {
+    if (this.state.ndbNoAndMacros === undefined) {
       return (
         <tr>
           {ingredientCell(link, this.props.item.name)}
@@ -81,18 +82,20 @@ export class SearchIngredientRow extends React.Component<
         </tr >
       );
     } else {
+      const macros = this.state.ndbNoAndMacros.macros;
+      const thisMacroPercents = macrosFromAmountOf(this.state.scaledIngredient);
       return (
         <tr>
           {ingredientCell(link, this.props.item.name)}
-          {ingredientCell(this.state.ingred.amount)}
-          {ingredientCell(this.state.ingred.unit)}
-          {ingredientCell(this.state.ingred.fat.toFixed())}
-          {ingredientCell(this.state.ingred.fatPct)}
-          {ingredientCell(this.state.ingred.carbs.toFixed())}
-          {ingredientCell(this.state.ingred.carbsPct)}
-          {ingredientCell(this.state.ingred.protein.toFixed())}
-          {ingredientCell(this.state.ingred.proteinPct)}
-          {ingredientCell(this.state.ingred.calories)}
+          {ingredientCell(macros.amount)}
+          {ingredientCell(macros.unit)}
+          {ingredientCell(macros.fat.toFixed())}
+          {ingredientCell(macros.fatPct)}
+          {ingredientCell(macros.carbs.toFixed())}
+          {ingredientCell(macros.carbsPct)}
+          {ingredientCell(macros.protein.toFixed())}
+          {ingredientCell(macros.proteinPct)}
+          {ingredientCell(macros.calories)}
           <td style={tdStyle}/>
           <td style={tdStyle}>
             <button onClick={() => this.props.onSaveClick(this.props.item)}>
