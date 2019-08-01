@@ -1,15 +1,26 @@
-import { AmountOfNamedMacros, Macros } from './client';
+import { Macros, AmountOfNamedMacros } from './client';
 
-export function macrosFromAmountOf(macros: AmountOfNamedMacros): {
+export function macrosFromAmountOfNamedMacros(amountOfNamedMacros: AmountOfNamedMacros): {
+    protein: number, fat: number, carbs: number, calories: number,
+    proteinPct: number, fatPct: number, carbsPct: number
+  } {
+    return macrosFromAmountOf(
+      amountOfNamedMacros.namedMacros,
+      amountOfNamedMacros.namedMacros.amount,
+      amountOfNamedMacros.amount
+    );
+  }
+
+export function macrosFromAmountOf(macros: Macros, from: number, to: number): {
   protein: number, fat: number, carbs: number, calories: number,
   proteinPct: number, fatPct: number, carbsPct: number
 } {
-  const percents = macroPercents(macros.namedMacros);
+  const percents = macroPercents(macros);
   return {
-    protein: scaleQuantity(macros.namedMacros.protein, macros.namedMacros.amount, macros.amount),
-    fat: scaleQuantity(macros.namedMacros.fat, macros.namedMacros.amount, macros.amount),
-    carbs: scaleQuantity(macros.namedMacros.carbs, macros.namedMacros.amount, macros.amount),
-    calories: scaleQuantity(macros.namedMacros.calories, macros.namedMacros.amount, macros.amount),
+    protein: scaleQuantity(macros.protein, from, to),
+    fat: scaleQuantity(macros.fat, from, to),
+    carbs: scaleQuantity(macros.carbs, from, to),
+    calories: scaleQuantity(macros.calories, from, to),
     proteinPct: percents.proteinPct,
     fatPct: percents.fatPct,
     carbsPct: percents.carbsPct

@@ -13,7 +13,9 @@ const PROTEIN_ID = '203';
 const FAT_ID = '204';
 const CARB_ID = '205';
 
-export function getMacrosFromSearchItem(searchItem: SearchItem): Promise<{ndbNo: string, macros: Macros}> {
+export function getMacrosFromSearchItem(searchItem: SearchItem): Promise<{
+  ndbNo: string, macros: Macros, amount: number, unit: string
+}> {
   return new DefaultApi().reports(
     {apiKey: GOV_API_KEY, ndbno: [searchItem.ndbno]}
     ).then(
@@ -21,7 +23,7 @@ export function getMacrosFromSearchItem(searchItem: SearchItem): Promise<{ndbNo:
     );
   }
 
-function macrosFromFood(food: FoodFood): {ndbNo: string, macros: Macros} {
+function macrosFromFood(food: FoodFood): {ndbNo: string, macros: Macros, amount: number, unit: string} {
     return {
       ndbNo: food.desc.ndbno,
       macros: {
@@ -29,7 +31,11 @@ function macrosFromFood(food: FoodFood): {ndbNo: string, macros: Macros} {
         fat: findNutrient(food, FAT_ID),
         carbs: findNutrient(food, CARB_ID),
         calories: findNutrient(food, CALORIES_ID)
-      }
+      },
+      // https://ndb.nal.usda.gov/ndb/doc/apilist/API-FOOD-REPORTV2.md
+      // states that values are expressed in amount per 100g
+      amount: 100,
+      unit: food.desc.ru
     };
   }
 

@@ -4,6 +4,7 @@ import { toTitleCase } from 'src/datautil';
 import { SearchItem } from 'src/usdaclient';
 import { Macros } from 'src/client';
 import { getMacrosFromSearchItem } from 'src/ndbapi';
+import { macrosFromAmountOf } from 'src/transforms';
 
 function ingredientCell(contents: string | number | JSX.Element, title?: string) {
   title = title || contents.toString();
@@ -16,7 +17,7 @@ interface SearchIngredientRowProps {
 }
 
 interface SearchIngredientRowState {
-  ndbNoAndMacros?: {ndbNo: string, macros: Macros};
+  ndbNoAndMacros?: {ndbNo: string, macros: Macros, amount: number, unit: string};
  }
 
 export class SearchIngredientRow extends React.Component<
@@ -83,18 +84,20 @@ export class SearchIngredientRow extends React.Component<
       );
     } else {
       const macros = this.state.ndbNoAndMacros.macros;
-      const thisMacroPercents = macrosFromAmountOf(this.state.scaledIngredient);
+      const thisMacroPercents = macrosFromAmountOf(
+        macros, 1, 1
+      );
       return (
         <tr>
           {ingredientCell(link, this.props.item.name)}
-          {ingredientCell(macros.amount)}
-          {ingredientCell(macros.unit)}
+          {ingredientCell(this.state.ndbNoAndMacros.amount)}
+          {ingredientCell(this.state.ndbNoAndMacros.unit)}
           {ingredientCell(macros.fat.toFixed())}
-          {ingredientCell(macros.fatPct)}
+          {ingredientCell(thisMacroPercents.fatPct)}
           {ingredientCell(macros.carbs.toFixed())}
-          {ingredientCell(macros.carbsPct)}
+          {ingredientCell(thisMacroPercents.carbsPct)}
           {ingredientCell(macros.protein.toFixed())}
-          {ingredientCell(macros.proteinPct)}
+          {ingredientCell(thisMacroPercents.proteinPct)}
           {ingredientCell(macros.calories)}
           <td style={tdStyle}/>
           <td style={tdStyle}>

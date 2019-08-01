@@ -5,7 +5,7 @@ import { tdStyle, thStyle } from '../style';
 import { toTitleCase } from '../datautil';
 import { MathInput } from './mathinput';
 import { AmountOfNamedMacros, NamedMacros } from 'src/client';
-import { round, macroPercents, macrosFromAmountOf } from 'src/transforms';
+import { macrosFromAmountOfNamedMacros } from 'src/transforms';
 
 export const Header = (
   <tr style={thStyle}>
@@ -88,7 +88,7 @@ export class StoredIngredientRow extends React.Component<
     } else {
       copyCell = null; // this has gotta be bad form, right?
     }
-    const thisMacroPercents = macrosFromAmountOf(this.state.scaledIngredient);
+    const thisMacroPercents = macrosFromAmountOfNamedMacros(this.state.scaledIngredient);
     return (
       <tr key={this.props.item.uid}>
         {ingredientCell(toTitleCase(this.state.scaledIngredient.namedMacros.name))}
