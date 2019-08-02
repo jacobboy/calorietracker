@@ -2,17 +2,18 @@ import * as React from 'react';
 import { thStyle, tableStyle } from '../style';
 import { IngredientsTable } from './ingredientstable';
 import { macrosFromFoods } from 'src/transforms';
+import { Meal, AmountOfNamedMacros } from 'src/client';
 
 interface MealsComponentProps {
   today: Meal[];
   handleFoodAmountChange: (
     mealIdx: number,
-    food: Ingredient,
+    food: AmountOfNamedMacros,
     newAmount: number
   ) => void;
   handleAddMealClick: () => void;
   handleDeleteMealClick: (mealIdx: number) => void;
-  handleRemoveFoodClick: (mealIdx: number, food: Ingredient) => void;
+  handleRemoveFoodClick: (mealIdx: number, food: AmountOfNamedMacros) => void;
 }
 
 export class MealsComponent extends React.Component<MealsComponentProps, {}> {
@@ -44,7 +45,7 @@ export class MealsComponent extends React.Component<MealsComponentProps, {}> {
     const rows = [];
     for (let mealIdx = 0; mealIdx < this.props.today.length; mealIdx++) {
       const meal: Meal = this.props.today[mealIdx];
-      const removeHandler = (food: Ingredient) => {
+      const removeHandler = (food: AmountOfNamedMacros) => {
         this.props.handleRemoveFoodClick(mealIdx, food);
       };
       const deleteHandler = () => {
@@ -64,7 +65,8 @@ export class MealsComponent extends React.Component<MealsComponentProps, {}> {
   }
 
   totalRow() {
-    const macros = macrosFromFoods(this.props.today);
+    const allFoods: AmountOfNamedMacros[][] = this.props.today.map((meal) => meal.foods);
+    const macros = macrosFromFoods([].concat.apply([], allFoods));
     return (
       <tr>
         <th style={thStyle}>Day Total</th>
