@@ -1,8 +1,10 @@
-import { Ingredient, FOOD_UNIT, macrosFromFoods } from '../classes';
+import { FOOD_UNIT } from '../classes';
 import * as React from 'react';
 import { tdStyle, thStyle } from '../style';
 import { toTitleCase } from '../datautil';
 import { MathInput } from './mathinput';
+import { AmountOfNamedMacros } from 'src/client';
+import { macrosFromFoods, macrosFromAmountOfNamedMacros } from 'src/transforms';
 
 export function headerCell(text: string) {
   return <th title={text.toString()} style={thStyle}>{text}</th>;
@@ -32,14 +34,14 @@ export function mealCell(text: string | number | JSX.Element, key?: string, id?:
 
 interface IngredientRowProps {
   idx: number;
-  food: Ingredient;
-  handleRemoveFoodClick: (food: Ingredient) => void;
-  handleFoodAmountChange?: (food: Ingredient, newAmount: number) => void;
+  food: AmountOfNamedMacros;
+  handleRemoveFoodClick: (food: AmountOfNamedMacros) => void;
+  handleFoodAmountChange?: (food: AmountOfNamedMacros, newAmount: number) => void;
 }
 
 interface IngredientRowState {
   amount: number;
-  handleFoodAmountChange: (food: Ingredient, newAmount: number) => void;
+  handleFoodAmountChange: (food: AmountOfNamedMacros, newAmount: number) => void;
 }
 
 class IngredientRow extends React.Component<IngredientRowProps, IngredientRowState> {
@@ -53,7 +55,7 @@ class IngredientRow extends React.Component<IngredientRowProps, IngredientRowSta
     if (this.props.handleFoodAmountChange) {
       handleFoodAmountChange = this.props.handleFoodAmountChange;
     } else {
-      handleFoodAmountChange = (food: Ingredient, newAmount: number) => {/*  */};
+      handleFoodAmountChange = (food: AmountOfNamedMacros, newAmount: number) => {/*  */};
     }
     this.state = {
       amount: this.props.food.amount,
@@ -61,7 +63,7 @@ class IngredientRow extends React.Component<IngredientRowProps, IngredientRowSta
     };
   }
 
-  handleFoodAmountChange(food: Ingredient, amount: number) {
+  handleFoodAmountChange(food: AmountOfNamedMacros, amount: number) {
     if (amount > 0) {
       this.setState({ amount });
       this.state.handleFoodAmountChange(food, amount);
@@ -76,7 +78,8 @@ class IngredientRow extends React.Component<IngredientRowProps, IngredientRowSta
     if (this.props.handleFoodAmountChange) {
       amountElement = (
         <MathInput
-          id={`foodAmountInput_${this.props.food.uid}`}
+          // TODO is this id needed?
+          /* id={`foodAmountInput_${this.props.food.uid}`} */
           amount={this.state.amount}
           onChange={amount => this.handleFoodAmountChange(this.props.food, amount)}
         />
@@ -84,21 +87,24 @@ class IngredientRow extends React.Component<IngredientRowProps, IngredientRowSta
     } else {
       amountElement = this.state.amount;
     }
+
+    const macros = macrosFromAmountOfNamedMacros(this.props.food);
     return (
       <tr key={`food_${this.props.idx}`} id={'food'}>
-        {ingredientCell(toTitleCase(this.props.food.name), 'name')}
+        {ingredientCell(toTitleCase(this.props.food.namedMacros.name), 'name')}
         {ingredientCell(amountElement, `amount`, 'amount')}
-        {ingredientCell(this.props.food.unit, 'unit')}
-        {ingredientCell(this.props.food.fat, 'fat')}
-        {ingredientCell(this.props.food.fatPct, 'fatPct')}
-        {ingredientCell(this.props.food.carbs, 'carbs')}
-        {ingredientCell(this.props.food.carbsPct, 'carbsPct')}
-        {ingredientCell(this.props.food.protein, 'protein')}
-        {ingredientCell(this.props.food.proteinPct, 'proteinPct')}
-        {ingredientCell(this.props.food.calories, 'calories')}
+        {ingredientCell(this.props.food.namedMacros.unit, 'unit')}
+        {ingredientCell(macros.fat, 'fat')}
+        {ingredientCell(macros.fatPct, 'fatPct')}
+        {ingredientCell(macros.carbs, 'carbs')}
+        {ingredientCell(macros.carbsPct, 'carbsPct')}
+        {ingredientCell(macros.protein, 'protein')}
+        {ingredientCell(macros.proteinPct, 'proteinPct')}
+        {ingredientCell(macros.calories, 'calories')}
         <td key={`button`} style={tdStyle}>
           <button
-            id={`removeFood_${this.props.food.uid}`}
+            // TODO is this id necessary?
+            /* id={`removeFood_${this.props.food.uid}`} */
             onClick={() => this.props.handleRemoveFoodClick(this.props.food)}
           >
             Remove
@@ -109,8 +115,8 @@ class IngredientRow extends React.Component<IngredientRowProps, IngredientRowSta
   }
 }
 
-interface IngredientsTableProps<T extends Ingredient> {
-  foods: Ingredient[];
+interface IngredientsTableProps<T extends AmountOfNamedMacros> {
+  foods: AmountOfNamedMacros[];
   handleFoodAmountChange?: (food: T, newAmount: number) => void;
   handleRemoveFoodClick: (food: T) => void;
   handleDeleteAllClick: () => void;
@@ -120,7 +126,7 @@ interface IngredientsTableProps<T extends Ingredient> {
   unit?: FOOD_UNIT;
 }
 
-export class IngredientsTable<T extends Ingredient> extends React.Component<
+export class IngredientsTable<T extends AmountOfNamedMacros> extends React.Component<
   IngredientsTableProps<T>, {}
   > {
 
@@ -146,7 +152,7 @@ export class IngredientsTable<T extends Ingredient> extends React.Component<
     super(props);
   }
 
-  makeTotalRow(foods: Ingredient[]) {
+  makeTotalRow(foods: AmountOfNamedMacros[]) {
     let amountCell;
     let unitCell;
     // TODO need to verify amount/unit is passed in if their respective handlers are.
