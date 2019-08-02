@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Ingredient, Meal, macrosFromFoods } from '../classes';
 import { thStyle, tableStyle } from '../style';
 import { IngredientsTable } from './ingredientstable';
+import { macrosFromFoods } from 'src/transforms';
 
 interface MealsComponentProps {
   today: Meal[];

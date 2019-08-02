@@ -1,9 +1,30 @@
 import { Macros, AmountOfNamedMacros } from './client';
 
-export function macrosFromAmountOfNamedMacros(amountOfNamedMacros: AmountOfNamedMacros): {
-    protein: number, fat: number, carbs: number, calories: number,
-    proteinPct: number, fatPct: number, carbsPct: number
-  } {
+export interface MacrosAndPercents extends Macros {
+  proteinPct: number;
+  fatPct: number;
+  carbsPct: number;
+}
+
+export function macrosFromFoods(foods: AmountOfNamedMacros[]): MacrosAndPercents {
+  const calories = foods.reduce(
+    (l, r) => l + scaleQuantity(r.namedMacros.calories, r.namedMacros.amount, r.amount), 0
+  );
+  const fat = foods.reduce(
+    (l, r) => l + scaleQuantity(r.namedMacros.fat, r.namedMacros.amount, r.amount), 0
+  );
+  const carbs = foods.reduce(
+    (l, r) => l + scaleQuantity(r.namedMacros.carbs, r.namedMacros.amount, r.amount), 0
+  );
+  const protein = foods.reduce(
+    (l, r) => l + scaleQuantity(r.namedMacros.protein, r.namedMacros.amount, r.amount), 0
+  );
+  return macrosFromAmountOf({fat, carbs, protein, calories}, 1, 1);
+}
+
+export function macrosFromAmountOfNamedMacros(
+  amountOfNamedMacros: AmountOfNamedMacros
+): MacrosAndPercents {
     return macrosFromAmountOf(
       amountOfNamedMacros.namedMacros,
       amountOfNamedMacros.namedMacros.amount,
@@ -11,10 +32,7 @@ export function macrosFromAmountOfNamedMacros(amountOfNamedMacros: AmountOfNamed
     );
   }
 
-export function macrosFromAmountOf(macros: Macros, from: number, to: number): {
-  protein: number, fat: number, carbs: number, calories: number,
-  proteinPct: number, fatPct: number, carbsPct: number
-} {
+export function macrosFromAmountOf(macros: Macros, from: number, to: number): MacrosAndPercents {
   const percents = macroPercents(macros);
   return {
     protein: scaleQuantity(macros.protein, from, to),

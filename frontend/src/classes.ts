@@ -1,11 +1,3 @@
-import { Macros } from './client';
-
-export enum MACROS {
-  'fat' = 'fat',
-  'carbs' = 'carbs',
-  'protein' = 'protein'
-}
-
 /* function ingredientId() { return getIngredientKey(uuid.v4()); }
 function ndbnoId(ndbno: string) { return getNdbKey(ndbno); }
 function amountOfId() { return getAmountOfKey(uuid.v4()); }
@@ -20,13 +12,11 @@ export enum FOOD_UNIT {
 
 export interface Named { readonly name: string; }
 
-export interface UIDed { readonly uid: string; }
-
-export interface Quantifiable extends Named {
+/* export interface Quantifiable extends Named {
   readonly amount: number;
   readonly unit: string;
 }
-
+ */
 /* export interface Ingredient extends Nutritional, Quantifiable, UIDed { } */
 
 /* export interface AmountOf<T extends Ingredient> extends Ingredient {
@@ -286,11 +276,3 @@ export function recipeFromJson (jsonStr: string): Recipe {
 /* export function meal(foods: AmountOfNamedMacros[]): Meal {
   return new MealImpl(foods);
 } */
-
-export function macrosFromFoods(foods: Macros[]): Macros {
-  const calories = foods.reduce((l, r) => l + r.calories, 0);
-  const fat = foods.reduce((l, r) => l + r.fat, 0);
-  const carbs = foods.reduce((l, r) => l + r.carbs, 0);
-  const protein = foods.reduce((l, r) => l + r.protein, 0);
-  return {fat, carbs, protein, calories};
-}

@@ -1,15 +1,17 @@
-import { Ingredient, FOOD_UNIT, macrosFromFoods, AmountOf } from '../classes';
+import { FOOD_UNIT } from '../classes';
 import * as React from 'react';
 import { tableStyle } from '../style';
 import { IngredientsTable, mealCell } from './ingredientstable';
 import { currentDate } from '../datautil';
+import { AmountOfNamedMacros } from 'src/client';
+import { macrosFromFoods } from 'src/transforms';
 
 interface CreateRecipeInputProps {
-  foods: AmountOf<Ingredient>[];
-  handleFoodAmountChange: (food: AmountOf<Ingredient>, newAmount: number) => void;
-  handleRemoveFoodClick: (food: AmountOf<Ingredient>) => void;
+  foods: AmountOfNamedMacros[];
+  handleFoodAmountChange: (food: AmountOfNamedMacros, newAmount: number) => void;
+  handleRemoveFoodClick: (food: AmountOfNamedMacros) => void;
   handleSaveRecipeClick: (name: string,
-                          foods: AmountOf<Ingredient>[],
+                          foods: AmountOfNamedMacros[],
                           portionSize: number,
                           totalSize: number,
                           unit: string) => void;
