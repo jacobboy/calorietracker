@@ -34,6 +34,9 @@ export function mealCell(text: string | number | JSX.Element, key?: string, id?:
 
 interface IngredientRowProps {
   idx: number;
+  // TODO don't like the row being aware of the table, this is a testing hack
+  //      that I should learn to do better
+  tableIdx: number;
   food: AmountOfNamedMacros;
   handleRemoveFoodClick: (food: AmountOfNamedMacros) => void;
   handleFoodAmountChange?: (food: AmountOfNamedMacros, newAmount: number) => void;
@@ -103,8 +106,8 @@ class IngredientRow extends React.Component<IngredientRowProps, IngredientRowSta
         {ingredientCell(macros.calories, 'calories')}
         <td key={`button`} style={tdStyle}>
           <button
-            // TODO is this id necessary?
-            /* id={`removeFood_${this.props.food.uid}`} */
+            // id for testing
+            id={`removeFood_${this.props.tableIdx}_${this.props.idx}`}
             onClick={() => this.props.handleRemoveFoodClick(this.props.food)}
           >
             Remove
@@ -117,6 +120,7 @@ class IngredientRow extends React.Component<IngredientRowProps, IngredientRowSta
 
 interface IngredientsTableProps<T extends AmountOfNamedMacros> {
   foods: AmountOfNamedMacros[];
+  idx: number;
   handleFoodAmountChange?: (food: T, newAmount: number) => void;
   handleRemoveFoodClick: (food: T) => void;
   handleDeleteAllClick: () => void;
@@ -221,6 +225,7 @@ export class IngredientsTable<T extends AmountOfNamedMacros> extends React.Compo
         food={food}
         handleFoodAmountChange={this.props.handleFoodAmountChange}
         handleRemoveFoodClick={this.props.handleRemoveFoodClick}
+        tableIdx={this.props.idx}
         idx={i}
       />));
       /* rows.push(React.createElement(IngredientRow, {

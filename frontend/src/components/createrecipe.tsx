@@ -130,6 +130,7 @@ export class CreateRecipeInput extends React.Component<
             {IngredientsTable.headerRow()}
             <IngredientsTable
                foods={this.props.foods}
+               idx={1}
                handleFoodAmountChange={this.props.handleFoodAmountChange}
                handleRemoveFoodClick={this.props.handleRemoveFoodClick}
                handleDeleteAllClick={() => null}

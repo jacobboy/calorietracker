@@ -1,26 +1,33 @@
 import * as React from 'react';
 import { MealsComponent } from '../components/meals';
 import { mount, ReactWrapper } from 'enzyme';
-import { Meal, meal, Ingredient, makeIngredient, FOOD_UNIT, AmountOf } from '../classes';
+import { FOOD_UNIT } from '../classes';
+import { Meal, AmountOfNamedMacros } from 'src/client';
 
 function mockMeals(nMeals: number, nFoods: number): Meal[] {
     const meals: Meal[] = [];
     for (let i = 0; i < nMeals; i++) {
-        const foods: AmountOf<Ingredient>[] = [];
+        const foods: AmountOfNamedMacros[] = [];
         for (let j = 0; j < nFoods; j++) {
-            const food = makeIngredient(
-                'ingredient_' + i.toString + j.toString(),
-                i * 10 + j,
-                i * 10 + j,
-                i * 10 + j,
-                i * 10 + j,
-                i * 10 + j,
-                FOOD_UNIT.g,
-                false
-            );
+            const food: AmountOfNamedMacros = {
+              amount: i * 10 + j,
+              namedMacros: {
+                uid: 'ingredient_' + i.toString + j.toString(),
+                name: 'ingredient_' + i.toString + j.toString(),
+                protein: i * 10 + j,
+                fat: i * 10 + j,
+                carbs: i * 10 + j,
+                calories: i * 10 + j,
+                amount: i * 10 + j,
+                unit: FOOD_UNIT.g,
+              }
+            };
             foods.push(food);
         }
-        meals.push(meal(foods));
+        meals.push({
+          uid: 'meal_' + i.toString(),
+          foods
+        });
     }
     return meals;
 }
@@ -59,7 +66,7 @@ describe('When the meals component is selected', () => {
     for (let foodIdx = 0; foodIdx < nMeals; foodIdx++) {
       it(`should submit ingredient ${foodIdx} on meal ${mealIdx}`, () => {
           const foodToRemove = today[mealIdx].foods[foodIdx];
-          wrapper.find('#removeFood_' + foodToRemove.uid).simulate('click');
+          wrapper.find(`#removeFood_${mealIdx}_${foodIdx}`).simulate('click');
           expect(mockRemoveFood.mock.calls.length).toBe(1);
           expect(mockRemoveFood.mock.calls[0][0]).toBe(mealIdx);
           expect(mockRemoveFood.mock.calls[0][1]).toBe(foodToRemove);

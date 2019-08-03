@@ -2,29 +2,36 @@ import * as React from 'react';
 import * as enzyme from 'enzyme';
 import MealsComponent from './meals';
 import { mount } from 'enzyme';
-import { meal, makeIngredient, FOOD_UNIT, Meal } from '../classes';
+import { FOOD_UNIT } from '../classes';
 import { AnyAction, createStore, Store } from 'redux';
 import { reducer } from '../reducers';
 import { Provider } from 'react-redux';
+import { Meal, AmountOfNamedMacros } from 'src/client';
 
-function mockMeals (nMeals: number, nFoods: number) {
-  const meals = [];
+function mockMeals(nMeals: number, nFoods: number): Meal[] {
+  const meals: Meal[] = [];
   for (let i = 0; i < nMeals; i++) {
-    const foods = [];
-    for (let j = 0; j < nFoods; j++) {
-      const food = makeIngredient(
-        'ingredient_' + i.toString() + j.toString(),
-        i * 10 + j,
-        i * 10 + j,
-        i * 10 + j,
-        i * 10 + j,
-        i * 10 + j,
-        FOOD_UNIT.g,
-        false
-      );
-      foods.push(food);
-    }
-    meals.push(meal(foods));
+      const foods: AmountOfNamedMacros[] = [];
+      for (let j = 0; j < nFoods; j++) {
+          const food: AmountOfNamedMacros = {
+            amount: i * 10 + j,
+            namedMacros: {
+              uid: 'ingredient_' + i.toString + j.toString(),
+              name: 'ingredient_' + i.toString + j.toString(),
+              protein: i * 10 + j,
+              fat: i * 10 + j,
+              carbs: i * 10 + j,
+              calories: i * 10 + j,
+              amount: i * 10 + j,
+              unit: FOOD_UNIT.g,
+            }
+          };
+          foods.push(food);
+      }
+      meals.push({
+        uid: 'meal_' + i.toString(),
+        foods
+      });
   }
   return meals;
 }
@@ -58,7 +65,7 @@ describe('When the meals component is selected', () => {
         const thisMeal = today[iMeal];
         const foodToRemove = thisMeal.foods[iIngred];
         const foodToRemain = thisMeal.foods[iIngred ? 0 : 1];
-        wrapper.find('#removeFood_' + foodToRemove.uid).simulate('click');
+        wrapper.find(`#removeFood_${iMeal}_${iIngred}`).simulate('click');
         expect(store.getState().today[iMeal].foods.length).toBe(1);
         expect(store.getState().today[iMeal].foods[0]).toBe(foodToRemain);
       });

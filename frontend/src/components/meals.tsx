@@ -57,6 +57,7 @@ export class MealsComponent extends React.Component<MealsComponentProps, {}> {
           foods={meal.foods}
           handleRemoveFoodClick={removeHandler}
           handleDeleteAllClick={deleteHandler}
+          idx={mealIdx}
         />
       );
       rows.push(row);
