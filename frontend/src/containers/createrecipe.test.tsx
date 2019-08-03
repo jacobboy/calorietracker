@@ -2,35 +2,29 @@ import * as React from 'react';
 import * as enzyme from 'enzyme';
 import { mount } from 'enzyme';
 import { Provider } from 'react-redux';
-import {
-  makeIngredient,
-  FOOD_UNIT,
-  Ingredient,
-  Recipe,
-  makeRecipe,
-  Nutritional,
-  Quantifiable,
-  scaleFoodTo,
-  AmountOf
-} from '../classes';
+import { FOOD_UNIT } from '../classes';
 import { AnyAction, createStore, Store } from 'redux';
 import { reducer } from '../reducers';
 import CreateRecipeInput from '../containers/createrecipe';
 import { TopBitState, emptyState } from '../types';
+import { AmountOfNamedMacros, Recipe } from 'src/client';
 
 function mockIngredients(nFoods: number) {
   const foods = [];
   for (let i = 0; i < nFoods; i++) {
-    const food = makeIngredient(
-      'ingredient_' + i.toString(),
-      i + 1,
-      i + 2,
-      i + 3,
-      i + 4,
-      i + 5,
-      FOOD_UNIT.g,
-      false
-    );
+    const food = {
+      amount: 100,
+      namedMacros: {
+        name: 'ingredient_' + i.toString(),
+        uid: 'ingredient_' + i.toString(),
+        protein: i + 1,
+        fat: i + 2,
+        carbs: i + 3,
+        calories: i + 4,
+        amount: i + 5,
+        unit: FOOD_UNIT.g
+      }
+    };
     foods.push(food);
   }
   return foods;
@@ -41,7 +35,7 @@ describe('Recipes', () => {
 
   // tslint:disable-next-line:no-any
   let wrapper: enzyme.ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
-  let foods: AmountOf<Ingredient>[];
+  let foods: AmountOfNamedMacros[];
   let store: Store<{topbit: TopBitState, saved: {recipes: Recipe[]}}, AnyAction>;
 
   beforeEach(() => {
@@ -63,7 +57,7 @@ describe('Recipes', () => {
     it(`can have food ${iIngred} removed`, () => {
       const foodToRemove = foods[iIngred];
       const foodToRemain = foods[iIngred ? 0 : 1];
-      wrapper.find('#removeFood_' + foodToRemove.uid).simulate('click');
+      wrapper.find(`#removeFood_1_${iIngred}`).simulate('click');
       expect(store.getState().topbit.recipe.foods.length).toBe(1);
       expect(store.getState().topbit.recipe.foods[0]).toBe(foodToRemain);
     });

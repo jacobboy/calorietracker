@@ -1,20 +1,28 @@
 import * as React from 'react';
 import { shallow, ShallowWrapper } from 'enzyme';
 import { StoredIngredientRow } from './storedingredientrow';
-import { makeIngredient, FOOD_UNIT, Ingredient } from '../classes';
+import { FOOD_UNIT } from '../classes';
 import { TopBitDisplay } from '../types';
 import { MathInput } from './mathinput';
+import { NamedMacros } from 'src/client';
 
 describe('The StoredIngredientComponent', () => {
   const foodComboName = 'meal1';
   let [fat, carbs, protein, calories, amount] = [1, 2, 3, 4, 5];
-  let thisIngred: Ingredient;
+  let thisIngred: NamedMacros;
   let mockTrackFn: jest.Mock<{}>;
   let wrapper: ShallowWrapper;
   beforeEach(() => {
-    thisIngred = makeIngredient(
-      'foo', fat, carbs, protein, calories, amount, FOOD_UNIT.g, false
-    ).baseFood;
+    thisIngred = {
+      name: 'foo',
+      uid: 'uid',
+      protein,
+      fat,
+      carbs,
+      calories,
+      amount,
+      unit: FOOD_UNIT.g
+    };
     mockTrackFn = jest.fn();
     wrapper = shallow(
       <StoredIngredientRow
