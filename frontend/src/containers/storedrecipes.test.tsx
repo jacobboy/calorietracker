@@ -2,7 +2,7 @@ import { ReactWrapper, mount } from 'enzyme';
 import * as React from 'react';
 import { Provider } from 'react-redux';
 import { Store, AnyAction, createStore } from 'redux';
-import { makeIngredient, FOOD_UNIT, Ingredient, Recipe, makeRecipe, AmountOf } from '../classes';
+import { FOOD_UNIT } from '../classes';
 import StoredRecipes from '../containers/storedrecipes';
 import { reducer } from '../reducers';
 import { TopBitDisplay } from '../types';

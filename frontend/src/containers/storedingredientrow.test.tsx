@@ -4,27 +4,44 @@ import { mount, ReactWrapper } from 'enzyme';
 import { createStore, Store, AnyAction } from 'redux';
 import { reducer } from '../reducers';
 import { Provider } from 'react-redux';
-import { FOOD_UNIT, makeIngredient, meal, Ingredient, Meal, amountOf } from '../classes';
+import { FOOD_UNIT } from '../classes';
 import { TopBitDisplay, TopBitState, emptyState } from '../types';
+import { Meal, NamedMacros, AmountOfNamedMacros } from 'src/client';
 
 // TODO try these with foods already in the meal/recipe
 
 describe('When the track food button is clicked', () => {
   // tslint:disable-next-line:no-any
   let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
-  let store: Store<{topbit: TopBitState, today: Meal[]}, AnyAction>;
-  let thisMeal: Meal, thatMeal: Meal, thisIngred: Ingredient, trackFoodId: string;
+  // TODO tests work, but how do pros test connected components in typescript?
+  let store: {
+    getState: () => { topbit: TopBitState, today: Meal[]},
+    // tslint:disable-next-line:no-any
+    dispatch: any,
+    // tslint:disable-next-line:no-any
+    subscribe: any,
+    // tslint:disable-next-line:no-any
+    replaceReducer: any
+  };
+  let thisMeal: Meal, thatMeal: Meal, thisIngred: NamedMacros, trackFoodId: string;
   let ref: React.RefObject<HTMLElement>;
 
   beforeEach(() => {
     let [fat, carbs, protein, calories, amount] = [1, 2, 3, 4, 5];
-    thisIngred = makeIngredient('foo', fat, carbs, protein, calories, amount, FOOD_UNIT.g, false);
-    [thisMeal, thatMeal] = [meal([]), meal([])];
+    thisIngred = {uid: 'foo_uid', name: 'foo', fat, carbs, protein, calories, amount, unit: FOOD_UNIT.g};
+    [thisMeal, thatMeal] = [{uid: 'meal1', foods: []}, {uid: 'meal2', foods: []}];
     trackFoodId = `#trackFoodAmountInput_${thisIngred.uid}`;
-    store = createStore(reducer, {
+    /* store = createStore(reducer, {
       topbit: { display: TopBitDisplay.MEALS },
       today: [thisMeal, thatMeal]
-    });
+    }); */
+    store = {
+      getState: jest.fn(() => ({ display: TopBitDisplay.MEALS, today: [thisMeal, thatMeal] })),
+      dispatch: jest.fn(),
+      subscribe: jest.fn(),
+      replaceReducer: jest.fn()
+    };
+
     ref = {current: {focus: jest.fn()} as unknown as HTMLElement};
     wrapper = mount(
       <Provider store={store}>
@@ -42,7 +59,7 @@ describe('When the track food button is clicked', () => {
     );
     wrapper.find('#trackFoodSubmit_meal1').simulate('click');
 
-    const expectedIngred = amountOf(thisIngred, newAmount);
+    const expectedIngred = {namedMacros: thisIngred, amount: newAmount};
     verifyIngredientList(
       store.getState().today[0].foods, [expectedIngred]
     );
@@ -62,12 +79,12 @@ describe('When the track food button is clicked', () => {
     );
     wrapper.find('#trackFoodSubmit_meal1').simulate('click');
 
-    const expectedIngred1 = amountOf(thisIngred, newAmount1);
+    const expectedIngred1 = {namedMacros: thisIngred, amount: newAmount1};
     verifyIngredientList(
       store.getState().today[0].foods, [expectedIngred1]
     );
 
-    const expectedIngred2 = amountOf(thisIngred, newAmount2);
+    const expectedIngred2 = {namedMacros: thisIngred, amount: newAmount2};
     verifyIngredientList(
       store.getState().today[1].foods, [expectedIngred2]
     );
@@ -84,12 +101,12 @@ describe('When the track food button is clicked', () => {
   // tslint:disable-next-line:no-any
   let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
   let store: Store<{topbit: TopBitState}, AnyAction>;
-  let thisIngred: Ingredient;
+  let thisIngred: NamedMacros;
   let ref: React.RefObject<HTMLElement>;
 
   beforeEach(() => {
     let [fat, carbs, protein, calories, amount] = [1, 2, 3, 4, 5];
-    thisIngred = makeIngredient('foo', fat, carbs, protein, calories, amount, FOOD_UNIT.g, false);
+    thisIngred = {uid: 'foo_uid', name: 'foo', fat, carbs, protein, calories, amount, unit: FOOD_UNIT.g};
     store = createStore(reducer, {
       topbit: {
         ...emptyState.topbit,
@@ -118,7 +135,7 @@ describe('When the track food button is clicked', () => {
     );
     wrapper.find('#trackFoodSubmit_recipe').simulate('click');
 
-    const expectedIngred = amountOf(thisIngred, newAmount);
+    const expectedIngred = {namedMacros: thisIngred, amount: newAmount};
     expect(store.getState().topbit.recipe.foods.length).toEqual(1);
     verifyIngredientList(store.getState().topbit.recipe.foods, [expectedIngred]);
   });
@@ -131,12 +148,13 @@ describe('When the track food button is clicked', () => {
   });
 });
 
-function verifyIngredientList (foods1: Ingredient[], foods2: Ingredient[]) {
-  const checkAttributes = ['name', 'amount', 'fat', 'carbs', 'protein', 'calories'];
+function verifyIngredientList (foods1: AmountOfNamedMacros[], foods2: AmountOfNamedMacros[]) {
+  expect(foods1).toEqual(foods2);
+  /* const checkAttributes = ['amount', 'namedMacros'];
   expect(foods1.length).toEqual(foods2.length);
   for (let i = 0; i < foods1.length; i++) {
     for (let attr of checkAttributes) {
       expect([attr, i, foods1[i][attr]]).toEqual([attr, i, foods2[i][attr]]);
     }
-  }
+  } */
 }
