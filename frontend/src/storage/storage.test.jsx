@@ -2,7 +2,7 @@ import * as storage from '.'
 import * as client from '../client'
 import { CheddarCheese } from '../mocks'
 import { Report } from '../ndbapi/classes'
-import { ingredientFromReport, makeIngredient, makeRecipe, FOOD_UNIT, amountOf } from '../classes'
+import { ingredientFromReport, makeTestNamedMacros, makeTestRecipe, FOOD_UNIT, amountOf } from '../classes'
 
 describe('Ingredient saving', () => {
   it('exports a single object containing the correct attributes', () => {
@@ -54,11 +54,11 @@ describe('Recipe saving', () => {
     const ndbIngred = ingredientFromReport(Report.new(CheddarCheese.report))
     const amountOfNdbIngred = amountOf(ndbIngred, 100)
     const [fat, carbs, protein, calories, amount] = [1, 2, 3, 4, 5]
-    const customIngred = makeIngredient(
+    const customIngred = makeTestNamedMacros(
       'foo', fat, carbs, protein, calories, amount, FOOD_UNIT.g, false
     ).baseFood
     const amountOfCustomIngred = amountOf(customIngred, 100)
-    const recipe = makeRecipe('bar', [amountOfNdbIngred, amountOfCustomIngred])
+    const recipe = makeTestRecipe('bar', [amountOfNdbIngred, amountOfCustomIngred])
 
     const mockSetItem = jest.fn()
     window.localStorage.setItem = mockSetItem

@@ -1,26 +1,26 @@
-import { meal, makeIngredient, FOOD_UNIT, Meal } from '../classes';
+import { FOOD_UNIT, makeTestMeal, makeTestAmountOfNamedMacros } from '../classes';
 import { reducer } from '.';
 import { actions } from '../actions';
 import { StoreState, emptyState } from '../types';
+import { Meal } from 'src/client';
 
-function mockMeals (nMeals: number, nFoods: number) {
+function mockMeals(nMeals: number, nFoods: number) {
   const meals = [];
   for (let i = 0; i < nMeals; i++) {
     const foods = [];
     for (let j = 0; j < nFoods; j++) {
-      const food = makeIngredient(
+      const food = makeTestAmountOfNamedMacros(
         'ingredient_' + i.toString() + j.toString(),
         i * 10 + j,
         i * 10 + j,
         i * 10 + j,
         i * 10 + j,
         i * 10 + j,
-        FOOD_UNIT.g,
-        false
+        FOOD_UNIT.g
       );
       foods.push(food);
     }
-    meals.push(meal(foods));
+    meals.push(makeTestMeal(`meal_${i}`, foods));
   }
   return meals;
 }

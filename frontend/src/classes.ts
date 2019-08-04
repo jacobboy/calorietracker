@@ -1,4 +1,4 @@
-import { NamedMacros, Recipe, AmountOfNamedMacros } from './client';
+import { NamedMacros, Recipe, AmountOfNamedMacros, Meal } from './client';
 import { macrosFromFoods } from './transforms';
 
 /* function ingredientId() { return getIngredientKey(uuid.v4()); }
@@ -213,20 +213,6 @@ export interface Meal extends client.Meal {
   }
 } */
 
-export function makeIngredient(
-  name: string,
-  fat: number,
-  carbs: number,
-  protein: number,
-  calories: number,
-  amount: number,
-  unit: string
-): NamedMacros {
-  return {
-    uid: `${name}_uid`, name, protein, fat, carbs, calories, amount, unit
-  };
-}
-
 /* export function makeScaledIngredient(
   name: string,
   fat: number,
@@ -252,11 +238,42 @@ export function makeIngredient(
   return ingred;
 } */
 
-export function makeRecipe(
+// TODO move these test helpers, where do test helpers go in a JS app?
+export function makeTestAmountOfNamedMacros(
+  name: string,
+  fat: number,
+  carbs: number,
+  protein: number,
+  calories: number,
+  amount: number,
+  unit: string
+): AmountOfNamedMacros {
+  return {
+    amount: amount,
+    namedMacros: {
+      uid: `${name}_uid`, name, protein, fat, carbs, calories, amount, unit
+    }
+  };
+}
+export function makeTestNamedMacros(
+  name: string,
+  fat: number,
+  carbs: number,
+  protein: number,
+  calories: number,
+  amount: number,
+  unit: string
+): NamedMacros {
+  return {
+    uid: `${name}_uid`, name, protein, fat, carbs, calories, amount, unit
+  };
+}
+
+export function makeTestRecipe(
   name: string, foods: AmountOfNamedMacros[], portionSize: number, totalSize?: number, unit?: string
 ): Recipe {
-const macros = macrosFromFoods(foods);
-return {
+  const macros = macrosFromFoods(foods);
+  return {
     uid: `${name}_uid`,
     name,
     foods,
@@ -268,6 +285,10 @@ return {
     carbs: macros.carbs,
     calories: macros.calories
   };
+}
+
+export function makeTestMeal(uid: string, foods: AmountOfNamedMacros[]): Meal {
+  return { uid, foods };
 }
 
 /* // tslint:disable-next-line:no-any

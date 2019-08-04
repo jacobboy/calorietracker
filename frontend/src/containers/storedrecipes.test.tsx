@@ -2,7 +2,7 @@ import { ReactWrapper, mount } from 'enzyme';
 import * as React from 'react';
 import { Provider } from 'react-redux';
 import { Store, AnyAction, createStore } from 'redux';
-import { FOOD_UNIT, makeIngredient, makeRecipe } from '../classes';
+import { FOOD_UNIT, makeTestNamedMacros, makeTestRecipe } from '../classes';
 import StoredRecipes from '../containers/storedrecipes';
 import { reducer } from '../reducers';
 import { TopBitDisplay } from '../types';
@@ -13,7 +13,7 @@ function mockIngredients(nFoods: number) {
   for (let i = 0; i < nFoods; i++) {
     const food = {
       amount: i + 5,
-      namedMacros: makeIngredient(
+      namedMacros: makeTestNamedMacros(
         'ingredient_' + i.toString(),
         i + 1,
         i + 2,
@@ -40,7 +40,7 @@ describe('The stored ingredient component', () => {
 
   beforeEach(() => {
     foods = mockIngredients(2);
-    recipe = makeRecipe('Test Recipe 2', foods, 100);
+    recipe = makeTestRecipe('Test Recipe 2', foods, 100);
 
     let state = {
       topbit: {
@@ -51,7 +51,7 @@ describe('The stored ingredient component', () => {
       },
       saved: {
         recipes: [
-          makeRecipe('Test Recipe 1', [foods[1]], 12), // just to have more than one
+          makeTestRecipe('Test Recipe 1', [foods[1]], 12), // just to have more than one
           recipe
         ]
       }
