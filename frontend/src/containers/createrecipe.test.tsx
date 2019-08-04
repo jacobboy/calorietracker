@@ -3,11 +3,12 @@ import * as enzyme from 'enzyme';
 import { mount } from 'enzyme';
 import { Provider } from 'react-redux';
 import { FOOD_UNIT } from '../classes';
-import { AnyAction, createStore, Store } from 'redux';
-import { reducer } from '../reducers';
 import CreateRecipeInput from '../containers/createrecipe';
 import { TopBitState, emptyState } from '../types';
 import { AmountOfNamedMacros, Recipe } from 'src/client';
+import { scaleQuantity } from 'src/transforms';
+import { CREATE_RECIPE_SUBMIT } from 'src/constants';
+import { actions } from 'src/actions';
 
 function mockIngredients(nFoods: number) {
   const foods = [];
@@ -36,15 +37,31 @@ describe('Recipes', () => {
   // tslint:disable-next-line:no-any
   let wrapper: enzyme.ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
   let foods: AmountOfNamedMacros[];
-  let store: Store<{topbit: TopBitState, saved: {recipes: Recipe[]}}, AnyAction>;
+  // TODO tests work, but how do pros test connected components in typescript?
+  let store: {
+    getState: () => { topbit: TopBitState, saved: { recipes: Recipe[] } },
+    // tslint:disable-next-line:no-any
+    dispatch: any,
+    // tslint:disable-next-line:no-any
+    subscribe: any,
+    // tslint:disable-next-line:no-any
+    replaceReducer: any
+  };
+  /* let store: Store<{topbit: TopBitState, saved: {recipes: Recipe[]}}, AnyAction>; */
 
   beforeEach(() => {
     foods = mockIngredients(nFoods);
-    let state = {
+    /* let state = {
       topbit: { ...emptyState.topbit, recipe: { ...emptyState.topbit.recipe, foods } },
       saved: { recipes: [] }
+    }; */
+    /* store = createStore(reducer, state); */
+    store = {
+      getState: jest.fn(() => ({ ...emptyState.topbit, recipe: { ...emptyState.topbit.recipe, foods } })),
+      dispatch: jest.fn(),
+      subscribe: jest.fn(),
+      replaceReducer: jest.fn()
     };
-    store = createStore(reducer, state);
 
     wrapper = mount(
       <Provider store={store}>
@@ -63,45 +80,50 @@ describe('Recipes', () => {
     });
   }
 
+  function macroSum(macroName: string) {
+    return foods.reduce(
+      (macro, food) => macro + scaleQuantity(food.namedMacros[macroName], food.namedMacros.amount, food.amount),
+      0
+    );
+  }
+
   it('can sum and display portions', () => {
-    /*  */
-    const title = 'The Recipe';
     const portionSize = 300;
-    const totalSize = 101;
-    const unit = FOOD_UNIT.g;
-    const createdRecipe = makeRecipe(title, foods, portionSize, totalSize, unit);
+    const amount = 101;
+    const portionMultiplier = portionSize / amount;
 
-    wrapper.find('#recipeNameInput').simulate('change', {target: { value: title }});
-    wrapper.find('#recipePortionInput').simulate('change', {target: { value: portionSize }});
-    wrapper.find('#recipeAmountInput').simulate('change', {target: { value: totalSize }});
-    wrapper.find('#recipeUnitInput').simulate('change', {target: { value: unit }});
+    wrapper.find('#recipePortionInput').simulate('change', { target: { value: portionSize } });
+    wrapper.find('#recipeAmountInput').simulate('change', { target: { value: amount } });
 
-    expect(wrapper.find('#portionFat').text()).toEqual(createdRecipe.fat.toFixed());
-    expect(wrapper.find('#portionCarbs').text()).toEqual(createdRecipe.carbs.toFixed());
-    expect(wrapper.find('#portionProtein').text()).toEqual(createdRecipe.protein.toFixed());
-    expect(wrapper.find('#portionCalories').text()).toEqual(createdRecipe.calories.toFixed());
+    const protein = macroSum('protein') * portionMultiplier;
+    const fat = macroSum('fat') * portionMultiplier;
+    const carbs = macroSum('carbs') * portionMultiplier;
+    const calories = macroSum('calories') * portionMultiplier;
+
+    expect(wrapper.find('#portionProtein').text()).toEqual(protein.toFixed());
+    expect(wrapper.find('#portionFat').text()).toEqual(fat.toFixed());
+    expect(wrapper.find('#portionCarbs').text()).toEqual(carbs.toFixed());
+    expect(wrapper.find('#portionCalories').text()).toEqual(calories.toFixed());
   });
 
-  it('can be created', () => {
+  it('dispatches CREATE_RECIPE on create', () => {
     const title = 'The Recipe';
     const portionSize = 300;
     const totalSize = 101;
     const unit = FOOD_UNIT.g;
-    const createdRecipe = makeRecipe(title, foods, portionSize, totalSize, unit);
 
-    wrapper.find('#recipeNameInput').simulate('change', {target: { value: title }});
-    wrapper.find('#recipePortionInput').simulate('change', {target: { value: portionSize }});
-    wrapper.find('#recipeAmountInput').simulate('change', {target: { value: totalSize }});
-    wrapper.find('#recipeUnitInput').simulate('change', {target: { value: unit }});
+    wrapper.find('#recipeNameInput').simulate('change', { target: { value: title } });
+    wrapper.find('#recipePortionInput').simulate('change', { target: { value: portionSize } });
+    wrapper.find('#recipeAmountInput').simulate('change', { target: { value: totalSize } });
+    wrapper.find('#recipeUnitInput').simulate('change', { target: { value: unit } });
     wrapper.find('#saveRecipe').simulate('click');
 
-    expect(store.getState().topbit.recipe.foods.length).toBe(0);
-    expect(store.getState().saved.recipes.length).toBe(1);
-
-    const foundRecipe = store.getState().saved.recipes[0];
-    expect(foundRecipe.foods.length).toBe(nFoods);
-
-    checkRecipe(foundRecipe, createdRecipe);
+    expect(store.dispatch).toHaveBeenCalledWith(
+      {
+        type: CREATE_RECIPE_SUBMIT,
+        action: actions.saveRecipe(name, foods, portionSize, totalSize, unit)
+      }
+    );
   });
 
   it('can edit ingredient amounts before saving', () => {
@@ -109,46 +131,23 @@ describe('Recipes', () => {
     const portionSize = 50;
     const totalSize = 100;
     const unit = FOOD_UNIT.g;
-    const newFood = scaleFoodTo(foods[1], foods[1].amount * 5);
-    const createdRecipe = makeRecipe(title, [foods[0], newFood], portionSize, totalSize, unit);
+    const foodToChangeIdx = 1;
+    const newFood = {...foods[foodToChangeIdx], amount: foods[foodToChangeIdx].amount * 5};
 
-    wrapper.find('#recipeNameInput').simulate('change', {target: { value: title }});
-    wrapper.find('#recipePortionInput').simulate('change', {target: { value: portionSize }});
-    wrapper.find('#recipeAmountInput').simulate('change', {target: { value: totalSize }});
-    wrapper.find('#recipeUnitInput').simulate('change', {target: { value: unit }});
-    wrapper.find(`#foodAmountInput_${foods[1].uid}`).first().simulate(
-      'change', {target: { value: newFood.amount.toString() }}
+    wrapper.find('#recipeNameInput').simulate('change', { target: { value: title } });
+    wrapper.find('#recipePortionInput').simulate('change', { target: { value: portionSize } });
+    wrapper.find('#recipeAmountInput').simulate('change', { target: { value: totalSize } });
+    wrapper.find('#recipeUnitInput').simulate('change', { target: { value: unit } });
+    wrapper.find('#saveRecipe').simulate('click');
+    wrapper.find(`#foodAmountInput_1_1}`).first().simulate(
+      'change', { target: { value: newFood.amount.toString() } }
     );
 
-    expect(wrapper.find('#portionFat').text()).toEqual(createdRecipe.fat.toFixed());
-    expect(wrapper.find('#portionCarbs').text()).toEqual(createdRecipe.carbs.toFixed());
-    expect(wrapper.find('#portionProtein').text()).toEqual(createdRecipe.protein.toFixed());
-    expect(wrapper.find('#portionCalories').text()).toEqual(createdRecipe.calories.toFixed());
-
-    wrapper.find('#saveRecipe').simulate('click');
-    const foundRecipe = store.getState().saved.recipes[0];
-    expect(foundRecipe.foods.length).toBe(nFoods);
-
-    checkRecipe(foundRecipe, createdRecipe);
+    expect(store.dispatch).toHaveBeenCalledWith(
+      {
+        type: CREATE_RECIPE_SUBMIT,
+        action: actions.saveRecipe(name, [foods[0], foods[foodToChangeIdx]], portionSize, totalSize, unit)
+      }
+    );
   });
 });
-
-function checkRecipe(foundRecipe: Recipe, createdRecipe: Recipe) {
-  checkMacros(foundRecipe, createdRecipe);
-  for (let i = 0; i < foundRecipe.foods.length; i++) {
-    let foundFood = foundRecipe.foods[i];
-    let expectedFood = createdRecipe.foods[i];
-    checkMacros(foundFood, expectedFood);
-  }
-}
-
-function checkMacros(foundRecipe: (Nutritional & Quantifiable),
-                     createdRecipe: (Nutritional & Quantifiable)) {
-  expect(foundRecipe.name).toEqual(createdRecipe.name);
-  expect(foundRecipe.fat).toEqual(createdRecipe.fat);
-  expect(foundRecipe.carbs).toEqual(createdRecipe.carbs);
-  expect(foundRecipe.protein).toEqual(createdRecipe.protein);
-  expect(foundRecipe.calories).toEqual(createdRecipe.calories);
-  expect(foundRecipe.amount).toEqual(createdRecipe.amount);
-  expect(foundRecipe.unit).toBe(createdRecipe.unit);
-}

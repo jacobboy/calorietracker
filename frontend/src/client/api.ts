@@ -303,12 +303,6 @@ export interface Recipe extends NamedMacros {
      * @type {number}
      * @memberof Recipe
      */
-    totalSize: number;
-    /**
-     *
-     * @type {number}
-     * @memberof Recipe
-     */
     portionSize: number;
 }
 
