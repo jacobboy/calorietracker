@@ -3,6 +3,7 @@ import { Dispatch } from 'redux';
 import { actions, Actions } from '../actions';
 import { StoredRecipes } from '../components/storedrecipes';
 import { StoreState } from '../types/index';
+import { NamedMacros } from 'src/client';
 
 function mapStateToProps(state: StoreState) {
   return {
@@ -12,8 +13,8 @@ function mapStateToProps(state: StoreState) {
 
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
-    onCopyRecipeClick: (recipeUid: string) => {
-      dispatch(actions.copyRecipe(recipeUid));
+    onCopyRecipeClick: (recipe: NamedMacros) => {
+      dispatch(actions.copyRecipe(recipe.uid));
       dispatch(actions.createRecipeOpen());
     }
   };

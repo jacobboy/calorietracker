@@ -1,3 +1,6 @@
+import { NamedMacros, Recipe, AmountOfNamedMacros } from './client';
+import { macrosFromFoods } from './transforms';
+
 /* function ingredientId() { return getIngredientKey(uuid.v4()); }
 function ndbnoId(ndbno: string) { return getNdbKey(ndbno); }
 function amountOfId() { return getAmountOfKey(uuid.v4()); }
@@ -210,18 +213,19 @@ export interface Meal extends client.Meal {
   }
 } */
 
-/* export function makeIngredient(
+export function makeIngredient(
   name: string,
   fat: number,
   carbs: number,
   protein: number,
   calories: number,
   amount: number,
-  unit: string,
-  persist: boolean = true
-): NewIngredient {
-  return makeScaledIngredient(name, fat, carbs, protein, calories, amount, amount, unit);
-} */
+  unit: string
+): NamedMacros {
+  return {
+    uid: `${name}_uid`, name, protein, fat, carbs, calories, amount, unit
+  };
+}
 
 /* export function makeScaledIngredient(
   name: string,
@@ -248,13 +252,23 @@ export interface Meal extends client.Meal {
   return ingred;
 } */
 
-/* export function makeRecipe(
+export function makeRecipe(
   name: string, foods: AmountOfNamedMacros[], portionSize: number, totalSize?: number, unit?: string
 ): Recipe {
-  const recipe = RecipeImpl.new(name, foods, portionSize, totalSize, unit);
-  saveRecipe(recipe);
-  return recipe;
-} */
+const macros = macrosFromFoods(foods);
+return {
+    uid: `${name}_uid`,
+    name,
+    foods,
+    portionSize,
+    amount: totalSize || foods.reduce((amt, food) => amt + food.amount, 0),
+    unit: unit || foods[0].namedMacros.unit,
+    protein: macros.protein,
+    fat: macros.fat,
+    carbs: macros.carbs,
+    calories: macros.calories
+  };
+}
 
 /* // tslint:disable-next-line:no-any
 function amountOfFromObj(amountOfObj: any): AmountOfNamedMacros {

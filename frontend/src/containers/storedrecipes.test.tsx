@@ -2,24 +2,28 @@ import { ReactWrapper, mount } from 'enzyme';
 import * as React from 'react';
 import { Provider } from 'react-redux';
 import { Store, AnyAction, createStore } from 'redux';
-import { FOOD_UNIT } from '../classes';
+import { FOOD_UNIT, makeIngredient, makeRecipe } from '../classes';
 import StoredRecipes from '../containers/storedrecipes';
 import { reducer } from '../reducers';
 import { TopBitDisplay } from '../types';
+import { AmountOfNamedMacros, Recipe } from 'src/client';
 
 function mockIngredients(nFoods: number) {
   const foods = [];
   for (let i = 0; i < nFoods; i++) {
-    const food = makeIngredient(
-      'ingredient_' + i.toString(),
-      i + 1,
-      i + 2,
-      i + 3,
-      i + 4,
-      i + 5,
-      FOOD_UNIT.g,
-      false
-    );
+    const food = {
+      amount: i + 5,
+      namedMacros: makeIngredient(
+        'ingredient_' + i.toString(),
+        i + 1,
+        i + 2,
+        i + 3,
+        i + 4,
+        i + 5,
+        FOOD_UNIT.g
+      )
+    };
+
     foods.push(food);
   }
   return foods;
@@ -31,7 +35,7 @@ describe('The stored ingredient component', () => {
   // tslint:disable-next-line:no-any
   let store: Store<any, AnyAction>;
 
-  let foods: AmountOf<Ingredient>[];
+  let foods: AmountOfNamedMacros[];
   let recipe: Recipe;
 
   beforeEach(() => {
@@ -56,7 +60,7 @@ describe('The stored ingredient component', () => {
 
     wrapper = mount(
       <Provider store={store}>
-        <StoredRecipes searchText={'2'} focusRef={React.createRef()}/>
+        <StoredRecipes searchText={'2'} focusRef={React.createRef()} />
       </Provider>
     );
 

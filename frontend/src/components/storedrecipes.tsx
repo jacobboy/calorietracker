@@ -8,7 +8,7 @@ import { NamedMacros } from 'src/client';
 
 type StoredRecipesProps = {
   recipes: NamedMacros[];
-  onCopyRecipeClick: (recipeIngredient: NamedMacros) => void;
+  onCopyRecipeClick: (recipe: NamedMacros) => void;
   searchText: string;
   focusRef: React.RefObject<HTMLElement>;
 };

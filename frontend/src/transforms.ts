@@ -7,8 +7,8 @@ export interface MacrosAndPercents extends Macros {
 }
 
 export function macrosFromFoods(foods: AmountOfNamedMacros[]): MacrosAndPercents {
-  const calories = foods.reduce(
-    (l, r) => l + scaleQuantity(r.namedMacros.calories, r.namedMacros.amount, r.amount), 0
+  const protein = foods.reduce(
+    (l, r) => l + scaleQuantity(r.namedMacros.protein, r.namedMacros.amount, r.amount), 0
   );
   const fat = foods.reduce(
     (l, r) => l + scaleQuantity(r.namedMacros.fat, r.namedMacros.amount, r.amount), 0
@@ -16,8 +16,8 @@ export function macrosFromFoods(foods: AmountOfNamedMacros[]): MacrosAndPercents
   const carbs = foods.reduce(
     (l, r) => l + scaleQuantity(r.namedMacros.carbs, r.namedMacros.amount, r.amount), 0
   );
-  const protein = foods.reduce(
-    (l, r) => l + scaleQuantity(r.namedMacros.protein, r.namedMacros.amount, r.amount), 0
+  const calories = foods.reduce(
+    (l, r) => l + scaleQuantity(r.namedMacros.calories, r.namedMacros.amount, r.amount), 0
   );
   return macrosFromAmountOf({fat, carbs, protein, calories}, 1, 1);
 }
