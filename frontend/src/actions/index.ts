@@ -7,7 +7,7 @@ import {
   REPLACE_FOOD_IN_RECIPE,
   REMOVE_FOOD_FROM_RECIPE,
   CREATE_RECIPE_SUBMIT,
-  SAVE_INGREDIENT,
+  SAVE_SEARCH_ITEM,
   SELECT_DATASOURCE,
   FOODSEARCH_INPUT,
   FOODSEARCH_SUBMIT,
@@ -25,6 +25,8 @@ import {
 import { TopBitDisplay } from '../types';
 import { NamedMacros, AmountOfNamedMacros, NewIngredient, Recipe } from 'src/client';
 import { FOOD_UNIT } from 'src/classes';
+import { DataSource } from 'src/ndbapi';
+import { SearchItem } from 'src/usdaclient';
 
 export interface Action<T extends string> {
   type: T;
@@ -92,10 +94,10 @@ function changeMealFoodAmount(mealIdx: number, food: AmountOfNamedMacros, newAmo
 // TODO should actions be UI-driven or business logic driven?
 // perhaps business-driven and have the containers perform business/ui mapping?
 export const actions = {
-  selectDataSource: (dataSource: string) => createAction(SELECT_DATASOURCE, dataSource),
+  selectDataSource: (dataSource: DataSource) => createAction(SELECT_DATASOURCE, dataSource),
   foodSearchInput: (searchString: string) => createAction(FOODSEARCH_INPUT, searchString),
   foodSearchSubmit: (searchString: String, ds: String) => createAction(FOODSEARCH_SUBMIT, {searchString, ds}),
-  foodSearchSucceeded: (searchResults: NamedMacros[]) => createAction(FOODSEARCH_SUCCESS, {searchResults}),
+  foodSearchSucceeded: (searchResults: SearchItem[]) => createAction(FOODSEARCH_SUCCESS, {searchResults}),
   addMeal: () => createAction(ADD_MEAL),
   removeMeal: (mealIdx: number) => createAction(REMOVE_MEAL, mealIdx),
   changeMealFoodAmount,
@@ -113,7 +115,7 @@ export const actions = {
   addFoodsToRecipe: (recipe: Recipe) => createAction(ADD_FOODS_TO_RECIPE, recipe),
   removeFoodFromRecipe: (food: AmountOfNamedMacros) => createAction(REMOVE_FOOD_FROM_RECIPE, food),
   saveRecipe,
-  saveIngredient: (ingredient: NamedMacros) => createAction(SAVE_INGREDIENT, ingredient),
+  saveSearchItem: (ingredient: NamedMacros) => createAction(SAVE_SEARCH_ITEM, ingredient),
   setDay: (day: Date) => createAction(CHANGE_DAY, day),
 };
 

@@ -15,7 +15,7 @@ import {
   ADD_MEAL,
   REMOVE_MEAL,
   CHANGE_DAY,
-  SAVE_INGREDIENT,
+  SAVE_SEARCH_ITEM,
   REPLACE_FOOD_IN_RECIPE,
   REPLACE_FOOD_IN_MEAL,
   ADD_FOODS_TO_RECIPE
@@ -50,7 +50,8 @@ function removeFoodFromMeal(
   return { ...state, today };
 }
 
-export function reducer(state: StoreState, action: Actions): StoreState {
+export function
+reducer(state: StoreState, action: Actions): StoreState {
   // console.log('Handling: ' + action.type);
   switch (action.type) {
     case SELECT_DATASOURCE:
@@ -185,7 +186,7 @@ export function reducer(state: StoreState, action: Actions): StoreState {
           recipes: [...state.saved.recipes, action.payload]
         }
       };
-    case SAVE_INGREDIENT:
+    case SAVE_SEARCH_ITEM:
       return {
         ...state,
         saved: {

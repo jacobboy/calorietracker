@@ -63,7 +63,6 @@ describe('When the meals component is selected', () => {
     for (let iIngred = 0; iIngred < nFoods; iIngred++) {
       it(`should remove ingredient ${iIngred} on meal ${iMeal}`, () => {
         const thisMeal = today[iMeal];
-        const foodToRemove = thisMeal.foods[iIngred];
         const foodToRemain = thisMeal.foods[iIngred ? 0 : 1];
         wrapper.find(`#removeFood_${iMeal}_${iIngred}`).simulate('click');
         expect(store.getState().today[iMeal].foods.length).toBe(1);

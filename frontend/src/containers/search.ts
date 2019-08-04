@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { actions, Actions } from '../actions/';
 import { SearchComponent } from '../components/search';
 import { StoreState } from '../types/index';
+import { DataSource } from 'src/ndbapi';
 
 function mapStateToProps(state: StoreState) {
   return {
@@ -12,13 +13,13 @@ function mapStateToProps(state: StoreState) {
 
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
-    onDataSourceSelect: (ds: string) => {
+    onDataSourceSelect: (ds: DataSource) => {
       dispatch(actions.selectDataSource(ds));
     },
     onFoodSearchInput: (searchString: string) => {
       dispatch(actions.foodSearchInput(searchString));
     },
-    onFoodSearchSubmit: (searchString: string, ds: String) => {
+    onFoodSearchSubmit: (searchString: string, ds: DataSource) => {
       console.log('Searching food ' + searchString);
       actions.foodSearchSubmit(searchString, ds);
     }

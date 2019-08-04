@@ -4,6 +4,7 @@ import {
   getAllRecipes,
  } from '../storage';
 import { AmountOfNamedMacros, NamedMacros, Meal } from 'src/client';
+import { SearchItem } from 'src/usdaclient';
 
 export interface SavedState {
   ingredients: NamedMacros[];
@@ -12,8 +13,8 @@ export interface SavedState {
 
 export interface SearchState {
   searchString: string;
-  dataSource: string;
-  items: NamedMacros[];
+  dataSource: DataSource;
+  items: SearchItem[];
 }
 
 export interface TrackingState {

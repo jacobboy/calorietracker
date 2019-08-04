@@ -72,7 +72,6 @@ describe('Recipes', () => {
 
   for (let iIngred = 0; iIngred < nFoods; iIngred++) {
     it(`can have food ${iIngred} removed`, () => {
-      const foodToRemove = foods[iIngred];
       const foodToRemain = foods[iIngred ? 0 : 1];
       wrapper.find(`#removeFood_1_${iIngred}`).simulate('click');
       expect(store.getState().topbit.recipe.foods.length).toBe(1);

@@ -2,8 +2,8 @@ import * as React from 'react';
 import { tdStyle, thStyle, searchLinkStyle } from 'src/style';
 import { toTitleCase } from 'src/datautil';
 import { SearchItem } from 'src/usdaclient';
-import { Macros } from 'src/client';
-import { getMacrosFromSearchItem } from 'src/ndbapi';
+import { NamedMacros } from 'src/client';
+import { getNamedMacrosFromSearchItem } from 'src/ndbapi';
 import { macrosFromAmountOf } from 'src/transforms';
 
 function ingredientCell(contents: string | number | JSX.Element, title?: string) {
@@ -13,11 +13,12 @@ function ingredientCell(contents: string | number | JSX.Element, title?: string)
 
 interface SearchIngredientRowProps {
   item: SearchItem;
-  onSaveClick: (searchItem: SearchItem) => void;
+  onSaveClick: (namedMacros: NamedMacros) => void;
 }
 
 interface SearchIngredientRowState {
-  ndbNoAndMacros?: {ndbNo: string, macros: Macros, amount: number, unit: string};
+  // TODO temporary hack where the client knows how the server creates a Usda NamedMacro
+  namedMacros?: NamedMacros;
  }
 
 export class SearchIngredientRow extends React.Component<
@@ -45,19 +46,28 @@ export class SearchIngredientRow extends React.Component<
   }
 
   handleDetailsClick() {
-    getMacrosFromSearchItem(this.props.item).then((ingred) => this.setState({ndbNoAndMacros: ingred}));
+    getNamedMacrosFromSearchItem(this.props.item).then((namedMacros) => this.setState({namedMacros}));
+  }
+
+  saveSearchItem() {
+    if (this.state.namedMacros === undefined) {
+      getNamedMacrosFromSearchItem(this.props.item).then((namedMacros) => this.props.onSaveClick(namedMacros));
+    } else {
+      this.props.onSaveClick(this.state.namedMacros);
+    }
+
   }
 
   render() {
     const link = (
     <a
-      href={'https://ndb.nal.usda.gov/ndb/foods/show/' + this.props.item.ndbno}
+      href={`https://ndb.nal.usda.gov/ndb/foods/show/${this.props.item.ndbno}`}
       style={searchLinkStyle}
       target="_blank"
     >
       {toTitleCase(this.props.item.name)}
     </a>);
-    if (this.state.ndbNoAndMacros === undefined) {
+    if (this.state.namedMacros === undefined) {
       return (
         <tr>
           {ingredientCell(link, this.props.item.name)}
@@ -76,32 +86,31 @@ export class SearchIngredientRow extends React.Component<
             </button>
           </td>
           <td style={tdStyle}>
-            <button onClick={() => this.props.onSaveClick(this.props.item)}>
+            <button onClick={() => this.saveSearchItem()}>
               Save
             </button>
           </td>
         </tr >
       );
     } else {
-      const macros = this.state.ndbNoAndMacros.macros;
-      const thisMacroPercents = macrosFromAmountOf(
-        macros, 1, 1
+      const macroPercents = macrosFromAmountOf(
+        this.state.namedMacros, 1, 1
       );
       return (
         <tr>
           {ingredientCell(link, this.props.item.name)}
-          {ingredientCell(this.state.ndbNoAndMacros.amount)}
-          {ingredientCell(this.state.ndbNoAndMacros.unit)}
-          {ingredientCell(macros.fat.toFixed())}
-          {ingredientCell(thisMacroPercents.fatPct)}
-          {ingredientCell(macros.carbs.toFixed())}
-          {ingredientCell(thisMacroPercents.carbsPct)}
-          {ingredientCell(macros.protein.toFixed())}
-          {ingredientCell(thisMacroPercents.proteinPct)}
-          {ingredientCell(macros.calories)}
+          {ingredientCell(this.state.namedMacros.amount)}
+          {ingredientCell(this.state.namedMacros.unit)}
+          {ingredientCell(this.state.namedMacros.fat.toFixed())}
+          {ingredientCell(macroPercents.fatPct)}
+          {ingredientCell(this.state.namedMacros.carbs.toFixed())}
+          {ingredientCell(macroPercents.carbsPct)}
+          {ingredientCell(this.state.namedMacros.protein.toFixed())}
+          {ingredientCell(macroPercents.proteinPct)}
+          {ingredientCell(this.state.namedMacros.calories)}
           <td style={tdStyle}/>
           <td style={tdStyle}>
-            <button onClick={() => this.props.onSaveClick(this.props.item)}>
+            <button onClick={() => this.saveSearchItem()}>
               Save
             </button>
           </td>
