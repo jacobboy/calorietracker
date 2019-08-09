@@ -1,4 +1,4 @@
-import { call, put, takeLatest } from 'redux-saga/effects';
+import { all, call, put, takeLatest } from 'redux-saga/effects';
 import { DefaultApiFp as MacroMacroFp, NamedMacros, Recipe, AmountOfNamedMacros } from './client';
 import { DefaultApi as UsdaClient, SearchResponse } from './usdaclient';
 import { ActionsTypeMap, actions } from './actions';
@@ -27,6 +27,7 @@ function* searchFood(action: ActionsTypeMap['foodSearchSubmit']) {
     {apiKey: GOV_API_KEY, q: searchString}
   );
   try {
+    console.log(`in foodsearch saga for ${action.payload.searchString}`);
     const searchResults: SearchResponse = yield call(searchFunc, action.payload.searchString);
     yield put(actions.foodSearchSucceeded(searchResults.list.item));
   } catch (response) {
@@ -62,11 +63,6 @@ function* saveRecipe(action: ActionsTypeMap['saveRecipe']) {
   yield takeLatest(CREATE_INGREDIENT_SUBMIT, f);
 } */
 
-function* mySaga() {
-  yield takeLatest(CREATE_INGREDIENT_SUBMIT, createIngredient);
+export default function* rootSaga() {
   yield takeLatest(FOODSEARCH_SUBMIT, searchFood);
-  yield takeLatest(COPY_RECIPE, copyRecipe);
-  yield takeLatest(CREATE_RECIPE_SUBMIT, saveRecipe);
 }
-
-export default mySaga;

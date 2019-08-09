@@ -7,11 +7,11 @@ import { reducer } from './reducers/index';
 import { initialState } from './types/index';
 import App from './app';
 import createSagaMiddleware from 'redux-saga';
-import mySaga from './sagas';
+import rootSaga from './sagas';
 
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(reducer, initialState, applyMiddleware(sagaMiddleware));
-sagaMiddleware.run(mySaga);
+sagaMiddleware.run(rootSaga);
 
 ReactDOM.render(
   <Provider store={store}>
