@@ -10,7 +10,6 @@ import {
   COPY_RECIPE,
   CREATE_RECIPE_SUBMIT
 } from './constants';
-import { SearchItem } from './usdaclient';
 import { GOV_API_KEY } from './apikey';
 
 function* createIngredient(action: ActionsTypeMap['createIngredientSubmit']) {
@@ -29,11 +28,7 @@ function* searchFood(action: ActionsTypeMap['foodSearchSubmit']) {
   );
   try {
     const searchResults: SearchResponse = yield call(searchFunc, action.payload.searchString);
-    if (searchResults.list !== undefined) {
-      yield put(actions.foodSearchSucceeded(searchResults.list));
-    } else {
-      yield put({ type: FOODSEARCH_FAILED, message: response.message });
-    }
+    yield put(actions.foodSearchSucceeded(searchResults.list.item));
   } catch (response) {
     console.log('error creating ingredient');
     yield put({ type: FOODSEARCH_FAILED, message: response.message });
