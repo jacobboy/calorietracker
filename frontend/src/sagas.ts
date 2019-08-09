@@ -1,5 +1,6 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
-import { DefaultApiFp, NamedMacros, Recipe, AmountOfNamedMacros } from './client';
+import { DefaultApiFp as MacroMacroFp, NamedMacros, Recipe, AmountOfNamedMacros } from './client';
+import { DefaultApi as UsdaClient, SearchResponse } from './usdaclient';
 import { ActionsTypeMap, actions } from './actions';
 import {
   CREATE_INGREDIENT_FAILED,
@@ -9,10 +10,12 @@ import {
   COPY_RECIPE,
   CREATE_RECIPE_SUBMIT
 } from './constants';
+import { SearchItem } from './usdaclient';
+import { GOV_API_KEY } from './apikey';
 
 function* createIngredient(action: ActionsTypeMap['createIngredientSubmit']) {
   try {
-    const macros: NamedMacros = yield call(DefaultApiFp().createIngredient, action.payload);
+    const macros: NamedMacros = yield call(MacroMacroFp().createIngredient, action.payload);
     yield put(actions.createIngredientSucceeded(macros));
   } catch (response) {
     console.log('error creating ingredient');
@@ -21,9 +24,16 @@ function* createIngredient(action: ActionsTypeMap['createIngredientSubmit']) {
 }
 
 function* searchFood(action: ActionsTypeMap['foodSearchSubmit']) {
+  const searchFunc = (searchString: string) => (new UsdaClient()).search(
+    {apiKey: GOV_API_KEY, q: searchString}
+  );
   try {
-    const searchResults: NamedMacros[] = yield call(DefaultApiFp().searchByName, action.payload.searchString);
-    yield put(actions.foodSearchSucceeded(searchResults));
+    const searchResults: SearchResponse = yield call(searchFunc, action.payload.searchString);
+    if (searchResults.list !== undefined) {
+      yield put(actions.foodSearchSucceeded(searchResults.list));
+    } else {
+      yield put({ type: FOODSEARCH_FAILED, message: response.message });
+    }
   } catch (response) {
     console.log('error creating ingredient');
     yield put({ type: FOODSEARCH_FAILED, message: response.message });
@@ -31,7 +41,7 @@ function* searchFood(action: ActionsTypeMap['foodSearchSubmit']) {
 }
 
 function* copyRecipe(action: ActionsTypeMap['copyRecipe']) {
-  const recipe: Recipe = yield call(DefaultApiFp().findRecipeByUID, action.payload);
+  const recipe: Recipe = yield call(MacroMacroFp().findRecipeByUID, action.payload);
   yield actions.addFoodsToRecipe(recipe);
 }
 
@@ -41,7 +51,7 @@ function namedMacroToIngredient(nm: AmountOfNamedMacros) {
 
 function* saveRecipe(action: ActionsTypeMap['saveRecipe']) {
   const recipe = yield call(
-    DefaultApiFp().createRecipe, {
+    MacroMacroFp().createRecipe, {
       name: action.payload.name,
       foods: action.payload.foods.map(namedMacroToIngredient),
       portionSize: action.payload.portionSize,

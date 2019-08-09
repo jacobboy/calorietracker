@@ -29,68 +29,68 @@ export interface SearchList {
      * @type {string}
      * @memberof SearchList
      */
-    q?: string;
+    q: string;
     /**
      * Standard Release version of the data being reported
      * @type {string}
      * @memberof SearchList
      */
-    sr?: string;
+    sr: string;
     /**
-     * undocumented. anecdotally, has returned \"all\"
+     * undocumented. has returned \"GDSN\", \"LI\",
      * @type {string}
      * @memberof SearchList
      */
-    ds?: string;
+    ds: string;
     /**
      * beginning item in the list
      * @type {number}
      * @memberof SearchList
      */
-    start?: number;
+    start: number;
     /**
      * last item in the list
      * @type {number}
      * @memberof SearchList
      */
-    end?: number;
+    end: number;
     /**
      * total # of items returned by the search 
      * @type {number}
      * @memberof SearchList
      */
-    total?: number;
+    total: number;
     /**
-     * food group to which the food belongs
+     * food group to which the food belongs.  e.g. \"Branded Food Products Database\", \"Baked Products\"
      * @type {string}
      * @memberof SearchList
      */
-    group?: string;
+    group: string;
     /**
      * requested sort order (r=relevance or n=name)
      * @type {string}
      * @memberof SearchList
      */
-    sort?: SearchListSortEnum;
+    sort: SearchListSortEnum;
     /**
      * individual items on the list
      * @type {Array<SearchItem>}
      * @memberof SearchList
      */
-    item?: Array<SearchItem>;
+    item: Array<SearchItem>;
 }
 
 export function SearchListFromJSON(json: any): SearchList {
     return {
-        'q': !exists(json, 'q') ? undefined : json['q'],
-        'sr': !exists(json, 'sr') ? undefined : json['sr'],
-        'ds': !exists(json, 'ds') ? undefined : json['ds'],
-        'start': !exists(json, 'start') ? undefined : json['start'],
-        'end': !exists(json, 'end') ? undefined : json['end'],
-        'total': !exists(json, 'total') ? undefined : json['total'],
-        'group': !exists(json, 'group') ? undefined : json['group'],
-        'sort': !exists(json, 'sort') ? undefined : json['sort'],
-        'item': !exists(json, 'item') ? undefined : (json['item'] as Array<any>).map(SearchItemFromJSON),
+        'q': json['q'],
+        'sr': json['sr'],
+        'ds': json['ds'],
+        'start': json['start'],
+        'end': json['end'],
+        'total': json['total'],
+        'group': json['group'],
+        'sort': json['sort'],
+        'item': (json['item'] as Array<any>).map(SearchItemFromJSON),
     };
 }
 
@@ -107,7 +107,7 @@ export function SearchListToJSON(value?: SearchList): any {
         'total': value.total,
         'group': value.group,
         'sort': value.sort,
-        'item': value.item === undefined ? undefined : (value.item as Array<any>).map(SearchItemToJSON),
+        'item': (value.item as Array<any>).map(SearchItemToJSON),
     };
 }
 

@@ -29,12 +29,12 @@ export interface SearchResponse {
      * @type {SearchList}
      * @memberof SearchResponse
      */
-    list?: SearchList;
+    list: SearchList;
 }
 
 export function SearchResponseFromJSON(json: any): SearchResponse {
     return {
-        'list': !exists(json, 'list') ? undefined : SearchListFromJSON(json['list']),
+        'list': SearchListFromJSON(json['list']),
     };
 }
 

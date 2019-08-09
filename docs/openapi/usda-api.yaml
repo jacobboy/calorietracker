@@ -29,12 +29,11 @@ paths:
           description: Must be a data.gov registered API key
           required: true
           schema:
-            type: integer
-            format: int32
+            type: string
         - name: q
           in: query
           description: Search terms
-          required: false
+          required: true
           schema:
             type: string
         - name: ds
@@ -87,6 +86,12 @@ paths:
             application/json:
               schema:
                 $ref: SearchResponse
+        '400':
+          description: Search error
+          content:
+            application/json:
+              schema:
+                $ref: ErrorResponse
 
   /V2/reports:
     get:
@@ -141,6 +146,8 @@ components:
       properties:
         list:
           $ref: '#/components/schemas/SearchList'
+      required:
+        - list
 
     SearchList:
       type: object
@@ -152,7 +159,7 @@ components:
           description: Standard Release version of the data being reported
           type: string
         ds:
-          description: undocumented. anecdotally, has returned "all"
+          description: undocumented. has returned "GDSN", "LI",
           type: string
         start:
           description: beginning item in the list
@@ -168,7 +175,7 @@ components:
           type: integer
           format: int32
         group:
-          description: food group to which the food belongs
+          description: food group to which the food belongs.  e.g. "Branded Food Products Database", "Baked Products"
           type: string
         sort:
           description: requested sort order (r=relevance or n=name)
@@ -179,6 +186,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SearchItem'
+      required:
+        - q
+        - sr
+        - ds
+        - start
+        - end
+        - total
+        - group
+        - sort
+        - item
 
     SearchItem:
       description: individual item in a response to a search
@@ -398,3 +415,32 @@ components:
         - name
         - ds
         - ru
+
+    ErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: object
+          properties:
+            error:
+              type: array
+              items:
+                $ref: '#/components/schemas/ErrorItem'
+          required:
+            - error
+      required:
+        - error
+
+    ErrorItem:
+      type: object
+      properties:
+        status:
+          type: integer
+        parameter:
+          type: string
+        message:
+          type: string
+      required:
+        - status
+          parameter
+          message

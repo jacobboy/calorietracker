@@ -14,6 +14,9 @@
 
 import * as runtime from '../runtime';
 import {
+    ErrorResponse,
+    ErrorResponseFromJSON,
+    ErrorResponseToJSON,
     FoodReport,
     FoodReportFromJSON,
     FoodReportToJSON,
@@ -30,8 +33,8 @@ export interface ReportsRequest {
 }
 
 export interface SearchRequest {
-    apiKey: number;
-    q?: string;
+    apiKey: string;
+    q: string;
     ds?: SearchDsEnum;
     fg?: string;
     sort?: SearchSortEnum;
@@ -101,6 +104,10 @@ export class DefaultApi extends runtime.BaseAPI {
     async searchRaw(requestParameters: SearchRequest): Promise<runtime.ApiResponse<SearchResponse>> {
         if (requestParameters.apiKey === null || requestParameters.apiKey === undefined) {
             throw new runtime.RequiredError('apiKey','Required parameter requestParameters.apiKey was null or undefined when calling search.');
+        }
+
+        if (requestParameters.q === null || requestParameters.q === undefined) {
+            throw new runtime.RequiredError('q','Required parameter requestParameters.q was null or undefined when calling search.');
         }
 
         const queryParameters: runtime.HTTPQuery = {};

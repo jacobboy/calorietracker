@@ -1,4 +1,7 @@
 export * from './Desc';
+export * from './ErrorItem';
+export * from './ErrorResponse';
+export * from './ErrorResponseErrors';
 export * from './Food';
 export * from './FoodFood';
 export * from './FoodFoodIng';
