@@ -53,21 +53,20 @@ export function macroPercents(macros: Macros): {
   // handling fiber.
   const calories = macroCalories(macros);
   return {
-    proteinPct: round(macros.protein * 9 / calories, 1),
-    fatPct: round(macros.fat * 9 / calories, 1),
-    carbsPct: round(macros.carbs * 9 / calories, 1)
+    proteinPct: round(macros.protein * 4 / calories, .01),
+    fatPct: round(macros.fat * 9 / calories, .01),
+    carbsPct: round(macros.carbs * 4 / calories, .01)
   };
 }
 
 export function macroCalories(macros: Macros): number {
-  return macros.protein * 9 + macros.fat * 4 + macros.carbs * 4;
+  return macros.protein * 4 + macros.fat * 9 + macros.carbs * 4;
 }
 
 export function scaleQuantity(q: number, from: number, to: number): number {
   const toPlace = .01;
   const newQ = round(q * to / from, toPlace);
   if (isNaN(newQ)) {
-    console.log(`Scale quantity received ${[q, from, to]}, returning 0`);
     return 0;
   }
   return newQ;

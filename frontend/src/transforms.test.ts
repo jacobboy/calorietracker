@@ -12,8 +12,8 @@ describe('The AmountOf', () => {
     expect(scaledMacros.fat).toBe(4);
     expect(scaledMacros.carbs).toBe(6);
     expect(scaledMacros.calories).toBe(8);
-    expect(scaledMacros.proteinPct).toBe(2);
-    expect(scaledMacros.fatPct).toBe(4);
-    expect(scaledMacros.carbsPct).toBe(6);
+    expect(scaledMacros.proteinPct).toBe(0.12);
+    expect(scaledMacros.fatPct).toBe(0.53);
+    expect(scaledMacros.carbsPct).toBe(0.35);
   });
 });
