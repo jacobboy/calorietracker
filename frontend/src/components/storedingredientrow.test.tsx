@@ -65,6 +65,6 @@ describe('The StoredIngredientComponent', () => {
     // tslint:disable-next-line:no-string-literal
     expect(mockTrackFn.mock.calls[0][0]['amount']).toBe(newAmount);
     // tslint:disable-next-line:no-string-literal
-    expect(mockTrackFn.mock.calls[0][0]['baseFood']).toBe(thisIngred);
+    expect(mockTrackFn.mock.calls[0][0]['namedMacros']).toBe(thisIngred);
   });
 });
