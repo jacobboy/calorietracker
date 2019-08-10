@@ -67,7 +67,7 @@ export function scaleQuantity(q: number, from: number, to: number): number {
   const toPlace = .01;
   const newQ = round(q * to / from, toPlace);
   if (isNaN(newQ)) {
-    // console.log(`Scale quantity received ${[q, from, to]}, returning 0`);
+    console.log(`Scale quantity received ${[q, from, to]}, returning 0`);
     return 0;
   }
   return newQ;

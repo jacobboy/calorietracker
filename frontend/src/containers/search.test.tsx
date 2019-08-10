@@ -6,7 +6,6 @@ import { SearchState } from '../types';
 import SearchComponent from '../containers/search';
 import { DataSource } from '../ndbapi';
 import { SearchItem } from '../usdaclient';
-import { reducer } from '../reducers';
 import { actions } from '../actions';
 
 describe('When the track food button is clicked', () => {
@@ -14,14 +13,15 @@ describe('When the track food button is clicked', () => {
   let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
   let store: Store<{search: SearchState}, AnyAction>;
   let searchState: SearchState;
+  // tslint:disable-next-line:no-any
+  let reducer: Reducer<SearchState, any> = jest.fn();
 
   beforeEach(() => {
     const searchString = 'butter';
     const dataSource = DataSource.Any;
     const items: SearchItem[] = [];
+    reducer = jest.fn();
     searchState = { searchString, dataSource, items };
-    // tslint:disable-next-line:no-any
-    const reducer: Reducer<SearchState, any> = jest.fn();
     store = createStore(reducer, searchState);
     wrapper = mount(
       <Provider store={store}>
@@ -36,4 +36,4 @@ describe('When the track food button is clicked', () => {
       searchState, actions.foodSearchSubmit('butter', DataSource.Any)
     );
   });
-};
+});
