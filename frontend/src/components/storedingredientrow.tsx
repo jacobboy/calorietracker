@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import { TopBitDisplay } from '../types';
 import { tdStyle, thStyle } from '../style';

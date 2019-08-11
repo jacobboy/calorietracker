@@ -274,7 +274,7 @@ export function makeTestRecipe(
 ): Recipe {
   const macros = macrosFromFoods(foods);
   return {
-    uid: `${name}_uid`,
+    uid: `${name.replace(/\s/g, '_')}_uid`,
     name,
     foods,
     portionSize,

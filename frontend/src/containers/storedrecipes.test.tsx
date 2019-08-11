@@ -7,6 +7,7 @@ import StoredRecipes from '../containers/storedrecipes';
 import { reducer } from '../reducers';
 import { TopBitDisplay } from '../types';
 import { AmountOfNamedMacros, Recipe } from 'src/client';
+import { actions } from 'src/actions';
 
 function mockIngredients(nFoods: number) {
   const foods = [];
@@ -33,7 +34,16 @@ describe('The stored ingredient component', () => {
   // tslint:disable-next-line:no-any
   let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
   // tslint:disable-next-line:no-any
-  let store: Store<any, AnyAction>;
+  let store: {
+    getState: () => { },
+    // tslint:disable-next-line:no-any
+    dispatch: any,
+    // tslint:disable-next-line:no-any
+    subscribe: any,
+    // tslint:disable-next-line:no-any
+    replaceReducer: any
+  };
+  let dispatch: () => null;
 
   let foods: AmountOfNamedMacros[];
   let recipe: Recipe;
@@ -56,23 +66,32 @@ describe('The stored ingredient component', () => {
         ]
       }
     };
-    store = createStore(reducer, state);
+    dispatch = jest.fn();
+    store = {
+      getState: () => state,
+      dispatch,
+      subscribe: jest.fn(),
+      replaceReducer: jest.fn()
+    };
 
+    foods = mockIngredients(2);
+    recipe = makeTestRecipe('Test Recipe 2', foods, 100);
+  });
+  it('adds recipes to the state on add recipe click', () => {
+    wrapper = mount(
+      <Provider store={store}>
+        <StoredRecipes searchText={''} focusRef={React.createRef()} />
+      </Provider>
+    );
+    wrapper.find(`#copy_${recipe.uid}`).simulate('click');
+    expect(dispatch).toHaveBeenCalledWith(actions.copyRecipe(recipe.uid));
+  });
+  it('only displays recipes that match the search criteria', () => {
     wrapper = mount(
       <Provider store={store}>
         <StoredRecipes searchText={'2'} focusRef={React.createRef()} />
       </Provider>
     );
-
-  });
-  it('adds recipes to the state on add recipe click', () => {
-    const mockLoadRecipe = jest.fn();
-    mockLoadRecipe.mockReturnValue(JSON.stringify(recipe));
-    window.localStorage.getItem = mockLoadRecipe;
-    wrapper.find(`#copy_${recipe.uid}`).simulate('click');
-    expect(store.getState().topbit.recipe.foods).toEqual(recipe.foods);
-  });
-  it('only displays recipes that match the search criteria', () => {
     expect(wrapper.html().indexOf('Test Recipe 2')).toBeGreaterThan(-1);
     expect(wrapper.html().indexOf('Test Recipe 1')).toEqual(-1);
   });
