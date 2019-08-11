@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 interface Props {
-  id?: string;
+  id: string;
   amount: number;
   onChange: (input: number) => void;
 }

@@ -4,10 +4,9 @@ import { mount } from 'enzyme';
 import { Provider } from 'react-redux';
 import { FOOD_UNIT } from '../classes';
 import CreateRecipeInput from '../containers/createrecipe';
-import { TopBitState, emptyState } from '../types';
-import { AmountOfNamedMacros, Recipe } from 'src/client';
+import { AmountOfNamedMacros } from 'src/client';
 import { scaleQuantity } from 'src/transforms';
-import { CREATE_RECIPE_SUBMIT } from 'src/constants';
+import { CREATE_RECIPE_SUBMIT, REMOVE_FOOD_FROM_RECIPE, REPLACE_FOOD_IN_RECIPE } from 'src/constants';
 import { actions } from 'src/actions';
 
 function mockIngredients(nFoods: number) {
@@ -39,7 +38,7 @@ describe('Recipes', () => {
   let foods: AmountOfNamedMacros[];
   // TODO tests work, but how do pros test connected components in typescript?
   let store: {
-    getState: () => { topbit: TopBitState, saved: { recipes: Recipe[] } },
+    getState: () => { topbit: { recipe: { foods: AmountOfNamedMacros[] }} },
     // tslint:disable-next-line:no-any
     dispatch: any,
     // tslint:disable-next-line:no-any
@@ -47,18 +46,21 @@ describe('Recipes', () => {
     // tslint:disable-next-line:no-any
     replaceReducer: any
   };
+  let dispatch: () => null;
   /* let store: Store<{topbit: TopBitState, saved: {recipes: Recipe[]}}, AnyAction>; */
 
   beforeEach(() => {
     foods = mockIngredients(nFoods);
+    dispatch = jest.fn();
     /* let state = {
       topbit: { ...emptyState.topbit, recipe: { ...emptyState.topbit.recipe, foods } },
       saved: { recipes: [] }
     }; */
     /* store = createStore(reducer, state); */
+    const getState = () => ({ topbit: { recipe: { foods }}});
     store = {
-      getState: jest.fn(() => ({ ...emptyState.topbit, recipe: { ...emptyState.topbit.recipe, foods } })),
-      dispatch: jest.fn(),
+      getState,
+      dispatch,
       subscribe: jest.fn(),
       replaceReducer: jest.fn()
     };
@@ -71,12 +73,10 @@ describe('Recipes', () => {
   });
 
   for (let iIngred = 0; iIngred < nFoods; iIngred++) {
-    it(`can have food ${iIngred} removed`, () => {
-      const foodToRemain = foods[iIngred ? 0 : 1];
+    it(`dispatches REMOVE_FOOD_FROM_RECIPE on food remove click`, () => {
       wrapper.find(`#removeFood_1_${iIngred}`).simulate('click');
-      expect(store.getState().topbit.recipe.foods.length).toBe(1);
-      expect(store.getState().topbit.recipe.foods[0]).toBe(foodToRemain);
-    });
+      expect(dispatch).toBeCalledWith({'payload': foods[iIngred], 'type': REMOVE_FOOD_FROM_RECIPE});
+     });
   }
 
   function macroSum(macroName: string) {
@@ -117,10 +117,10 @@ describe('Recipes', () => {
     wrapper.find('#recipeUnitInput').simulate('change', { target: { value: unit } });
     wrapper.find('#saveRecipe').simulate('click');
 
-    expect(store.dispatch).toHaveBeenCalledWith(
+    expect(dispatch).toHaveBeenCalledWith(
       {
         type: CREATE_RECIPE_SUBMIT,
-        action: actions.saveRecipe(name, foods, portionSize, totalSize, unit)
+        payload: actions.saveRecipe(title, foods, portionSize, totalSize, unit).payload
       }
     );
   });
@@ -137,15 +137,14 @@ describe('Recipes', () => {
     wrapper.find('#recipePortionInput').simulate('change', { target: { value: portionSize } });
     wrapper.find('#recipeAmountInput').simulate('change', { target: { value: totalSize } });
     wrapper.find('#recipeUnitInput').simulate('change', { target: { value: unit } });
-    wrapper.find('#saveRecipe').simulate('click');
-    wrapper.find(`#foodAmountInput_1_1}`).first().simulate(
+    wrapper.find('#foodAmountInput11').first().simulate(
       'change', { target: { value: newFood.amount.toString() } }
     );
-
-    expect(store.dispatch).toHaveBeenCalledWith(
+    wrapper.find('#saveRecipe').simulate('click');
+    expect(dispatch).lastCalledWith(
       {
         type: CREATE_RECIPE_SUBMIT,
-        action: actions.saveRecipe(name, [foods[0], foods[foodToChangeIdx]], portionSize, totalSize, unit)
+        payload: actions.saveRecipe(title, [foods[0], foods[foodToChangeIdx]], portionSize, totalSize, unit).payload
       }
     );
   });
