@@ -27,6 +27,7 @@ import { NamedMacros, AmountOfNamedMacros, NewIngredient, Recipe } from 'src/cli
 import { FOOD_UNIT } from 'src/classes';
 import { DataSource } from 'src/ndbapi';
 import { SearchItem } from 'src/usdaclient';
+import { macrosFromAmountOf } from 'src/transforms';
 
 export interface Action<T extends string> {
   type: T;
@@ -59,15 +60,18 @@ function createIngredientSubmit(
   convertAmount: number,
   unit: FOOD_UNIT,
 ) {
+  const scaledMacros = macrosFromAmountOf(
+    {protein, fat, carbs, calories}, amount, convertAmount
+  );
   const ingredient: NewIngredient = {
     name,
-    amount,
-    unit,
-    protein,
-    fat,
-    carbs,
-    calories
-  };
+    protein: scaledMacros.protein,
+    fat: scaledMacros.fat,
+    carbs: scaledMacros.carbs,
+    calories: scaledMacros.calories,
+    amount: convertAmount,
+    unit
+};
   return createAction(CREATE_INGREDIENT_SUBMIT, ingredient);
 }
 

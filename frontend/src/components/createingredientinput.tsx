@@ -68,7 +68,8 @@ export class CreateIngredientInput extends React.Component<
   }
 
   handleAmountInput(event: React.ChangeEvent<HTMLInputElement>) {
-    const amount = Number(event.target.value);    this.setState({ amount });
+    const amount = Number(event.target.value);
+    this.setState({ amount });
   }
 
   handleConvertAmountInput(event: React.ChangeEvent<HTMLInputElement>) {

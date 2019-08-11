@@ -52,14 +52,8 @@ describe('Recipes', () => {
   beforeEach(() => {
     foods = mockIngredients(nFoods);
     dispatch = jest.fn();
-    /* let state = {
-      topbit: { ...emptyState.topbit, recipe: { ...emptyState.topbit.recipe, foods } },
-      saved: { recipes: [] }
-    }; */
-    /* store = createStore(reducer, state); */
-    const getState = () => ({ topbit: { recipe: { foods }}});
     store = {
-      getState,
+      getState: () => ({ topbit: { recipe: { foods }}}),
       dispatch,
       subscribe: jest.fn(),
       replaceReducer: jest.fn()
