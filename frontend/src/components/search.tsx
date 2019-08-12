@@ -33,7 +33,7 @@ export class SearchComponent extends React.Component<
     this.searchRef = React.createRef();
   }
 
-  handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
+  handleDataSourceChange(event: React.ChangeEvent<HTMLSelectElement>) {
     this.props.onDataSourceSelect(DataSource[event.target.value]);
   }
 
@@ -53,14 +53,14 @@ export class SearchComponent extends React.Component<
   render() {
     return (
       <div>
-        <form onSubmit={(e) => this.handleSubmit(e)} >
+        <form id="globalSearchForm" onSubmit={(e) => this.handleSubmit(e)} >
           <label>
             Search:
             <input
               id="globalSearchInput"
               ref={this.searchRef}
               type="text"
-              placeholder="Search USDA Database"
+              placeholder="Search ingredients, recipes, and the USDA Database"
               autoFocus={true}
               value={this.props.searchString || ''}
               onChange={(e) => this.handleSearchChange(e)}
@@ -69,8 +69,9 @@ export class SearchComponent extends React.Component<
           <label>
             Datasource:
             <select
+              id="globalSearchDataSourceSelect"
               value={this.props.dataSource}
-              onChange={(e) => this.handleSelectChange(e)}
+              onChange={(e) => this.handleDataSourceChange(e)}
             >
               <option value={DataSource.SR}>Non-branded</option>
               <option value={DataSource.BL}>Branded</option>

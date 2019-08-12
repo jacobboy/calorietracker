@@ -20,7 +20,6 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
       dispatch(actions.foodSearchInput(searchString));
     },
     onFoodSearchSubmit: (searchString: string, ds: DataSource) => {
-      console.log('Searching food ' + searchString);
       dispatch(actions.foodSearchSubmit(searchString, ds));
     }
   };

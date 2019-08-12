@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { mount, ReactWrapper } from 'enzyme';
-import { createStore, Store, AnyAction, Reducer } from 'redux';
+import * as enzyme from 'enzyme';
+import { mount } from 'enzyme';
 import { Provider } from 'react-redux';
-import { SearchState } from '../types';
+import { SearchState, SavedState } from '../types';
 import SearchComponent from '../containers/search';
 import { DataSource } from '../ndbapi';
 import { SearchItem } from '../usdaclient';
@@ -10,19 +10,38 @@ import { actions } from '../actions';
 
 describe('When the track food button is clicked', () => {
   // tslint:disable-next-line:no-any
-  let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
-  let store: Store<{search: SearchState}, AnyAction>;
-  let searchState: SearchState;
-  // tslint:disable-next-line:no-any
-  let reducer: Reducer<SearchState, any> = jest.fn();
+  let wrapper: enzyme.ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
+  // TODO tests work, but how do pros test connected components in typescript?
+  let store: {
+    getState: () => {
+      search:  SearchState,
+      saved: SavedState
+     },
+    // tslint:disable-next-line:no-any
+    dispatch: any,
+    // tslint:disable-next-line:no-any
+    subscribe: any,
+    // tslint:disable-next-line:no-any
+    replaceReducer: any
+  };
+  let dispatch: () => null;
 
   beforeEach(() => {
     const searchString = 'butter';
     const dataSource = DataSource.Any;
     const items: SearchItem[] = [];
-    reducer = jest.fn();
-    searchState = { searchString, dataSource, items };
-    store = createStore(reducer, searchState);
+    const searchState = {
+      search: { searchString, dataSource, items },
+      saved: { recipes: [], ingredients: [] }
+    };
+    dispatch = jest.fn();
+    store = {
+      getState: () => searchState,
+      dispatch,
+      subscribe: jest.fn(),
+      replaceReducer: jest.fn()
+    };
+
     wrapper = mount(
       <Provider store={store}>
           <SearchComponent/>
@@ -31,9 +50,11 @@ describe('When the track food button is clicked', () => {
   });
 
   it(`creates a FOODSEARCH_SUBMIT action on search`, () => {
-    wrapper.find('#globalSearchInput').simulate('click');
-    expect(reducer).toBeCalledWith(
-      searchState, actions.foodSearchSubmit('butter', DataSource.Any)
-    );
+    const searchString = 'butter';
+    wrapper.find('#globalSearchInput').simulate('change', searchString);
+    // TODO testing select change is a bit more complicated than I feel like dealing with rn
+    // wrapper.find('#globalSearchDataSourceSelect').simulate('change', { target: { value: DataSource.BL } });
+    wrapper.find('#globalSearchForm').simulate('submit');
+    expect(dispatch).toHaveBeenCalledWith(actions.foodSearchSubmit(searchString, DataSource.Any));
   });
 });
