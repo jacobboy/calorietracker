@@ -10,7 +10,7 @@ function mapStateToProps(state: StoreState) {
   if (state.topbit.display === TopBitDisplay.CREATE_RECIPE) {
     foodComboNames = ['recipe'];
   } else {
-    foodComboNames = state.today.map((meal, idx) => `meal ${idx + 1}`);
+    foodComboNames = state.today.map((meal, idx) => `meal ${idx}`);
   }
 
   return {

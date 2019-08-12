@@ -127,7 +127,7 @@ export class StoredIngredientRow extends React.Component<
 }
 
 function trackButton(foodComboName: string, onClick: () => void) {
-  const id = foodComboName.replace(' ', '');
+  const id = foodComboName.replace(/\s/g, '');
   return (
     <button
       key={`trackFoodSubmit_${id}`}
