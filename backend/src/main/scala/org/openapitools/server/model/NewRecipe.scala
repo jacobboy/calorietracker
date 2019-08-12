@@ -16,7 +16,7 @@ case class NewRecipe(
 
   foods: List[AmountOfIngredient],
 
-  totalSize: BigDecimal,
+  amount: BigDecimal,
 
   portionSize: BigDecimal,
 

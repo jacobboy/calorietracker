@@ -28,7 +28,7 @@ case class Recipe(
 
   foods: List[AmountOfNamedMacros],
 
-  totalSize: BigDecimal,
+  amount: BigDecimal,
 
   portionSize: BigDecimal) {
 

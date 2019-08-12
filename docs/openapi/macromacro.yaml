@@ -315,7 +315,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AmountOfIngredient'
-        totalSize:
+        amount:
           type: number
         portionSize:
           type: number
@@ -326,17 +326,13 @@ components:
       allOf:
         - $ref: '#/components/schemas/NamedMacros'
         - required:
-          - uid
           - foods
-          - totalSize
           - portionSize
           properties:
             foods:
               type: array
               items:
                 $ref: '#/components/schemas/AmountOfNamedMacros'
-            totalSize:
-              type: number
             portionSize:
               type: number
 
