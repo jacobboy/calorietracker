@@ -211,7 +211,7 @@ object Storage {
 
   def save(newRecipe: NewRecipe): Either[ConnectionError, Either[List[MissingIngredientError], NamedMacros]] = {
     calculateStoredRecipe(
-      RecipeId(), newRecipe.name, newRecipe.foods, newRecipe.totalSize,
+      RecipeId(), newRecipe.name, newRecipe.foods, newRecipe.amount,
       newRecipe.portionSize, newRecipe.unit).map(_.map(r => {
         val recipeJson = write(r)
         val document = nameBodyDoc(r.uid, "recipe", r.name, recipeJson)
