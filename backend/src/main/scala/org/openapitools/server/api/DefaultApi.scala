@@ -11,7 +11,7 @@
 
 package org.openapitools.server.api
 
-import com.macromacro.storage._
+import com.typesafe.scalalogging.LazyLogging
 import org.openapitools.server.model._
 
 import java.io.File
@@ -27,7 +27,7 @@ import scala.collection.JavaConverters._
 
 import com.macromacro.storage._
 
-class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
+class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet with LazyLogging
   with JacksonJsonSupport
   with SwaggerSupport {
 
@@ -66,6 +66,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
     parameters (bodyParam[NewIngredient]("newIngredient").description("Ingredient to create")))
 
   post("/ingredients", operation(createIngredientOperation)) {
+    logger.info("Creating ingredient")
     val newIngredient = parsedBody.extract[NewIngredient]
     handlePostStorageError(Storage.save(newIngredient))
   }

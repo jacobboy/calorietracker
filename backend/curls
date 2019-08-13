@@ -8,7 +8,7 @@
 POST :api/ingredients
 Content-Type: application/json
 {
-    "name": "donklage the man234",
+    "name": "piotr donklage",
     "carbs": 1,
     "fat": 3,
     "protein": 3,
@@ -18,7 +18,7 @@ Content-Type: application/json
 }
 
 
-:ingredient = ingredient::v1::a6ad4e1a-a89e-44b7-a52c-507ea02fd15e
+:ingredient = ingredient::v1::ba9405c4-fc21-4ac6-8230-dd448332b8e0
 
 
 # Check if we can get it back
@@ -44,13 +44,13 @@ Content-Type: application/json
         "amount": 10,
         "uid": ":ndbno"
     }],
-    "totalSize": 300,
+    "amount": 300,
     "portionSize": 100,
     "unit": "g"
 }
 
 
-:recipe = recipe::v1::c2d31ca1-21ae-4b9f-ab45-7904e3df0c47
+:recipe = recipe::v1::c0c076da-91ce-47e9-af93-abae38d00f9b
 
 
 # Check if we can get it back
