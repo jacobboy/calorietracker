@@ -271,7 +271,7 @@ export interface NewRecipe {
      * @type {number}
      * @memberof NewRecipe
      */
-    totalSize: number;
+    amount: number;
     /**
      *
      * @type {number}

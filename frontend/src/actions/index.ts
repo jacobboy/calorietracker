@@ -85,7 +85,7 @@ function addFoodToRecipe(ingredient: AmountOfNamedMacros) {
 }
 
 function saveRecipe(
-  name: string, foods: AmountOfNamedMacros[], portionSize: number, amount?: number, unit?: string
+  name: string, foods: AmountOfNamedMacros[], portionSize: number, amount: number, unit: string
 ) {
   return createAction(CREATE_RECIPE_SUBMIT, {name, foods, portionSize, amount, unit});
 }

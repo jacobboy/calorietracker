@@ -305,7 +305,7 @@ components:
       required:
         - name
         - foods
-        - totalSize
+        - amount
         - portionSize
         - unit
       properties:

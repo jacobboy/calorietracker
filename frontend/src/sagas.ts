@@ -46,13 +46,13 @@ function namedMacroToIngredient(nm: AmountOfNamedMacros) {
 
 function* saveRecipe(action: ActionsTypeMap['saveRecipe']) {
   const recipe = yield call(
-    MacroMacroFp().createRecipe, {
+    MacroMacroFp().createRecipe({
       name: action.payload.name,
       foods: action.payload.foods.map(namedMacroToIngredient),
       portionSize: action.payload.portionSize,
-      totalSize: action.payload.totalSize,
+      amount: action.payload.amount,
       unit: action.payload.unit
-    }
+    })
   );
   yield actions.createRecipeSucceeded(recipe);
 }
