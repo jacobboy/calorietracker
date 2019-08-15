@@ -1,8 +1,4 @@
 import { DataSource } from '../ndbapi';
-import {
-  getAllCustomIngredients,
-  getAllRecipes,
- } from '../storage';
 import { AmountOfNamedMacros, NamedMacros, Meal } from 'src/client';
 import { SearchItem } from 'src/usdaclient';
 
@@ -42,7 +38,6 @@ export class TopBitState {
 export interface StoreState {
   topbit: TopBitState;
   search: SearchState;
-  tracking: TrackingState;
   today: Meal[];
   saved: SavedState;
 }
@@ -61,10 +56,6 @@ export const emptyState: StoreState = {
     dataSource: DataSource.SR,
     items: []
   },
-  tracking: {
-    mealIdx: undefined,
-    ingredient: undefined
-  },
   today: [],
   saved: {
     ingredients: [],
@@ -76,7 +67,7 @@ export const initialState: StoreState = {
   ...emptyState,
   saved: {
     ...emptyState.saved,
-    ingredients: getAllCustomIngredients(),
-    recipes: getAllRecipes()
+    ingredients: [],
+    recipes: []
   }
 };
