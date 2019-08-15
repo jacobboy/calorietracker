@@ -17,7 +17,7 @@ import * as url from "url";
 import * as portableFetch from "portable-fetch";
 import { Configuration } from "./configuration";
 
-const BASE_PATH = "http://localhost:5555".replace(/\/+$/, "");
+const BASE_PATH = "http://localhost:8080/Default".replace(/\/+$/, "");
 
 /**
  *
@@ -585,6 +585,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @throws {RequiredError}
          */
         createIngredient(newIngredient: NewIngredient, options?: any): (fetch?: FetchAPI, basePath?: string) => Promise<NamedMacros> {
+            console.log(`creating ${newIngredient.name}`)
             const localVarFetchArgs = DefaultApiFetchParamCreator(configuration).createIngredient(newIngredient, options);
             return (fetch: FetchAPI = portableFetch, basePath: string = BASE_PATH) => {
                 return fetch(basePath + localVarFetchArgs.url, localVarFetchArgs.options).then((response) => {

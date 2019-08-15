@@ -1,4 +1,4 @@
-import { all, call, put, takeLatest } from 'redux-saga/effects';
+import { all, call, put, takeLatest, take } from 'redux-saga/effects';
 import { DefaultApiFp as MacroMacroFp, NamedMacros, Recipe, AmountOfNamedMacros } from './client';
 import { DefaultApi as UsdaClient, SearchResponse } from './usdaclient';
 import { ActionsTypeMap, actions } from './actions';
@@ -14,10 +14,10 @@ import { GOV_API_KEY } from './apikey';
 
 function* createIngredient(action: ActionsTypeMap['createIngredientSubmit']) {
   try {
-    const macros: NamedMacros = yield call(MacroMacroFp().createIngredient, action.payload);
+    const macros: NamedMacros = yield call(MacroMacroFp().createIngredient(action.payload));
     yield put(actions.createIngredientSucceeded(macros));
   } catch (response) {
-    console.log('error creating ingredient');
+    console.log(`error creating ingredient: ${response.message}`);
     yield put({ type: CREATE_INGREDIENT_FAILED, message: response.message });
   }
 }
@@ -27,17 +27,16 @@ function* searchFood(action: ActionsTypeMap['foodSearchSubmit']) {
     {apiKey: GOV_API_KEY, q: searchString}
   );
   try {
-    console.log(`in foodsearch saga for ${action.payload.searchString}`);
     const searchResults: SearchResponse = yield call(searchFunc, action.payload.searchString);
     yield put(actions.foodSearchSucceeded(searchResults.list.item));
   } catch (response) {
-    console.log('error creating ingredient');
+    console.log(`error searching '${action.payload.searchString}': ${response.message}`);
     yield put({ type: FOODSEARCH_FAILED, message: response.message });
   }
 }
 
 function* copyRecipe(action: ActionsTypeMap['copyRecipe']) {
-  const recipe: Recipe = yield call(MacroMacroFp().findRecipeByUID, action.payload);
+  const recipe: Recipe = yield call(MacroMacroFp().findRecipeByUID(action.payload));
   yield actions.addFoodsToRecipe(recipe);
 }
 
@@ -64,5 +63,10 @@ function* saveRecipe(action: ActionsTypeMap['saveRecipe']) {
 } */
 
 export default function* rootSaga() {
-  yield takeLatest(FOODSEARCH_SUBMIT, searchFood);
+  yield all([
+    takeLatest(FOODSEARCH_SUBMIT, searchFood),
+    takeLatest(CREATE_INGREDIENT_SUBMIT, createIngredient),
+    takeLatest(COPY_RECIPE, copyRecipe),
+    takeLatest(CREATE_RECIPE_SUBMIT, saveRecipe)
+  ]);
 }

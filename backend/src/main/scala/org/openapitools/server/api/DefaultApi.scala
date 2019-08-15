@@ -27,7 +27,8 @@ import scala.collection.JavaConverters._
 
 import com.macromacro.storage._
 
-class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet with LazyLogging
+class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
+  with LazyLogging
   with JacksonJsonSupport
   with SwaggerSupport {
 
@@ -38,7 +39,6 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet with Laz
 
   before() {
     contentType = formats("json")
-    response.headers += ("Access-Control-Allow-Origin" -> "*")
   }
 
   // TODO how to not have to duplicate these handler functions?
