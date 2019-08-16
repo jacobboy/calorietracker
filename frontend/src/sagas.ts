@@ -13,7 +13,8 @@ import {
   LOAD_INGREDIENTS_SUBMIT,
   LOAD_RECIPES_FAILED,
   LOAD_RECIPES_SUBMIT,
-  LOAD_INGREDIENTS_SUCCESS
+  LOAD_INGREDIENTS_SUCCESS,
+  LOAD_RECIPES_SUCCESS
 } from './constants';
 import { GOV_API_KEY } from './apikey';
 
@@ -30,9 +31,10 @@ export function* loadInitialIngredients() {
   }
 }
 
-function* loadInitialRecipes() {
+export function* loadInitialRecipes() {
   try {
     const macros: NamedMacros[] = yield call(MacroMacroFp().findRecipes());
+    yield put({ type: LOAD_RECIPES_SUCCESS, payload: macros });
   } catch (response) {
     console.log(`error loading recipes: ${response.message}`);
     yield put({ type: LOAD_RECIPES_FAILED, payload: response.message });
