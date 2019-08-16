@@ -5,12 +5,39 @@ import { ActionsTypeMap, actions } from './actions';
 import {
   CREATE_INGREDIENT_FAILED,
   CREATE_INGREDIENT_SUBMIT,
+  CREATE_RECIPE_SUBMIT,
+  COPY_RECIPE,
   FOODSEARCH_SUBMIT,
   FOODSEARCH_FAILED,
-  COPY_RECIPE,
-  CREATE_RECIPE_SUBMIT
+  LOAD_INGREDIENTS_FAILED,
+  LOAD_INGREDIENTS_SUBMIT,
+  LOAD_RECIPES_FAILED,
+  LOAD_RECIPES_SUBMIT,
+  LOAD_INGREDIENTS_SUCCESS
 } from './constants';
 import { GOV_API_KEY } from './apikey';
+
+// TODO How am I supposed to test sagas without exporting them all?
+// attempts to test the root saga have failed so far
+
+export function* loadInitialIngredients() {
+  try {
+    const macros: NamedMacros[] = yield call(MacroMacroFp().findIngredients());
+    yield put({ type: LOAD_INGREDIENTS_SUCCESS, payload: macros });
+  } catch (response) {
+    console.log(`error loading ingredients: ${response.message}`);
+    yield put({ type: LOAD_INGREDIENTS_FAILED, payload: response.message });
+  }
+}
+
+function* loadInitialRecipes() {
+  try {
+    const macros: NamedMacros[] = yield call(MacroMacroFp().findRecipes());
+  } catch (response) {
+    console.log(`error loading recipes: ${response.message}`);
+    yield put({ type: LOAD_RECIPES_FAILED, payload: response.message });
+  }
+}
 
 function* createIngredient(action: ActionsTypeMap['createIngredientSubmit']) {
   try {
@@ -18,7 +45,7 @@ function* createIngredient(action: ActionsTypeMap['createIngredientSubmit']) {
     yield put(actions.createIngredientSucceeded(macros));
   } catch (response) {
     console.log(`error creating ingredient: ${response.message}`);
-    yield put({ type: CREATE_INGREDIENT_FAILED, message: response.message });
+    yield put({ type: CREATE_INGREDIENT_FAILED, payload: response.message });
   }
 }
 
@@ -31,7 +58,7 @@ function* searchFood(action: ActionsTypeMap['foodSearchSubmit']) {
     yield put(actions.foodSearchSucceeded(searchResults.list.item));
   } catch (response) {
     console.log(`error searching '${action.payload.searchString}': ${response.message}`);
-    yield put({ type: FOODSEARCH_FAILED, message: response.message });
+    yield put({ type: FOODSEARCH_FAILED, payload: response.message });
   }
 }
 
@@ -64,6 +91,8 @@ function* saveRecipe(action: ActionsTypeMap['saveRecipe']) {
 
 export default function* rootSaga() {
   yield all([
+    takeLatest(LOAD_INGREDIENTS_SUBMIT, loadInitialIngredients),
+    takeLatest(LOAD_RECIPES_SUBMIT, loadInitialRecipes),
     takeLatest(FOODSEARCH_SUBMIT, searchFood),
     takeLatest(CREATE_INGREDIENT_SUBMIT, createIngredient),
     takeLatest(COPY_RECIPE, copyRecipe),
