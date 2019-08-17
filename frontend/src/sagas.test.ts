@@ -22,7 +22,12 @@ describe('The load ingredients saga', () => {
   });
 
   it('puts a LOAD_INGREDIENT_FAILED on failure', () => {
-    expect(gen.clone().throw({message: 'sup'}).value).toEqual(put({ type: LOAD_INGREDIENTS_FAILED, payload: 'sup' }));
+    const clone = gen.clone();
+    if (clone.throw) {
+      expect(clone.throw({message: 'sup'}).value).toEqual(put({ type: LOAD_INGREDIENTS_FAILED, payload: 'sup' }));
+    } else {
+      throw('clone not throwable');
+    }
   });
 });
 
@@ -38,6 +43,12 @@ describe('The load recipes saga', () => {
   });
 
   it('puts a LOAD_RECIPES_FAILED on failure', () => {
-    expect(gen.clone().throw({message: 'sup'}).value).toEqual(put({ type: LOAD_RECIPES_FAILED, payload: 'sup' }));
+    const clone = gen.clone();
+    if (clone.throw) {
+      expect(clone.throw({message: 'sup'}).value).toEqual(put({ type: LOAD_RECIPES_FAILED, payload: 'sup' }));
+    } else {
+      throw('clone not throwable');
+    }
+
   });
 });

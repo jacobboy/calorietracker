@@ -18,7 +18,9 @@ import {
   SAVE_SEARCH_ITEM,
   REPLACE_FOOD_IN_RECIPE,
   REPLACE_FOOD_IN_MEAL,
-  ADD_FOODS_TO_RECIPE
+  ADD_FOODS_TO_RECIPE,
+  LOAD_INGREDIENTS_SUCCESS,
+  LOAD_RECIPES_SUCCESS
 } from '../constants/index';
 import { dropIndex, replaceElement, replaceObject } from '../datautil';
 import { AmountOfNamedMacros, Meal } from 'src/client';
@@ -54,6 +56,22 @@ export function
 reducer(state: StoreState, action: Actions): StoreState {
   // console.log('Handling: ' + action.type);
   switch (action.type) {
+    case LOAD_INGREDIENTS_SUCCESS:
+      return {
+        ...state,
+        saved: {
+          ...state.saved,
+          ingredients: action.payload
+        }
+      };
+    case LOAD_RECIPES_SUCCESS:
+      return {
+        ...state,
+        saved: {
+          ...state.saved,
+          recipes: action.payload
+        }
+      };
     case SELECT_DATASOURCE:
       return {
         ...state,

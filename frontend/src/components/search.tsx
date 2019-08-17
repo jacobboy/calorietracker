@@ -11,6 +11,7 @@ interface SearchComponentProps {
   searchString: string;
   dataSource: DataSource;
   items: SearchItem[];
+  onLoad: () => void;
   onDataSourceSelect: (ds: DataSource) => void;
   onFoodSearchInput: (searchString: string) => void;
   onFoodSearchSubmit: (searchString: string, ds: DataSource) => void;
@@ -31,6 +32,10 @@ export class SearchComponent extends React.Component<
       createIngredientOn: false
     };
     this.searchRef = React.createRef();
+  }
+
+  componentDidMount() {
+    this.props.onLoad();
   }
 
   handleDataSourceChange(event: React.ChangeEvent<HTMLSelectElement>) {

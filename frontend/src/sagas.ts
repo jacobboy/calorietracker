@@ -41,6 +41,13 @@ export function* loadInitialRecipes() {
   }
 }
 
+function* loadInitialIngredientsAndRecipes() {
+  yield all([
+    loadInitialIngredients(),
+    loadInitialRecipes()
+  ]);
+}
+
 function* createIngredient(action: ActionsTypeMap['createIngredientSubmit']) {
   try {
     const macros: NamedMacros = yield call(MacroMacroFp().createIngredient(action.payload));
@@ -93,7 +100,7 @@ function* saveRecipe(action: ActionsTypeMap['saveRecipe']) {
 
 export default function* rootSaga() {
   yield all([
-    takeLatest(LOAD_INGREDIENTS_SUBMIT, loadInitialIngredients),
+    takeLatest(LOAD_INGREDIENTS_SUBMIT, loadInitialIngredientsAndRecipes),
     takeLatest(LOAD_RECIPES_SUBMIT, loadInitialRecipes),
     takeLatest(FOODSEARCH_SUBMIT, searchFood),
     takeLatest(CREATE_INGREDIENT_SUBMIT, createIngredient),

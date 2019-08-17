@@ -20,7 +20,11 @@ import {
   CREATE_INGREDIENT_SUCCEEDED,
   FOODSEARCH_SUCCESS,
   COPY_RECIPE,
-  CREATE_RECIPE_SUCCEEDED
+  CREATE_RECIPE_SUCCEEDED,
+  LOAD_INGREDIENTS_SUBMIT,
+  LOAD_RECIPES_SUBMIT,
+  LOAD_INGREDIENTS_SUCCESS,
+  LOAD_RECIPES_SUCCESS
 } from '../constants/index';
 import { TopBitDisplay } from '../types';
 import { NamedMacros, AmountOfNamedMacros, NewIngredient, Recipe } from 'src/client';
@@ -84,7 +88,7 @@ function addFoodToRecipe(ingredient: AmountOfNamedMacros) {
   return createAction(ADD_FOOD_TO_RECIPE, ingredient);
 }
 
-function saveRecipe(
+function createRecipeSubmit(
   name: string, foods: AmountOfNamedMacros[], portionSize: number, amount: number, unit: string
 ) {
   return createAction(CREATE_RECIPE_SUBMIT, {name, foods, portionSize, amount, unit});
@@ -95,12 +99,22 @@ function changeMealFoodAmount(mealIdx: number, food: AmountOfNamedMacros, newAmo
   return createAction(REPLACE_FOOD_IN_MEAL, {mealIdx, from: food, to: newFood});
 }
 
+export const sagaActions = {
+  loadIngredientsAndRecipes: () => createAction(LOAD_INGREDIENTS_SUBMIT),
+  foodSearchSubmit: (searchString: String, ds: String) => createAction(FOODSEARCH_SUBMIT, {searchString, ds}),
+  createIngredientSubmit,
+  copyRecipe: (recipeUid: string) => createAction(COPY_RECIPE, recipeUid),
+  saveRecipe: createRecipeSubmit,
+};
+
 // TODO should actions be UI-driven or business logic driven?
 // perhaps business-driven and have the containers perform business/ui mapping?
 export const actions = {
+  ...sagaActions,
+  loadIngredientsSucceeded: (namedMacros: NamedMacros[]) => createAction(LOAD_INGREDIENTS_SUCCESS, namedMacros),
+  loadRecipesSucceeded: (namedMacros: NamedMacros[]) => createAction(LOAD_RECIPES_SUCCESS, namedMacros),
   selectDataSource: (dataSource: DataSource) => createAction(SELECT_DATASOURCE, dataSource),
   foodSearchInput: (searchString: string) => createAction(FOODSEARCH_INPUT, searchString),
-  foodSearchSubmit: (searchString: String, ds: String) => createAction(FOODSEARCH_SUBMIT, {searchString, ds}),
   foodSearchSucceeded: (searchResults: SearchItem[]) => createAction(FOODSEARCH_SUCCESS, {searchResults}),
   addMeal: () => createAction(ADD_MEAL),
   removeMeal: (mealIdx: number) => createAction(REMOVE_MEAL, mealIdx),
@@ -109,16 +123,13 @@ export const actions = {
   removeFoodFromMeal: (mealIdx: number, food: AmountOfNamedMacros) =>
       createAction(REMOVE_FOOD_FROM_MEAL, { mealIdx, food }),
   createIngredientToggle: (destination: TopBitDisplay) => createAction(CREATE_INGREDIENT_TOGGLE, destination),
-  createIngredientSubmit,
   createIngredientSucceeded: (macros: NamedMacros) => createAction(CREATE_INGREDIENT_SUCCEEDED, macros),
   createRecipeOpen: () => createAction(CREATE_RECIPE_OPEN),
   changeRecipeFoodAmount,
   addFoodToRecipe,
-  copyRecipe: (recipeUid: string) => createAction(COPY_RECIPE, recipeUid),
   createRecipeSucceeded: (recipe: Recipe) => createAction(CREATE_RECIPE_SUCCEEDED, recipe),
   addFoodsToRecipe: (recipe: Recipe) => createAction(ADD_FOODS_TO_RECIPE, recipe),
   removeFoodFromRecipe: (food: AmountOfNamedMacros) => createAction(REMOVE_FOOD_FROM_RECIPE, food),
-  saveRecipe,
   saveSearchItem: (ingredient: NamedMacros) => createAction(SAVE_SEARCH_ITEM, ingredient),
   setDay: (day: Date) => createAction(CHANGE_DAY, day),
 };
