@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import { actions, Actions, sagaActions } from '../actions/';
+import { actions, Actions } from '../actions/';
 import { SearchComponent } from '../components/search';
 import { StoreState } from '../types/index';
 import { DataSource } from 'src/ndbapi';
@@ -14,7 +14,7 @@ function mapStateToProps(state: StoreState) {
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
     onLoad: () => {
-      dispatch(sagaActions.loadIngredientsAndRecipes());
+      dispatch(actions.loadIngredientsAndRecipes());
     },
     onDataSourceSelect: (ds: DataSource) => {
       dispatch(actions.selectDataSource(ds));
@@ -23,7 +23,7 @@ function mapDispatchToProps(dispatch: Dispatch<Actions>) {
       dispatch(actions.foodSearchInput(searchString));
     },
     onFoodSearchSubmit: (searchString: string, ds: DataSource) => {
-      dispatch(sagaActions.foodSearchSubmit(searchString, ds));
+      dispatch(actions.foodSearchSubmit(searchString, ds));
     }
   };
 }

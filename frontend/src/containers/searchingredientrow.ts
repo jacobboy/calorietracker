@@ -11,7 +11,7 @@ function mapStateToProps(state: StoreState) {
 
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
-    onSaveClick: (namedMacros: NamedMacros) => dispatch(actions.saveSearchItem(namedMacros))
+    onSaveClick: (ndbNo: string) => dispatch(actions.saveSearchItem(ndbNo))
   };
 }
 

@@ -15,12 +15,12 @@ import {
   ADD_MEAL,
   REMOVE_MEAL,
   CHANGE_DAY,
-  SAVE_SEARCH_ITEM,
   REPLACE_FOOD_IN_RECIPE,
   REPLACE_FOOD_IN_MEAL,
   ADD_FOODS_TO_RECIPE,
   LOAD_INGREDIENTS_SUCCESS,
-  LOAD_RECIPES_SUCCESS
+  LOAD_RECIPES_SUCCESS,
+  SAVE_SEARCH_ITEM_SUCCEEDED
 } from '../constants/index';
 import { dropIndex, replaceElement, replaceObject } from '../datautil';
 import { AmountOfNamedMacros, Meal } from 'src/client';
@@ -204,7 +204,7 @@ reducer(state: StoreState, action: Actions): StoreState {
           recipes: [...state.saved.recipes, action.payload]
         }
       };
-    case SAVE_SEARCH_ITEM:
+    case SAVE_SEARCH_ITEM_SUCCEEDED:
       return {
         ...state,
         saved: {

@@ -36,7 +36,7 @@ GET :api/ingredients/:ndbno
 POST :api/recipes
 Content-Type: application/json
 {
-    "name": "recipe",
+    "name": "recipe-the-recipe",
     "foods": [{
         "amount": 112,
         "uid": ":ingredient"

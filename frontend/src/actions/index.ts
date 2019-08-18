@@ -8,6 +8,7 @@ import {
   REMOVE_FOOD_FROM_RECIPE,
   CREATE_RECIPE_SUBMIT,
   SAVE_SEARCH_ITEM,
+  SAVE_SEARCH_ITEM_SUCCEEDED,
   SELECT_DATASOURCE,
   FOODSEARCH_INPUT,
   FOODSEARCH_SUBMIT,
@@ -22,7 +23,6 @@ import {
   COPY_RECIPE,
   CREATE_RECIPE_SUCCEEDED,
   LOAD_INGREDIENTS_SUBMIT,
-  LOAD_RECIPES_SUBMIT,
   LOAD_INGREDIENTS_SUCCESS,
   LOAD_RECIPES_SUCCESS
 } from '../constants/index';
@@ -99,18 +99,16 @@ function changeMealFoodAmount(mealIdx: number, food: AmountOfNamedMacros, newAmo
   return createAction(REPLACE_FOOD_IN_MEAL, {mealIdx, from: food, to: newFood});
 }
 
-export const sagaActions = {
+const sagaActions = {
   loadIngredientsAndRecipes: () => createAction(LOAD_INGREDIENTS_SUBMIT),
   foodSearchSubmit: (searchString: String, ds: String) => createAction(FOODSEARCH_SUBMIT, {searchString, ds}),
   createIngredientSubmit,
   copyRecipe: (recipeUid: string) => createAction(COPY_RECIPE, recipeUid),
   saveRecipe: createRecipeSubmit,
+  saveSearchItem: (ndbNo: string) => createAction(SAVE_SEARCH_ITEM, ndbNo),
 };
 
-// TODO should actions be UI-driven or business logic driven?
-// perhaps business-driven and have the containers perform business/ui mapping?
-export const actions = {
-  ...sagaActions,
+const reducerActions = {
   loadIngredientsSucceeded: (namedMacros: NamedMacros[]) => createAction(LOAD_INGREDIENTS_SUCCESS, namedMacros),
   loadRecipesSucceeded: (namedMacros: NamedMacros[]) => createAction(LOAD_RECIPES_SUCCESS, namedMacros),
   selectDataSource: (dataSource: DataSource) => createAction(SELECT_DATASOURCE, dataSource),
@@ -130,8 +128,15 @@ export const actions = {
   createRecipeSucceeded: (recipe: Recipe) => createAction(CREATE_RECIPE_SUCCEEDED, recipe),
   addFoodsToRecipe: (recipe: Recipe) => createAction(ADD_FOODS_TO_RECIPE, recipe),
   removeFoodFromRecipe: (food: AmountOfNamedMacros) => createAction(REMOVE_FOOD_FROM_RECIPE, food),
-  saveSearchItem: (ingredient: NamedMacros) => createAction(SAVE_SEARCH_ITEM, ingredient),
   setDay: (day: Date) => createAction(CHANGE_DAY, day),
+  saveSearchItemSucceeded: (ingredient: NamedMacros) => createAction(SAVE_SEARCH_ITEM_SUCCEEDED, ingredient),
+};
+
+// TODO should actions be UI-driven or business logic driven?
+// perhaps business-driven and have the containers perform business/ui mapping?
+export const actions = {
+  ...sagaActions,
+  ...reducerActions
 };
 
 // tslint:disable-next-line:no-any

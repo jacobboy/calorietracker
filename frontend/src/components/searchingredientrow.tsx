@@ -3,7 +3,7 @@ import { tdStyle, thStyle, searchLinkStyle } from 'src/style';
 import { toTitleCase } from 'src/datautil';
 import { SearchItem } from 'src/usdaclient';
 import { NamedMacros } from 'src/client';
-import { getNamedMacrosFromSearchItem } from 'src/ndbapi';
+import { getNamedMacrosFromNdbno } from 'src/ndbapi';
 import { macrosFromAmountOf } from 'src/transforms';
 
 function ingredientCell(contents: string | number | JSX.Element, title?: string) {
@@ -13,7 +13,7 @@ function ingredientCell(contents: string | number | JSX.Element, title?: string)
 
 interface SearchIngredientRowProps {
   item: SearchItem;
-  onSaveClick: (namedMacros: NamedMacros) => void;
+  onSaveClick: (ndbNo: string) => void;
 }
 
 interface SearchIngredientRowState {
@@ -46,16 +46,11 @@ export class SearchIngredientRow extends React.Component<
   }
 
   handleDetailsClick() {
-    getNamedMacrosFromSearchItem(this.props.item).then((namedMacros) => this.setState({namedMacros}));
+    getNamedMacrosFromNdbno(this.props.item.ndbno).then((namedMacros) => this.setState({namedMacros}));
   }
 
   saveSearchItem() {
-    if (this.state.namedMacros === undefined) {
-      getNamedMacrosFromSearchItem(this.props.item).then((namedMacros) => this.props.onSaveClick(namedMacros));
-    } else {
-      this.props.onSaveClick(this.state.namedMacros);
-    }
-
+    this.props.onSaveClick(this.props.item.ndbno);
   }
 
   render() {

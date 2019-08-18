@@ -1,6 +1,6 @@
-import { all, call, put, takeLatest, take } from 'redux-saga/effects';
-import { DefaultApiFp as MacroMacroFp, NamedMacros, Recipe, AmountOfNamedMacros } from './client';
-import { DefaultApi as UsdaClient, SearchResponse } from './usdaclient';
+import { all, call, put, takeLatest } from 'redux-saga/effects';
+import { DefaultApiFp as MacroMacroFp, NamedMacros, Recipe, AmountOfNamedMacros, DefaultApi } from './client';
+import { DefaultApi as UsdaClient, SearchResponse, SearchDsEnum } from './usdaclient';
 import { ActionsTypeMap, actions } from './actions';
 import {
   CREATE_INGREDIENT_FAILED,
@@ -12,11 +12,13 @@ import {
   LOAD_INGREDIENTS_FAILED,
   LOAD_INGREDIENTS_SUBMIT,
   LOAD_RECIPES_FAILED,
-  LOAD_RECIPES_SUBMIT,
   LOAD_INGREDIENTS_SUCCESS,
-  LOAD_RECIPES_SUCCESS
+  LOAD_RECIPES_SUCCESS,
+  SAVE_SEARCH_ITEM,
+  SAVE_SEARCH_ITEM_FAILED
 } from './constants';
 import { GOV_API_KEY } from './apikey';
+import { macrosFromFood } from './ndbapi';
 
 // TODO How am I supposed to test sagas without exporting them all?
 // attempts to test the root saga have failed so far
@@ -73,7 +75,7 @@ function* searchFood(action: ActionsTypeMap['foodSearchSubmit']) {
 
 function* copyRecipe(action: ActionsTypeMap['copyRecipe']) {
   const recipe: Recipe = yield call(MacroMacroFp().findRecipeByUID(action.payload));
-  yield actions.addFoodsToRecipe(recipe);
+  yield put(actions.addFoodsToRecipe(recipe));
 }
 
 function namedMacroToIngredient(nm: AmountOfNamedMacros) {
@@ -93,6 +95,18 @@ function* saveRecipe(action: ActionsTypeMap['saveRecipe']) {
   yield actions.createRecipeSucceeded(recipe);
 }
 
+function* saveSearchItem(action: ActionsTypeMap['saveSearchItem']) {
+  try {
+    // little hack
+    const uid = `ndbno::v1::${action.payload}`;
+    const namedMacros = yield call(MacroMacroFp().findIngredientByUID(uid));
+    yield put(actions.saveSearchItemSucceeded(namedMacros));
+  } catch (response) {
+    console.log(response.message);
+    yield put({type: SAVE_SEARCH_ITEM_FAILED, payload: response.message});
+  }
+}
+
 /* function* taker<T extends string, V>(f: (ActionWithPayload<T, V>) => ) {
   const z: string = CREATE_INGREDIENT_SUBMIT;
   yield takeLatest(CREATE_INGREDIENT_SUBMIT, f);
@@ -101,10 +115,10 @@ function* saveRecipe(action: ActionsTypeMap['saveRecipe']) {
 export default function* rootSaga() {
   yield all([
     takeLatest(LOAD_INGREDIENTS_SUBMIT, loadInitialIngredientsAndRecipes),
-    takeLatest(LOAD_RECIPES_SUBMIT, loadInitialRecipes),
     takeLatest(FOODSEARCH_SUBMIT, searchFood),
     takeLatest(CREATE_INGREDIENT_SUBMIT, createIngredient),
     takeLatest(COPY_RECIPE, copyRecipe),
-    takeLatest(CREATE_RECIPE_SUBMIT, saveRecipe)
+    takeLatest(CREATE_RECIPE_SUBMIT, saveRecipe),
+    takeLatest(SAVE_SEARCH_ITEM, saveSearchItem)
   ]);
 }

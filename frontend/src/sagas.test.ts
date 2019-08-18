@@ -1,13 +1,11 @@
-import { DefaultApiFp as MacroMacroFp } from './client';
-import rootSaga, { loadInitialIngredients, loadInitialRecipes } from './sagas';
+import { loadInitialIngredients, loadInitialRecipes } from './sagas';
 import {
-  LOAD_INGREDIENTS_SUBMIT,
   LOAD_INGREDIENTS_SUCCESS,
   LOAD_INGREDIENTS_FAILED,
   LOAD_RECIPES_SUCCESS,
   LOAD_RECIPES_FAILED
 } from './constants';
-import { call, put } from 'redux-saga/effects';
+import { put } from 'redux-saga/effects';
 import { cloneableGenerator } from '@redux-saga/testing-utils';
 
 describe('The load ingredients saga', () => {

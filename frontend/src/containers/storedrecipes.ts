@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { actions, Actions, sagaActions } from '../actions';
+import { actions, Actions } from '../actions';
 import { StoredRecipes } from '../components/storedrecipes';
 import { StoreState } from '../types/index';
 import { NamedMacros } from 'src/client';
@@ -14,7 +14,7 @@ function mapStateToProps(state: StoreState) {
 function mapDispatchToProps(dispatch: Dispatch<Actions>) {
   return {
     onCopyRecipeClick: (recipe: NamedMacros) => {
-      dispatch(sagaActions.copyRecipe(recipe.uid));
+      dispatch(actions.copyRecipe(recipe.uid));
       dispatch(actions.createRecipeOpen());
     }
   };

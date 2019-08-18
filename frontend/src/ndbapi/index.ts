@@ -14,17 +14,17 @@ const FAT_ID = '204';
 const CARB_ID = '205';
 
 // TODO temporary hack where the client knows how the server creates a Usda NamedMacro
-export function getNamedMacrosFromSearchItem(
-  searchItem: SearchItem
+export function getNamedMacrosFromNdbno(
+  ndbno: string
 ): Promise<NamedMacros> {
   return new DefaultApi().reports(
-    { apiKey: GOV_API_KEY, ndbno: [searchItem.ndbno] }
+    { apiKey: GOV_API_KEY, ndbno: [ndbno] }
   ).then(
     (report) => macrosFromFood(report.foods[0].food)
   );
 }
 
-function macrosFromFood(food: FoodFood): NamedMacros {
+export function macrosFromFood(food: FoodFood): NamedMacros {
   const ndbno = food.desc.ndbno;
   return {
     uid: `ndbno::v1::${ndbno}`,
