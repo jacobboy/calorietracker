@@ -24,7 +24,8 @@ import {
   CREATE_RECIPE_SUCCEEDED,
   LOAD_INGREDIENTS_SUBMIT,
   LOAD_INGREDIENTS_SUCCESS,
-  LOAD_RECIPES_SUCCESS
+  LOAD_RECIPES_SUCCESS,
+  FOODSEARCH_FAILED
 } from '../constants/index';
 import { TopBitDisplay } from '../types';
 import { NamedMacros, AmountOfNamedMacros, NewIngredient, Recipe } from 'src/client';
@@ -101,7 +102,7 @@ function changeMealFoodAmount(mealIdx: number, food: AmountOfNamedMacros, newAmo
 
 const sagaActions = {
   loadIngredientsAndRecipes: () => createAction(LOAD_INGREDIENTS_SUBMIT),
-  foodSearchSubmit: (searchString: String, ds: String) => createAction(FOODSEARCH_SUBMIT, {searchString, ds}),
+  foodSearchSubmit: (searchString: string, ds: DataSource) => createAction(FOODSEARCH_SUBMIT, {searchString, ds}),
   createIngredientSubmit,
   copyRecipe: (recipeUid: string) => createAction(COPY_RECIPE, recipeUid),
   saveRecipe: createRecipeSubmit,
@@ -114,6 +115,7 @@ const reducerActions = {
   selectDataSource: (dataSource: DataSource) => createAction(SELECT_DATASOURCE, dataSource),
   foodSearchInput: (searchString: string) => createAction(FOODSEARCH_INPUT, searchString),
   foodSearchSucceeded: (searchResults: SearchItem[]) => createAction(FOODSEARCH_SUCCESS, {searchResults}),
+  foodSearchFailed: () => createAction(FOODSEARCH_FAILED),
   addMeal: () => createAction(ADD_MEAL),
   removeMeal: (mealIdx: number) => createAction(REMOVE_MEAL, mealIdx),
   changeMealFoodAmount,

@@ -10,6 +10,7 @@ import {
   SELECT_DATASOURCE,
   FOODSEARCH_INPUT,
   FOODSEARCH_SUCCESS,
+  FOODSEARCH_FAILED,
   ADD_FOOD_TO_MEAL,
   REMOVE_FOOD_FROM_MEAL,
   ADD_MEAL,
@@ -94,6 +95,14 @@ reducer(state: StoreState, action: Actions): StoreState {
         search: {
           ...state.search,
           items: action.payload.searchResults
+        }
+      };
+    case FOODSEARCH_FAILED:
+      return {
+        ...state,
+        search: {
+          ...state.search,
+          items: []
         }
       };
     case ADD_MEAL:

@@ -86,6 +86,11 @@ paths:
             application/json:
               schema:
                 $ref: SearchResponse
+                # ...usda doesn't 400 actually, just a search that _says_ 400
+                #    unfortunately, it looks like ATM the client generator doesn't handle oneoF
+                # oneOf:
+                #   - $ref: SearchResponse
+                #   - $ref: ErrorResponse
         '400':
           description: Search error
           content:

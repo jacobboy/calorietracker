@@ -18,7 +18,7 @@ import {
   SAVE_SEARCH_ITEM_FAILED
 } from './constants';
 import { GOV_API_KEY } from './apikey';
-import { macrosFromFood } from './ndbapi';
+import { macrosFromFood, DataSource } from './ndbapi';
 
 // TODO How am I supposed to test sagas without exporting them all?
 // attempts to test the root saga have failed so far
@@ -28,7 +28,6 @@ export function* loadInitialIngredients() {
     const macros: NamedMacros[] = yield call(MacroMacroFp().findIngredients());
     yield put({ type: LOAD_INGREDIENTS_SUCCESS, payload: macros });
   } catch (response) {
-    console.log(`error loading ingredients: ${response.message}`);
     yield put({ type: LOAD_INGREDIENTS_FAILED, payload: response.message });
   }
 }
@@ -38,7 +37,6 @@ export function* loadInitialRecipes() {
     const macros: NamedMacros[] = yield call(MacroMacroFp().findRecipes());
     yield put({ type: LOAD_RECIPES_SUCCESS, payload: macros });
   } catch (response) {
-    console.log(`error loading recipes: ${response.message}`);
     yield put({ type: LOAD_RECIPES_FAILED, payload: response.message });
   }
 }
@@ -55,21 +53,31 @@ function* createIngredient(action: ActionsTypeMap['createIngredientSubmit']) {
     const macros: NamedMacros = yield call(MacroMacroFp().createIngredient(action.payload));
     yield put(actions.createIngredientSucceeded(macros));
   } catch (response) {
-    console.log(`error creating ingredient: ${response.message}`);
     yield put({ type: CREATE_INGREDIENT_FAILED, payload: response.message });
   }
 }
 
-function* searchFood(action: ActionsTypeMap['foodSearchSubmit']) {
-  const searchFunc = (searchString: string) => (new UsdaClient()).search(
-    {apiKey: GOV_API_KEY, q: searchString}
-  );
+export function* searchFood(action: ActionsTypeMap['foodSearchSubmit']) {
+
+  let searchRequest: {apiKey: string, q: string, ds?: SearchDsEnum};
+  if (action.payload.ds === DataSource.Any) {
+    searchRequest = {apiKey: GOV_API_KEY, q: action.payload.searchString};
+  } else {
+    const ds = action.payload.ds === DataSource.BL ? SearchDsEnum.BrandedFoodProducts : SearchDsEnum.StandardReference;
+    searchRequest = {apiKey: GOV_API_KEY, q: action.payload.searchString, ds};
+  }
+  const searchFunc = (
+    searchReq: {apiKey: string, q: string, ds?: SearchDsEnum}
+  ) => (new UsdaClient()).search(searchRequest);
+
   try {
-    const searchResults: SearchResponse = yield call(searchFunc, action.payload.searchString);
+    const searchResults: SearchResponse = yield call(searchFunc, searchRequest);
     yield put(actions.foodSearchSucceeded(searchResults.list.item));
   } catch (response) {
-    console.log(`error searching '${action.payload.searchString}': ${response.message}`);
-    yield put({ type: FOODSEARCH_FAILED, payload: response.message });
+    /* TODO ...usda doesn't 400 actually, just a search that _says_ 400
+       unfortunately, it looks like ATM the client generator doesn't handle oneoF
+       How to handle the error response? */
+    yield put(actions.foodSearchFailed());
   }
 }
 
