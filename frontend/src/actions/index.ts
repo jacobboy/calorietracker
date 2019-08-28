@@ -19,13 +19,15 @@ import {
   REMOVE_MEAL,
   CHANGE_DAY,
   CREATE_INGREDIENT_SUCCEEDED,
-  FOODSEARCH_SUCCESS,
   COPY_RECIPE,
   CREATE_RECIPE_SUCCEEDED,
   LOAD_INGREDIENTS_SUBMIT,
   LOAD_INGREDIENTS_SUCCESS,
   LOAD_RECIPES_SUCCESS,
-  FOODSEARCH_FAILED
+  MACROMACRO_FOODSEARCH_SUCCESS,
+  USDA_FOODSEARCH_FAILED,
+  MACROMACRO_FOODSEARCH_FAILED,
+  USDA_FOODSEARCH_SUCCESS
 } from '../constants/index';
 import { TopBitDisplay } from '../types';
 import { NamedMacros, AmountOfNamedMacros, NewIngredient, Recipe } from 'src/client';
@@ -114,8 +116,12 @@ const reducerActions = {
   loadRecipesSucceeded: (namedMacros: NamedMacros[]) => createAction(LOAD_RECIPES_SUCCESS, namedMacros),
   selectDataSource: (dataSource: DataSource) => createAction(SELECT_DATASOURCE, dataSource),
   foodSearchInput: (searchString: string) => createAction(FOODSEARCH_INPUT, searchString),
-  foodSearchSucceeded: (searchResults: SearchItem[]) => createAction(FOODSEARCH_SUCCESS, {searchResults}),
-  foodSearchFailed: () => createAction(FOODSEARCH_FAILED),
+  usdaFoodSearchSucceeded: (searchResults: SearchItem[]) => createAction(USDA_FOODSEARCH_SUCCESS, searchResults),
+  macroMacroFoodSearchSucceeded: (namedMacros: NamedMacros[]) => createAction(
+    MACROMACRO_FOODSEARCH_SUCCESS, namedMacros
+  ),
+  usdaFoodSearchFailed: () => createAction(USDA_FOODSEARCH_FAILED),
+  macroMacroFoodSearchFailed: () => createAction(MACROMACRO_FOODSEARCH_FAILED),
   addMeal: () => createAction(ADD_MEAL),
   removeMeal: (mealIdx: number) => createAction(REMOVE_MEAL, mealIdx),
   changeMealFoodAmount,

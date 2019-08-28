@@ -7,7 +7,8 @@ import { NamedMacros } from 'src/client';
 
 function mapStateToProps(state: StoreState) {
   return {
-    recipes: state.saved.recipes
+    recentRecipes: state.saved.recentRecipes,
+    searchRecipes: state.saved.searchRecipes
   };
 }
 

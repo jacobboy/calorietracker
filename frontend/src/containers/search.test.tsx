@@ -32,7 +32,7 @@ describe('When the track food button is clicked', () => {
     const items: SearchItem[] = [];
     const searchState = {
       search: { searchString, dataSource, items },
-      saved: { recipes: [], ingredients: [] }
+      saved: { recentRecipes: [], recentIngredients: [], searchRecipes: [], searchIngredients: [] }
     };
     dispatch = jest.fn();
     store = {

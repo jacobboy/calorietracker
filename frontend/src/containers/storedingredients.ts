@@ -7,7 +7,8 @@ import { StoreState } from '../types/index';
 
 function mapStateToProps(state: StoreState) {
   return {
-    ingredients: state.saved.ingredients
+    recentIngredients: state.saved.recentIngredients,
+    searchIngredients: state.saved.searchIngredients
   };
 }
 

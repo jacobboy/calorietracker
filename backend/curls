@@ -74,4 +74,4 @@ GET https://api.nal.usda.gov/ndb/V2/reports?ndbno=40&type=b&format=json&api_key=
 
 
 # Search USDA
-GET https://api.nal.usda.gov/ndb/search/?format=json&q=butter&sort=n&max=25&offset=0&api_key=:GOV_API_KEY
+GET https://api.nal.usda.gov/ndb/search/?format=json&q=funrice&sort=n&max=25&offset=0&api_key=:GOV_API_KEY

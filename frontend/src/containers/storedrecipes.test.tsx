@@ -30,7 +30,7 @@ function mockIngredients(nFoods: number) {
   return foods;
 }
 
-describe('The stored ingredient component', () => {
+describe('The stored recipes component', () => {
   // tslint:disable-next-line:no-any
   let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
   // tslint:disable-next-line:no-any
@@ -60,10 +60,11 @@ describe('The stored ingredient component', () => {
         }
       },
       saved: {
-        recipes: [
+        recentRecipes: [
           makeTestRecipe('Test Recipe 1', [foods[1]], 12), // just to have more than one
           recipe
-        ]
+        ],
+        searchRecipes: []
       }
     };
     dispatch = jest.fn();

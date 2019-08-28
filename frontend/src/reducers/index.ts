@@ -9,8 +9,6 @@ import {
   REMOVE_FOOD_FROM_RECIPE,
   SELECT_DATASOURCE,
   FOODSEARCH_INPUT,
-  FOODSEARCH_SUCCESS,
-  FOODSEARCH_FAILED,
   ADD_FOOD_TO_MEAL,
   REMOVE_FOOD_FROM_MEAL,
   ADD_MEAL,
@@ -21,10 +19,15 @@ import {
   ADD_FOODS_TO_RECIPE,
   LOAD_INGREDIENTS_SUCCESS,
   LOAD_RECIPES_SUCCESS,
-  SAVE_SEARCH_ITEM_SUCCEEDED
+  SAVE_SEARCH_ITEM_SUCCEEDED,
+  MACROMACRO_FOODSEARCH_SUCCESS,
+  USDA_FOODSEARCH_SUCCESS,
+  USDA_FOODSEARCH_FAILED,
+  MACROMACRO_FOODSEARCH_FAILED
 } from '../constants/index';
 import { dropIndex, replaceElement, replaceObject } from '../datautil';
 import { AmountOfNamedMacros, Meal } from 'src/client';
+import { actionChannel } from 'redux-saga/effects';
 
 function mealIdxOrLast(state: StoreState, mealIdx?: number) {
   return mealIdx === undefined ? state.today.length - 1 : mealIdx;
@@ -62,7 +65,7 @@ reducer(state: StoreState, action: Actions): StoreState {
         ...state,
         saved: {
           ...state.saved,
-          ingredients: action.payload
+          recentIngredients: action.payload
         }
       };
     case LOAD_RECIPES_SUCCESS:
@@ -70,7 +73,7 @@ reducer(state: StoreState, action: Actions): StoreState {
         ...state,
         saved: {
           ...state.saved,
-          recipes: action.payload
+          recentRecipes: action.payload
         }
       };
     case SELECT_DATASOURCE:
@@ -89,15 +92,15 @@ reducer(state: StoreState, action: Actions): StoreState {
           searchString: action.payload
         }
       };
-    case FOODSEARCH_SUCCESS:
+    case USDA_FOODSEARCH_SUCCESS:
       return {
         ...state,
         search: {
           ...state.search,
-          items: action.payload.searchResults
+          items: action.payload
         }
       };
-    case FOODSEARCH_FAILED:
+    case USDA_FOODSEARCH_FAILED:
       return {
         ...state,
         search: {
@@ -105,7 +108,23 @@ reducer(state: StoreState, action: Actions): StoreState {
           items: []
         }
       };
-    case ADD_MEAL:
+    case MACROMACRO_FOODSEARCH_SUCCESS:
+      return {
+        ...state,
+        saved: {
+          ...state.saved,
+          searchIngredients: action.payload
+        }
+      };
+    case MACROMACRO_FOODSEARCH_FAILED:
+      return {
+        ...state,
+        saved: {
+          ...state.saved,
+          searchIngredients: []
+        }
+      };
+      case ADD_MEAL:
       return {
         ...state,
         // TODO lol
@@ -139,7 +158,7 @@ reducer(state: StoreState, action: Actions): StoreState {
         ...state,
         saved: {
           ...state.saved,
-          ingredients: [...state.saved.ingredients, action.payload].sort(
+          recentIngredients: [...state.saved.recentIngredients, action.payload].sort(
             (l, r) => (l.name < r.name ? -1 : 1)
           )
         }
@@ -210,7 +229,7 @@ reducer(state: StoreState, action: Actions): StoreState {
         },
         saved: {
           ...state.saved,
-          recipes: [...state.saved.recipes, action.payload]
+          recentRecipes: [...state.saved.recentRecipes, action.payload]
         }
       };
     case SAVE_SEARCH_ITEM_SUCCEEDED:
@@ -218,7 +237,7 @@ reducer(state: StoreState, action: Actions): StoreState {
         ...state,
         saved: {
           ...state.saved,
-          ingredients: [...state.saved.ingredients, action.payload]
+          recentIngredients: [...state.saved.recentIngredients, action.payload]
         }
       };
     case CHANGE_DAY:

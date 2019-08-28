@@ -8,7 +8,6 @@ import {
   CREATE_RECIPE_SUBMIT,
   COPY_RECIPE,
   FOODSEARCH_SUBMIT,
-  FOODSEARCH_FAILED,
   LOAD_INGREDIENTS_FAILED,
   LOAD_INGREDIENTS_SUBMIT,
   LOAD_RECIPES_FAILED,
@@ -57,8 +56,7 @@ function* createIngredient(action: ActionsTypeMap['createIngredientSubmit']) {
   }
 }
 
-export function* searchFood(action: ActionsTypeMap['foodSearchSubmit']) {
-
+export function* searchUsdaForFood(action: ActionsTypeMap['foodSearchSubmit']) {
   let searchRequest: {apiKey: string, q: string, ds?: SearchDsEnum};
   if (action.payload.ds === DataSource.Any) {
     searchRequest = {apiKey: GOV_API_KEY, q: action.payload.searchString};
@@ -66,18 +64,29 @@ export function* searchFood(action: ActionsTypeMap['foodSearchSubmit']) {
     const ds = action.payload.ds === DataSource.BL ? SearchDsEnum.BrandedFoodProducts : SearchDsEnum.StandardReference;
     searchRequest = {apiKey: GOV_API_KEY, q: action.payload.searchString, ds};
   }
-  const searchFunc = (
+  const usdaSearchFunc = (
     searchReq: {apiKey: string, q: string, ds?: SearchDsEnum}
-  ) => (new UsdaClient()).search(searchRequest);
-
+  ) => (new UsdaClient()).search(searchReq);
   try {
-    const searchResults: SearchResponse = yield call(searchFunc, searchRequest);
-    yield put(actions.foodSearchSucceeded(searchResults.list.item));
+    const usdaSearchResults: SearchResponse = yield call(usdaSearchFunc, searchRequest);
+    yield put(actions.usdaFoodSearchSucceeded(usdaSearchResults.list.item));
+  } catch (response) {
+    /* TODO ...usda doesn't 400 actually, just a search that _says_ 400
+    unfortunately, it looks like ATM the client generator doesn't handle oneOf
+    How to handle the error response? */
+    yield put(actions.usdaFoodSearchFailed());
+  }
+}
+
+export function* searchMacroMacroForFood(action: ActionsTypeMap['foodSearchSubmit']) {
+  try {
+    const macroMacroSearchResults: NamedMacros[] = yield call(MacroMacroFp().searchByName(action.payload.searchString));
+    yield put(actions.macroMacroFoodSearchSucceeded(macroMacroSearchResults));
   } catch (response) {
     /* TODO ...usda doesn't 400 actually, just a search that _says_ 400
        unfortunately, it looks like ATM the client generator doesn't handle oneoF
        How to handle the error response? */
-    yield put(actions.foodSearchFailed());
+    yield put(actions.macroMacroFoodSearchFailed());
   }
 }
 
@@ -123,7 +132,8 @@ function* saveSearchItem(action: ActionsTypeMap['saveSearchItem']) {
 export default function* rootSaga() {
   yield all([
     takeLatest(LOAD_INGREDIENTS_SUBMIT, loadInitialIngredientsAndRecipes),
-    takeLatest(FOODSEARCH_SUBMIT, searchFood),
+    takeLatest(FOODSEARCH_SUBMIT, searchMacroMacroForFood),
+    takeLatest(FOODSEARCH_SUBMIT, searchUsdaForFood),
     takeLatest(CREATE_INGREDIENT_SUBMIT, createIngredient),
     takeLatest(COPY_RECIPE, copyRecipe),
     takeLatest(CREATE_RECIPE_SUBMIT, saveRecipe),

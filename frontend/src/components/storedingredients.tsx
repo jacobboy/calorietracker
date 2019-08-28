@@ -7,7 +7,8 @@ import { nameMatches } from 'src/datautil';
 import { NamedMacros } from 'src/client';
 
 type StoredIngredientsProps = {
-  ingredients: NamedMacros[];
+  recentIngredients: NamedMacros[];
+  searchIngredients: NamedMacros[];
   searchText: string;
   focusRef: React.RefObject<HTMLElement>;
 };
@@ -23,10 +24,19 @@ export function StoredIngredients(props: StoredIngredientsProps) {
       <table style={tableStyle}>
         <tbody>
           {Header}
-          {findIngredients(props.ingredients, props.searchText).map(
+          {findIngredients(props.recentIngredients, props.searchText).map(
             item => (
               <StoredIngredientRow
-                key={item.uid}
+                key={'recent_' + item.uid}
+                item={item}
+                focusRef={props.focusRef}
+              />
+            )
+          )}
+          {props.searchIngredients.map(
+            item => (
+              <StoredIngredientRow
+                key={'search_' + item.uid}
                 item={item}
                 focusRef={props.focusRef}
               />

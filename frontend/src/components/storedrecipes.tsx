@@ -7,7 +7,8 @@ import { nameMatches } from '../datautil';
 import { NamedMacros } from 'src/client';
 
 type StoredRecipesProps = {
-  recipes: NamedMacros[];
+  recentRecipes: NamedMacros[];
+  searchRecipes: NamedMacros[];
   onCopyRecipeClick: (recipe: NamedMacros) => void;
   searchText: string;
   focusRef: React.RefObject<HTMLElement>;
@@ -24,7 +25,7 @@ export function StoredRecipes(props: StoredRecipesProps) {
       <table style={tableStyle}>
         <tbody>
           {Header}
-          {findRecipes(props.recipes, props.searchText).map(
+          {findRecipes(props.recentRecipes, props.searchText).map(
             item => (
               <StoredIngredientRow
                 key={item.uid}
@@ -33,6 +34,16 @@ export function StoredRecipes(props: StoredRecipesProps) {
                 focusRef={props.focusRef}
               />
             ))}
+          {props.searchRecipes.map(
+            item => (
+              <StoredIngredientRow
+                key={'search_' + item.uid}
+                item={item}
+                focusRef={props.focusRef}
+              />
+            )
+          )}
+
         </tbody>
       </table>
     </div>

@@ -1,11 +1,18 @@
-import { loadInitialIngredients, loadInitialRecipes, searchFood } from './sagas';
+import {
+  loadInitialIngredients,
+  loadInitialRecipes,
+  searchMacroMacroForFood,
+  searchUsdaForFood
+} from './sagas';
 import {
   LOAD_INGREDIENTS_SUCCESS,
   LOAD_INGREDIENTS_FAILED,
   LOAD_RECIPES_SUCCESS,
   LOAD_RECIPES_FAILED,
-  FOODSEARCH_SUCCESS,
-  FOODSEARCH_FAILED
+  MACROMACRO_FOODSEARCH_SUCCESS,
+  MACROMACRO_FOODSEARCH_FAILED,
+  USDA_FOODSEARCH_SUCCESS,
+  USDA_FOODSEARCH_FAILED
 } from './constants';
 import { put } from 'redux-saga/effects';
 import { cloneableGenerator } from '@redux-saga/testing-utils';
@@ -57,21 +64,21 @@ describe('The load recipes saga', () => {
   });
 });
 
-describe('The search food saga', () => {
+describe('The MacroMacro search food saga', () => {
   const action = actions.foodSearchSubmit('searchString', DataSource.BL);
-  const gen = cloneableGenerator(searchFood)(action);
+  const gen = cloneableGenerator(searchMacroMacroForFood)(action);
   gen.next();
   // TODO how do i assert it uses the datasource?
   it('puts a FOODSEARCH_SUCCESS on success', () => {
-    expect(gen.clone().next({list: {item: ['resp']}}).value)
-    .toEqual(put({ type: FOODSEARCH_SUCCESS, payload: {'searchResults': ['resp'] }}));
+    expect(gen.clone().next(['resp']).value)
+    .toEqual(put({ type: MACROMACRO_FOODSEARCH_SUCCESS, payload: ['resp'] }));
   });
 
   it('puts a FOODSEARCH_FAILED on failure', () => {
     const clone = gen.clone();
     if (clone.throw) {
       expect(clone.throw({'message': 'sup'}).value)
-      .toEqual(put({ type: FOODSEARCH_FAILED }));
+      .toEqual(put({ type: MACROMACRO_FOODSEARCH_FAILED }));
     } else {
       throw('clone not throwable');
     }

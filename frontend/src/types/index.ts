@@ -3,8 +3,10 @@ import { AmountOfNamedMacros, NamedMacros, Meal } from 'src/client';
 import { SearchItem } from 'src/usdaclient';
 
 export interface SavedState {
-  ingredients: NamedMacros[];
-  recipes: NamedMacros[];
+  recentIngredients: NamedMacros[];
+  recentRecipes: NamedMacros[];
+  searchIngredients: NamedMacros[];
+  searchRecipes: NamedMacros[];
 }
 
 export interface SearchState {
@@ -58,8 +60,10 @@ export const emptyState: StoreState = {
   },
   today: [],
   saved: {
-    ingredients: [],
-    recipes: []
+    recentIngredients: [],
+    recentRecipes: [],
+    searchIngredients: [],
+    searchRecipes: []
   }
 };
 
@@ -67,7 +71,7 @@ export const initialState: StoreState = {
   ...emptyState,
   saved: {
     ...emptyState.saved,
-    ingredients: [],
-    recipes: []
+    recentIngredients: [],
+    recentRecipes: []
   }
 };
