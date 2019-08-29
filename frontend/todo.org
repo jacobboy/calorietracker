@@ -19,42 +19,27 @@
 ** Search filter creates duplicates after saving an ingredient that is already saved
 
 * TODO Refactorings
-** `amountOf` needs to not do type checking.  Perhaps Ingredient has `scaleTo(amount?: number): this`?
-** have Recipe implement FoodCombo and Ingredient
-** RecipeIngredient for partially loading Recipes
-** clean up scaleFood and ScaledIngredient usage
-*** IngredientRow stores a food and a scaledFood
-*** StoredIngredientRow stores a food and a scaledFood
-** don't remove from meal by index?
-*** Does FoodCombo need to exist? If so, Why doesn't IngredientTable use it?
-    Represent Meal as Food[]?
-** convert window storage saves to promises
-** find consistent solution to conversion/portion nomenclature
+** oh man idk
 
 * TODO Features
+** simultaneously create multiple recipes
+** scale search row to see if it matches your food before saving
+** unit conversion / options
+*** what other units can we get from the USDA
+** Recipe and ingredient input validation
+*** ensure every field has values
+** convert meal to recipe
+** save date with custom ingredients
 ** Account for fiber in carbs and carbs pct
 ** Recipe copy copies total amount if current recipe is empty
 ** Add notes to recipes
-** should I be passing around objects that are an ingredient + an amount?
-   then i won't need to be careful about scaling foods to 0, can always just take the original food
-   see scaleFoodTo
-** copy recipe uses previous amount as well
 ** enhanced keyboard navigation
    arrows, readline, vim keybindings to navigate
-** simultaneously create multiple recipes
-** recent recipes / ingredients
 ** delete recipe / ingredient
 ** edit ingredient name
-** scale search row to see if it matches your food before saving
 ** set default amount of NDBIngredient
 *** wtf did i mean by this?  is return from USDA always 100?
-** convert meal to recipe
-** save date with custom ingredients
 ** search pagination
-** unit conversion / options
-** Recipe and ingredient input validation
-*** ensure every field has values
-** what other units can we get from the USDA
 ** edit meals ingredients
 ** a11y?  use titles for "Fat: 12", etc?
 
@@ -67,9 +52,5 @@
 *** using jsx files to avoid TS not letting me overwrite client.saveIngredient
 
 * Course of actions
-** Create ingredient saga
-** Create recipe saga
-** Get most recent recipes and ingredients in front
-** Search in front
 ** Meal support on backend
 ** Track food saga adds to meal
