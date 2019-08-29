@@ -218,9 +218,10 @@ export class IngredientsTable<T extends AmountOfNamedMacros> extends React.Compo
     const rows = [];
     for (let i = 0; i < this.props.foods.length; i++) {
       let food = this.props.foods[i];
+      const key = `${food.namedMacros.uid}_${food.amount}_${i}`;
       rows.push((
       <IngredientRow
-        key={'ingred_' + i.toString()}
+        key={'ingred_' + key}
         food={food}
         handleFoodAmountChange={this.props.handleFoodAmountChange}
         handleRemoveFoodClick={this.props.handleRemoveFoodClick}
