@@ -18,11 +18,11 @@ interface CreateRecipeInputProps {
 }
 
 interface CreateRecipeInputState {
-    name: string;
-    unit: FOOD_UNIT;
-    useCalculatedAmount: boolean;
-    totalSize?: number;
-    portionSize: number;
+  name: string;
+  unit: FOOD_UNIT;
+  useCalculatedAmount: boolean;
+  totalSize?: number;
+  portionSize: number;
 }
 
 function emptyState() {
@@ -57,12 +57,12 @@ export class CreateRecipeInput extends React.Component<
   }
 
   onSaveRecipeClick() {
-      if (this.props.foods.length > 0) {
-        this.props.handleSaveRecipeClick(
-            this.state.name, this.props.foods, this.state.portionSize, this.getTotalSize(false), this.state.unit
-        );
-      }
-      this.setState(emptyState());
+    if (this.props.foods.length > 0) {
+      this.props.handleSaveRecipeClick(
+        this.state.name, this.props.foods, this.state.portionSize, this.getTotalSize(false), this.state.unit
+      );
+    }
+    this.setState(emptyState());
   }
 
   handleNameInput(event: React.ChangeEvent<HTMLInputElement>) {
@@ -129,32 +129,32 @@ export class CreateRecipeInput extends React.Component<
           <tbody>
             {IngredientsTable.headerRow()}
             <IngredientsTable
-               foods={this.props.foods}
-               idx={1}
-               handleFoodAmountChange={this.props.handleFoodAmountChange}
-               handleRemoveFoodClick={this.props.handleRemoveFoodClick}
-               handleDeleteAllClick={() => null}
-               handleAmountAllInput={(e) => this.handleAmountInput(e)}
-               amount={this.getTotalSize(true)}
-               handleUnitAllInput={(e) => this.handleUnitInput(e)}
-               unit={this.state.unit}
+              foods={this.props.foods}
+              idx={1}
+              handleFoodAmountChange={this.props.handleFoodAmountChange}
+              handleRemoveFoodClick={this.props.handleRemoveFoodClick}
+              handleDeleteAllClick={() => null}
+              handleAmountAllInput={(e) => this.handleAmountInput(e)}
+              amount={this.getTotalSize(true)}
+              handleUnitAllInput={(e) => this.handleUnitInput(e)}
+              unit={this.state.unit}
             />
             {this.portionRow()}
           </tbody>
         </table>
-        <label>
-          Name:
+        <form onSubmit={() => this.onSaveRecipeClick()}>
+          <label>
+            Name:
           <input
-            id="recipeNameInput"
-            type="text"
-            placeholder="Recipe name"
-            value={this.state.name || ''}
-            onChange={(e) => this.handleNameInput(e)}
+              id="recipeNameInput"
+              type="text"
+              placeholder="Recipe name"
+              value={this.state.name || ''}
+              onChange={(e) => this.handleNameInput(e)}
           />
-        </label>
-        <button id="saveRecipe" onClick={() => this.onSaveRecipeClick()} >
-          Save Recipe
-        </button>
+          </label>
+          <input id="submitIngredient" type="submit" value="Submit" />
+        </form>
       </div>
     );
   }

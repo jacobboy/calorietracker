@@ -18,6 +18,7 @@ import {
 } from './constants';
 import { GOV_API_KEY } from './apikey';
 import { macrosFromFood, DataSource } from './ndbapi';
+import { takeLeading } from './sagahelpers';
 
 // TODO How am I supposed to test sagas without exporting them all?
 // attempts to test the root saga have failed so far
@@ -135,12 +136,12 @@ function* saveSearchItem(action: ActionsTypeMap['saveSearchItem']) {
 
 export default function* rootSaga() {
   yield all([
-    takeLatest(LOAD_INGREDIENTS_SUBMIT, loadInitialIngredientsAndRecipes),
-    takeLatest(FOODSEARCH_SUBMIT, searchMacroMacroForFood),
-    takeLatest(FOODSEARCH_SUBMIT, searchUsdaForFood),
-    takeLatest(CREATE_INGREDIENT_SUBMIT, createIngredient),
-    takeLatest(COPY_RECIPE, copyRecipe),
-    takeLatest(CREATE_RECIPE_SUBMIT, saveRecipe),
-    takeLatest(SAVE_SEARCH_ITEM, saveSearchItem)
+    takeLeading(LOAD_INGREDIENTS_SUBMIT, loadInitialIngredientsAndRecipes),
+    takeLeading(FOODSEARCH_SUBMIT, searchMacroMacroForFood),
+    takeLeading(FOODSEARCH_SUBMIT, searchUsdaForFood),
+    takeLeading(CREATE_INGREDIENT_SUBMIT, createIngredient),
+    takeLeading(COPY_RECIPE, copyRecipe),
+    takeLeading(CREATE_RECIPE_SUBMIT, saveRecipe),
+    takeLeading(SAVE_SEARCH_ITEM, saveSearchItem)
   ]);
 }
