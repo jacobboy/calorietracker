@@ -1,8 +1,7 @@
 * TODO Bugs
-** copy recipe in, removing last ingredients, removes wrong amounts
+** save recipe doesn't clear recipe
 ** clicking add to meal causes focus reset and amount reverts to 100
 ** enter on save recipe should submit
-** Adding to recipe via submit button does not keep ingredient amount
 ** math in total field on create recipe doesn't work
 ** Can't have 0 for a nutrient in an ingredient
 ** Searching for quaker steel oats and clicking more details results in TypeError

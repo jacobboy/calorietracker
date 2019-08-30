@@ -57,15 +57,15 @@ function* createIngredient(action: ActionsTypeMap['createIngredientSubmit']) {
 }
 
 export function* searchUsdaForFood(action: ActionsTypeMap['foodSearchSubmit']) {
-  let searchRequest: {apiKey: string, q: string, ds?: SearchDsEnum};
+  let searchRequest: { apiKey: string, q: string, ds?: SearchDsEnum };
   if (action.payload.ds === DataSource.Any) {
-    searchRequest = {apiKey: GOV_API_KEY, q: action.payload.searchString};
+    searchRequest = { apiKey: GOV_API_KEY, q: action.payload.searchString };
   } else {
     const ds = action.payload.ds === DataSource.BL ? SearchDsEnum.BrandedFoodProducts : SearchDsEnum.StandardReference;
-    searchRequest = {apiKey: GOV_API_KEY, q: action.payload.searchString, ds};
+    searchRequest = { apiKey: GOV_API_KEY, q: action.payload.searchString, ds };
   }
   const usdaSearchFunc = (
-    searchReq: {apiKey: string, q: string, ds?: SearchDsEnum}
+    searchReq: { apiKey: string, q: string, ds?: SearchDsEnum }
   ) => (new UsdaClient()).search(searchReq);
   try {
     const usdaSearchResults: SearchResponse = yield call(usdaSearchFunc, searchRequest);
@@ -96,20 +96,24 @@ function* copyRecipe(action: ActionsTypeMap['copyRecipe']) {
 }
 
 function namedMacroToIngredient(nm: AmountOfNamedMacros) {
-  return {uid: nm.namedMacros.uid, amount: nm.amount};
+  return { uid: nm.namedMacros.uid, amount: nm.amount };
 }
 
-function* saveRecipe(action: ActionsTypeMap['saveRecipe']) {
-  const recipe = yield call(
-    MacroMacroFp().createRecipe({
-      name: action.payload.name,
-      foods: action.payload.foods.map(namedMacroToIngredient),
-      portionSize: action.payload.portionSize,
-      amount: action.payload.amount,
-      unit: action.payload.unit
-    })
-  );
-  yield actions.createRecipeSucceeded(recipe);
+export function* saveRecipe(action: ActionsTypeMap['saveRecipe']) {
+  try {
+    const recipe = yield call(
+      MacroMacroFp().createRecipe({
+        name: action.payload.name,
+        foods: action.payload.foods.map(namedMacroToIngredient),
+        portionSize: action.payload.portionSize,
+        amount: action.payload.amount,
+        unit: action.payload.unit
+      })
+    );
+    yield put(actions.createRecipeSucceeded(recipe));
+  } catch (response) {
+    console.log(response.message);
+  }
 }
 
 function* saveSearchItem(action: ActionsTypeMap['saveSearchItem']) {
@@ -120,7 +124,7 @@ function* saveSearchItem(action: ActionsTypeMap['saveSearchItem']) {
     yield put(actions.saveSearchItemSucceeded(namedMacros));
   } catch (response) {
     console.log(response.message);
-    yield put({type: SAVE_SEARCH_ITEM_FAILED, payload: response.message});
+    yield put({ type: SAVE_SEARCH_ITEM_FAILED, payload: response.message });
   }
 }
 
