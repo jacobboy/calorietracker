@@ -109,7 +109,7 @@ describe('Recipes', () => {
     wrapper.find('#recipePortionInput').simulate('change', { target: { value: portionSize } });
     wrapper.find('#recipeAmountInput').simulate('change', { target: { value: totalSize } });
     wrapper.find('#recipeUnitInput').simulate('change', { target: { value: unit } });
-    wrapper.find('#saveRecipe').simulate('click');
+    wrapper.find('#saveRecipe').simulate('submit');
 
     expect(dispatch).toHaveBeenCalledWith(
       {
@@ -134,7 +134,7 @@ describe('Recipes', () => {
     wrapper.find('#foodAmountInput11').first().simulate(
       'change', { target: { value: newFood.amount.toString() } }
     );
-    wrapper.find('#saveRecipe').simulate('click');
+    wrapper.find('#saveRecipe').simulate('submit');
     expect(dispatch).lastCalledWith(
       {
         type: CREATE_RECIPE_SUBMIT,

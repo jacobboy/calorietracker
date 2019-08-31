@@ -56,7 +56,8 @@ export class CreateRecipeInput extends React.Component<
     }
   }
 
-  onSaveRecipeClick() {
+  onSaveRecipeClick(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     if (this.props.foods.length > 0) {
       this.props.handleSaveRecipeClick(
         this.state.name, this.props.foods, this.state.portionSize, this.getTotalSize(false), this.state.unit
@@ -142,7 +143,7 @@ export class CreateRecipeInput extends React.Component<
             {this.portionRow()}
           </tbody>
         </table>
-        <form onSubmit={() => this.onSaveRecipeClick()}>
+        <form onSubmit={(e) => this.onSaveRecipeClick(e)}>
           <label>
             Name:
           <input
@@ -153,7 +154,7 @@ export class CreateRecipeInput extends React.Component<
               onChange={(e) => this.handleNameInput(e)}
           />
           </label>
-          <input id="submitIngredient" type="submit" value="Submit" />
+          <input id="saveRecipe" type="submit" value="Submit" />
         </form>
       </div>
     );
