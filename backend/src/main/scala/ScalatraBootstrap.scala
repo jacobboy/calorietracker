@@ -9,6 +9,8 @@
  * https://openapi-generator.tech
  */
 
+import com.typesafe.config.{ ConfigFactory }
+import com.macromacro.settings.Settings
 import org.openapitools.server.api._
 import org.openapitools.app.{ ResourcesApp, OpenAPIApp }
 import javax.servlet.ServletContext
@@ -16,6 +18,7 @@ import org.scalatra.LifeCycle
 
 class ScalatraBootstrap extends LifeCycle {
   implicit val openapi = new OpenAPIApp
+  implicit val settings = new Settings(ConfigFactory.load())
 
   override def init(context: ServletContext) {
     try {

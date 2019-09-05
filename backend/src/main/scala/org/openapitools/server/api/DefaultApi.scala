@@ -11,6 +11,7 @@
 
 package org.openapitools.server.api
 
+import com.macromacro.settings.Settings
 import com.typesafe.scalalogging.LazyLogging
 import org.openapitools.server.model._
 
@@ -27,7 +28,7 @@ import scala.collection.JavaConverters._
 
 import com.macromacro.storage._
 
-class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
+class DefaultApi(implicit val swagger: Swagger, settings: Settings) extends ScalatraServlet
   with LazyLogging
   with JacksonJsonSupport
   with SwaggerSupport {
@@ -36,6 +37,8 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
   protected implicit val jsonFormats: Formats = Serialization.formats(NoTypeHints) ++ JavaTypesSerializers.all
 
   protected val applicationDescription: String = "MacroMacroApi"
+
+  protected val storage = new Storage
 
   before() {
     contentType = formats("json")
@@ -68,7 +71,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
   post("/ingredients", operation(createIngredientOperation)) {
     logger.info("Creating ingredient")
     val newIngredient = parsedBody.extract[NewIngredient]
-    handlePostStorageError(Storage.save(newIngredient))
+    handlePostStorageError(storage.save(newIngredient))
   }
 
   val createRecipeOperation = (apiOperation[NamedMacros]("createRecipe")
@@ -77,7 +80,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
 
   post("/recipes", operation(createRecipeOperation)) {
     val newRecipe = parsedBody.extract[NewRecipe]
-    Storage.save(newRecipe) match {
+    storage.save(newRecipe) match {
       case Left(connectionError) => {
         AppError.Storage(connectionError)
       }
@@ -94,7 +97,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
 
   get("/ingredients/:uid", operation(findIngredientByUIDOperation)) {
     val uid = params.getOrElse("uid", halt(400))
-    handleGetStorageError(Storage.getIngredient(uid))
+    handleGetStorageError(storage.getIngredient(uid))
   }
 
   val findIngredientsOperation = (apiOperation[List[NamedMacros]]("findIngredients")
@@ -107,7 +110,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
     val sort = params.getAs[String]("sort")
     val limit = params.getAs[Int]("limit").getOrElse(10)
 
-    handleGetStorageError(Storage.getLatestIngredients(limit))
+    handleGetStorageError(storage.getLatestIngredients(limit))
   }
 
   val findRecipeByUIDOperation = (apiOperation[Recipe]("findRecipeByUID")
@@ -118,7 +121,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
 
   get("/recipes/:uid", operation(findRecipeByUIDOperation)) {
     val uid = params.getOrElse("uid", halt(400))
-    handleGetStorageError(Storage.getRecipe(uid))
+    handleGetStorageError(storage.getRecipe(uid))
   }
 
   val findRecipesOperation = (apiOperation[List[NamedMacros]]("findRecipes")
@@ -131,7 +134,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
     val sort = params.getAs[String]("sort")
     val limit = params.getAs[Int]("limit").getOrElse(10)
 
-    handleGetStorageError(Storage.getLatestRecipes(limit))
+    handleGetStorageError(storage.getLatestRecipes(limit))
   }
 
   val searchByNameOperation = (apiOperation[List[NamedMacros]]("searchAll")
@@ -145,7 +148,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
     val q = params.getOrElse("q", halt(400))
     val sort = params.getAs[String]("sort")
     val limit = params.getAs[Int]("limit").getOrElse(10)
-    handleGetStorageError(Storage.getIngredientsAndRecipes(q, limit))
+    handleGetStorageError(storage.getIngredientsAndRecipes(q, limit))
   }
 
   // TODO remove this
@@ -156,7 +159,7 @@ class DefaultApi(implicit val swagger: Swagger) extends ScalatraServlet
 
   delete("/items/:uid", operation(deleteByUidOperation)) {
     val uid = params.getOrElse("uid", halt(400))
-    Storage.deleteItem(uid)
+    storage.deleteItem(uid)
     NoContent()
   }
 }

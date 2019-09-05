@@ -1,5 +1,6 @@
 package com.macromacro.usda
 
+import com.macromacro.settings.Settings
 import com.softwaremill.sttp._
 import com.softwaremill.sttp.json4s._
 import com.macromacro.schema.UsdaId
@@ -11,14 +12,16 @@ object UsdaClient {
   // TODO can this be lazy?
   private val httpBackend: SttpBackend[Id, Nothing] = HttpURLConnectionBackend()
 
-  def foodReport(ndbnoOrUid: String)(implicit backend: SttpBackend[Id, Nothing] = httpBackend): Either[USDAError, FoodFood] = {
+  def foodReport(ndbnoOrUid: String)(
+    implicit
+    backend: SttpBackend[Id, Nothing] = httpBackend,
+    settings: Settings): Either[USDAError, FoodFood] = {
     val ndbno = ndbnoOrUid match {
       case UsdaId(ndbno) => ndbno
       case ndbno => ndbno
     }
 
-    val apiKey = sys.env("GOV_API_KEY")
-    val params = Map("api_key" -> apiKey, "ndbno" -> ndbno, "type" -> "b", "format" -> "json")
+    val params = Map("api_key" -> settings.govApiKey, "ndbno" -> ndbno, "type" -> "b", "format" -> "json")
     val response = sttp.get(uri"$usdaUrl?$params").response(asJson[FoodReport]).send()
 
     response.body

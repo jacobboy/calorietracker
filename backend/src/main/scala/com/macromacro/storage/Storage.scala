@@ -10,6 +10,7 @@ import com.google.appengine.api.search.PutException
 import com.google.appengine.api.search.SearchServiceFactory
 import com.google.appengine.api.search.StatusCode
 import com.macromacro.schema._
+import com.macromacro.settings.Settings
 import com.macromacro.usda.{ FoodFood, ReportNotFound, USDAError, UsdaApiError, UsdaClient }
 import java.util.Date
 import org.openapitools.server.model._
@@ -85,7 +86,7 @@ protected object IngredientIndex {
   }
 }
 
-object Storage {
+class Storage(implicit settings: Settings) {
 
   private implicit val jsonFormats = Serialization.formats(NoTypeHints) ++ JavaTypesSerializers.all
   private val typeFacet = "type"
