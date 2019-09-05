@@ -22,5 +22,14 @@ project/plugins/project/
 *.iml
 
 .ensime*
+ensime-langserver.log
 
 app.yaml
+
+# built site files
+src/main/webapp/asset-manifest.json
+src/main/webapp/favicon.ico
+src/main/webapp/index.html
+src/main/webapp/manifest.json
+src/main/webapp/service-worker.js
+src/main/webapp/static/
