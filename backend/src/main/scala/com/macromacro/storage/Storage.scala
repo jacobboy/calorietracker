@@ -86,27 +86,27 @@ protected object IngredientIndex {
   }
 }
 
+protected case class StoredRecipe(
+  uid: String,
+  name: String,
+  fat: BigDecimal,
+  carbs: BigDecimal,
+  protein: BigDecimal,
+  calories: BigDecimal,
+  unit: String,
+  foods: List[AmountOfIngredient],
+  totalSize: BigDecimal,
+  portionSize: BigDecimal) {
+
+  def toNamedMacros() = {
+    NamedMacros(uid, name, fat, carbs, protein, calories, portionSize, unit)
+  }
+}
+
 class Storage(implicit settings: Settings) {
 
   private implicit val jsonFormats = Serialization.formats(NoTypeHints) ++ JavaTypesSerializers.all
   private val typeFacet = "type"
-
-  protected case class StoredRecipe(
-    uid: String,
-    name: String,
-    fat: BigDecimal,
-    carbs: BigDecimal,
-    protein: BigDecimal,
-    calories: BigDecimal,
-    unit: String,
-    foods: List[AmountOfIngredient],
-    totalSize: BigDecimal,
-    portionSize: BigDecimal) {
-
-    def toNamedMacros() = {
-      NamedMacros(uid, name, fat, carbs, protein, calories, portionSize, unit)
-    }
-  }
 
   private def document(id: String, t: String, keyValues: (String, String)*) = {
     val doc = Document.newBuilder

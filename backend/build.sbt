@@ -39,3 +39,6 @@ libraryDependencies ++= Seq(
 )
 
 enablePlugins(ScalatraPlugin)
+
+
+fork in Test := true
