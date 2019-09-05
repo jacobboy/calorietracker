@@ -1,6 +1,7 @@
-import { GOV_API_KEY } from '../apikey';
-import { SearchItem, DefaultApi, Nutrients, FoodFood } from 'src/usdaclient';
+import { DefaultApi, Nutrients, FoodFood } from 'src/usdaclient';
 import { NamedMacros } from 'src/client';
+
+const GOV_API_KEY = process.env.REACT_APP_GOV_API_KEY!;
 
 export enum DataSource {
   SR = 'SR',

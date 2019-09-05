@@ -17,7 +17,8 @@ import * as url from "url";
 import * as portableFetch from "portable-fetch";
 import { Configuration } from "./configuration";
 
-const BASE_PATH = "http://localhost:8080/Default".replace(/\/+$/, "");
+const BASE_PATH = process.env.REACT_APP_MACROMACRO_HOST!.replace(/\/+$/, "");
+console.log(`BASE_PATH: ${BASE_PATH}`);
 
 /**
  *

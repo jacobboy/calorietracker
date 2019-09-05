@@ -16,7 +16,6 @@ import {
   SAVE_SEARCH_ITEM,
   SAVE_SEARCH_ITEM_FAILED
 } from './constants';
-import { GOV_API_KEY } from './apikey';
 import { macrosFromFood, DataSource } from './ndbapi';
 import { takeLeading } from './sagahelpers';
 
@@ -58,6 +57,8 @@ function* createIngredient(action: ActionsTypeMap['createIngredientSubmit']) {
 }
 
 export function* searchUsdaForFood(action: ActionsTypeMap['foodSearchSubmit']) {
+  // TODO move this logic to ndbapi module
+  const GOV_API_KEY = process.env.REACT_APP_GOV_API_KEY!;
   let searchRequest: { apiKey: string, q: string, ds?: SearchDsEnum };
   if (action.payload.ds === DataSource.Any) {
     searchRequest = { apiKey: GOV_API_KEY, q: action.payload.searchString };
