@@ -1,3 +1,5 @@
 * typing into createrecipe ingredient amount loses focus
 * document how to set up backend and appcfg, or at least the need for it
 ** Also look into Cloud SDK, apparently appcfg is deprecated?
+* login and user-specific data
+* return recipes and ingredients separate from search
