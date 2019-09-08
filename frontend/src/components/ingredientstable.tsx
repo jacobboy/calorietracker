@@ -11,7 +11,7 @@ export function headerCell(text: string) {
 }
 
 export function ingredientCell(text: string | number | JSX.Element, key?: string, id?: string) {
-  const opts: {key?: string, id?: string} = {};
+  const opts: { key?: string, id?: string } = {};
   if (key) {
     opts.key = key;
   }
@@ -22,7 +22,7 @@ export function ingredientCell(text: string | number | JSX.Element, key?: string
 }
 
 export function mealCell(text: string | number | JSX.Element, key?: string, id?: string) {
-  const opts: {key?: string, id?: string} = {};
+  const opts: { key?: string, id?: string } = {};
   if (key) {
     opts.key = key;
   }
@@ -58,7 +58,7 @@ class IngredientRow extends React.Component<IngredientRowProps, IngredientRowSta
     if (this.props.handleFoodAmountChange) {
       handleFoodAmountChange = this.props.handleFoodAmountChange;
     } else {
-      handleFoodAmountChange = (food: AmountOfNamedMacros, newAmount: number) => {/*  */};
+      handleFoodAmountChange = (food: AmountOfNamedMacros, newAmount: number) => {/*  */ };
     }
     this.state = {
       amount: this.props.food.amount,
@@ -216,24 +216,25 @@ export class IngredientsTable<T extends AmountOfNamedMacros> extends React.Compo
 
   renderRows() {
     const rows = [];
+    const specificMacroIndexes = new Map();
     for (let i = 0; i < this.props.foods.length; i++) {
       let food = this.props.foods[i];
-      const key = `${food.namedMacros.uid}_${food.amount}_${i}`;
+
+      // keep track of how many times we've seen this uid so we can create a stable key
+      const thisMacroIndex = specificMacroIndexes.get(food.namedMacros.uid) || 0;
+      specificMacroIndexes.set(food.namedMacros.uid, thisMacroIndex + 1);
+
       rows.push((
-      <IngredientRow
-        key={'ingred_' + key}
-        food={food}
-        handleFoodAmountChange={this.props.handleFoodAmountChange}
-        handleRemoveFoodClick={this.props.handleRemoveFoodClick}
-        tableIdx={this.props.idx}
-        idx={i}
-      />));
-      /* rows.push(React.createElement(IngredientRow, {
-        food: food,
-        handleFoodAmountChange: this.props.handleFoodAmountChange,
-        handleRemoveFoodClick: this.props.handleRemoveFoodClick,
-        idx: i
-      })); */
+        <IngredientRow
+          // use length in the key to avoid bugs on addition/removal
+          key={`ingred_${food.namedMacros.uid}_${thisMacroIndex}_${this.props.foods.length}_${i}`}
+          food={food}
+          handleFoodAmountChange={this.props.handleFoodAmountChange}
+          handleRemoveFoodClick={this.props.handleRemoveFoodClick}
+          tableIdx={this.props.idx}
+          idx={i}
+        />
+      ));
     }
     rows.push(this.makeTotalRow(this.props.foods));
     return rows;

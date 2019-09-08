@@ -1,7 +1,4 @@
-* USDA usage on server broken
-** https://stackoverflow.com/questions/12912998/java-net-unknownhostexception-appengine-google-com
-* typing into createrecipe ingredient amount loses focus
+* login and user-specific data
 * document how to set up backend and appcfg, or at least the need for it
 ** Also look into Cloud SDK, apparently appcfg is deprecated?
-* login and user-specific data
 * return recipes and ingredients separate from search
