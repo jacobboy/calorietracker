@@ -6,6 +6,7 @@
     <version>1</version>
     <threadsafe>true</threadsafe>
     <runtime>java8</runtime>
+    <url-stream-handler>urlfetch</url-stream-handler>
     <!-- <env>flex</env> -->
     <!-- <system-properties> -->
     <!--     <property name="config.resource" value="production.conf" /> -->

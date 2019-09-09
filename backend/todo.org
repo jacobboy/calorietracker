@@ -1,4 +1,6 @@
 * Bugs
+** catch and log 500s
+** 500 from save ingredient
 ** favicon.ico and manifest.json are 404ing
 * NDB API search
 * Recipe
