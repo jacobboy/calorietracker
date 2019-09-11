@@ -1,6 +1,5 @@
-* 500 from save ingredient
 * login and user-specific data
 * math in createrecipe total clears the box
+* return recipes and ingredients separate from search
 * document how to set up backend and appcfg, or at least the need for it
 ** Also look into Cloud SDK, apparently appcfg is deprecated?
-* return recipes and ingredients separate from search
