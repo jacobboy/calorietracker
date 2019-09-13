@@ -123,7 +123,7 @@ interface IngredientsTableProps<T extends AmountOfNamedMacros> {
   handleFoodAmountChange?: (food: T, newAmount: number) => void;
   handleRemoveFoodClick: (food: T) => void;
   handleDeleteAllClick: () => void;
-  handleAmountAllInput?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleAmountAllInput?: (totalSize: number) => void;
   amount?: number;
   handleUnitAllInput?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   unit?: FOOD_UNIT;
@@ -165,10 +165,9 @@ export class IngredientsTable<T extends AmountOfNamedMacros> extends React.Compo
       // otherwise TS thinks this might be undefined
       const handleAmountInput = this.props.handleAmountAllInput;
       amountCell = (
-        <input
+        <MathInput
           id="recipeAmountInput"
-          type="number"
-          value={this.props.amount || ''}
+          amount={this.props.amount || 0}
           onChange={(e) => handleAmountInput(e)}
         />
       );

@@ -1,5 +1,4 @@
 * TODO Bugs
-** math in createrecipe total clears the box
 ** clicking add to meal causes focus reset and amount reverts to 100
 ** math in total field on create recipe doesn't work
 ** Can't have 0 for a nutrient in an ingredient

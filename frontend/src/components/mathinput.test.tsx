@@ -54,4 +54,30 @@ describe('The MathInput', () => {
       });
     expect(handler.mock.calls.length).toEqual(0);
   });
+  it('allows input to be modified by parent', () => {
+    const handler = jest.fn();
+    const originalAmount = 100;
+    const newAmount = 200;
+
+    const wrapper = shallow(
+      <MathInput id="theInput" amount={originalAmount} onChange={handler} />
+    );
+    wrapper.setProps({ id: 'theInput', amount: newAmount, onChange: handler });
+    expect(wrapper.find('#theInput').props().value).toBe(newAmount.toString());
+  });
+
+  it('doesn\'t allow parent to overwrite math in progress', () => {
+    const handler = jest.fn();
+    const originalAmount = 100;
+    const newAmount = 200;
+
+    const wrapper = shallow(
+      <MathInput id="theInput" amount={originalAmount} onChange={handler} />
+    );
+    wrapper
+      .find('#theInput')
+      .simulate('change', { target: { value: '12*12' } });
+    wrapper.setProps({ id: 'theInput', amount: newAmount, onChange: handler });
+    expect(wrapper.find('#theInput').props().value).toBe('12*12');
+  });
 });

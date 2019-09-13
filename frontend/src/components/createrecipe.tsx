@@ -70,8 +70,7 @@ export class CreateRecipeInput extends React.Component<
     this.setState({ name: event.target.value });
   }
 
-  handleAmountInput(event: React.ChangeEvent<HTMLInputElement>) {
-    const totalSize = Number(event.target.value);
+  handleAmountInput(totalSize: number) {
     this.setState({ totalSize, useCalculatedAmount: false });
   }
 

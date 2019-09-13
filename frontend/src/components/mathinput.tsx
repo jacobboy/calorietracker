@@ -24,6 +24,15 @@ export class MathInput extends React.Component<Props, State> {
     };
   }
 
+  componentDidUpdate(prevProps: Props) {
+    if (this.props.amount !== prevProps.amount) {
+      // Don't allow parent to overwrite in the middle of math
+      if (!this.state.input.split('').some(char => this.OPERATIONS.has(char))) {
+        this.setState({input: this.props.amount.toString()});
+      }
+    }
+  }
+
   isMath(input: string) {
     const itIs = input
       .split('')
