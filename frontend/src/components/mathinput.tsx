@@ -79,7 +79,7 @@ export class MathInput extends React.Component<Props, State> {
         : this.state.input; */
     return (
       <input
-        id={this.props.id}
+        id={`${this.props.id}_mathinput`}
         type="text"
         value={this.state.input}
         onChange={e => this.handleChange(e)}

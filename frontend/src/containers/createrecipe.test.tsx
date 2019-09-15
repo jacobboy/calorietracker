@@ -84,9 +84,8 @@ describe('Recipes', () => {
     const portionSize = 300;
     const amount = 101;
     const portionMultiplier = portionSize / amount;
-
     wrapper.find('#recipePortionInput').simulate('change', { target: { value: portionSize } });
-    wrapper.find('#recipeAmountInput').simulate('change', { target: { value: amount } });
+    wrapper.find('#recipeAmountInput_mathinput').simulate('change', { target: { value: amount.toString() } });
 
     const protein = macroSum('protein') * portionMultiplier;
     const fat = macroSum('fat') * portionMultiplier;
@@ -107,7 +106,7 @@ describe('Recipes', () => {
 
     wrapper.find('#recipeNameInput').simulate('change', { target: { value: title } });
     wrapper.find('#recipePortionInput').simulate('change', { target: { value: portionSize } });
-    wrapper.find('#recipeAmountInput').simulate('change', { target: { value: totalSize } });
+    wrapper.find('#recipeAmountInput_mathinput').simulate('change', { target: { value: totalSize.toString() } });
     wrapper.find('#recipeUnitInput').simulate('change', { target: { value: unit } });
     wrapper.find('#saveRecipe').simulate('submit');
 
@@ -129,7 +128,7 @@ describe('Recipes', () => {
 
     wrapper.find('#recipeNameInput').simulate('change', { target: { value: title } });
     wrapper.find('#recipePortionInput').simulate('change', { target: { value: portionSize } });
-    wrapper.find('#recipeAmountInput').simulate('change', { target: { value: totalSize } });
+    wrapper.find('#recipeAmountInput_mathinput').simulate('change', { target: { value: totalSize.toString() } });
     wrapper.find('#recipeUnitInput').simulate('change', { target: { value: unit } });
     wrapper.find('#foodAmountInput11').first().simulate(
       'change', { target: { value: newFood.amount.toString() } }
