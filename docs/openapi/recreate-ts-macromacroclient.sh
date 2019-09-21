@@ -1,1 +1,1 @@
-openapi-generator generate -i macromacro.yaml -g typescript-fetch -o macromacro && rm -rf ../../frontend/src/client/ && mv macromacro/ ../../frontend/src/client
+openapi-generator generate -i macromacro.yaml -g typescript-fetch -o macromacro -p supportsES6=true -p typescriptThreePlus=true && rm -rf ../../frontend/src/client/ && mv macromacro/src ../../frontend/src/client

@@ -215,13 +215,23 @@ paths:
             format: int32
       responses:
         '200':
-          description: recipe response
+          description: Search response
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/NamedMacros'
+                type: object
+                properties:
+                  recipes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/NamedMacros'
+                  ingredients:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/NamedMacros'
+                required:
+                  - recipes
+                  - ingredients
         default:
           description: unexpected error
           content:
@@ -231,7 +241,6 @@ paths:
 
 components:
   schemas:
-
     Macros:
       required:
         - fat
@@ -273,13 +282,13 @@ components:
           - name
           - amount
           - unit
-      properties:
-        name:
-          type: string
-        amount:
-          type: number
-        unit:
-          type: string
+          properties:
+            name:
+              type: string
+            amount:
+              type: number
+            unit:
+              type: string
 
     AmountOfIngredient:
       required:
@@ -341,6 +350,8 @@ components:
         - uid
         - foods
       properties:
+        uid:
+          type: string
         foods:
           type: array
           items:

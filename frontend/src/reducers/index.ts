@@ -26,7 +26,7 @@ import {
   MACROMACRO_FOODSEARCH_FAILED
 } from '../constants/index';
 import { dropIndex, replaceElement, replaceObject } from '../datautil';
-import { AmountOfNamedMacros, Meal } from 'src/client';
+import { AmountOfNamedMacros, Meal } from '../client';
 import { actionChannel } from 'redux-saga/effects';
 
 function mealIdxOrLast(state: StoreState, mealIdx?: number) {
@@ -56,8 +56,7 @@ function removeFoodFromMeal(
   return { ...state, today };
 }
 
-export function
-reducer(state: StoreState, action: Actions): StoreState {
+export function reducer(state: StoreState, action: Actions): StoreState {
   // console.log('Handling: ' + action.type);
   switch (action.type) {
     case LOAD_INGREDIENTS_SUCCESS:
@@ -113,7 +112,8 @@ reducer(state: StoreState, action: Actions): StoreState {
         ...state,
         saved: {
           ...state.saved,
-          searchIngredients: action.payload
+          searchIngredients: action.payload.ingredients,
+          searchRecipes: action.payload.recipes
         }
       };
     case MACROMACRO_FOODSEARCH_FAILED:

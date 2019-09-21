@@ -1,13 +1,12 @@
 import * as React from 'react';
 import StoredIngredientRow from './storedingredientrow';
 import { mount, ReactWrapper } from 'enzyme';
-import { createStore, Store, AnyAction } from 'redux';
-import { reducer } from '../reducers';
+import { createStore, Store } from 'redux';
 import { Provider } from 'react-redux';
 import { FOOD_UNIT } from '../classes';
 import { TopBitDisplay, TopBitState, emptyState } from '../types';
-import { Meal, NamedMacros, AmountOfNamedMacros } from 'src/client';
-import { actions } from 'src/actions';
+import { Meal, NamedMacros } from '../client';
+import { actions } from '../actions';
 
 // TODO try these with foods already in the meal/recipe
 
@@ -15,35 +14,30 @@ describe('When the track food button is clicked on meals view', () => {
   // tslint:disable-next-line:no-any
   let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
   // TODO tests work, but how do pros test connected components in typescript?
-  let store: {
-    getState: () => { topbit: TopBitState, today: Meal[]},
-    // tslint:disable-next-line:no-any
-    dispatch: any,
-    // tslint:disable-next-line:no-any
-    subscribe: any,
-    // tslint:disable-next-line:no-any
-    replaceReducer: any
-  };
   let thisMeal: Meal, thatMeal: Meal, thisIngred: NamedMacros, trackFoodId: string;
   let ref: React.RefObject<HTMLElement>;
-  let dispatch: () => null;
+
+  // tslint:disable-next-line:no-any
+  let store: Store<{}, any>;
+  // tslint:disable-next-line:no-any
+  let createdActions: any[];
 
   beforeEach(() => {
     let [fat, carbs, protein, calories, amount] = [1, 2, 3, 4, 5];
     thisIngred = {uid: 'foo_uid', name: 'foo', fat, carbs, protein, calories, amount, unit: FOOD_UNIT.g};
     [thisMeal, thatMeal] = [{uid: 'meal1', foods: []}, {uid: 'meal2', foods: []}];
     trackFoodId = `#trackFoodAmountInput_${thisIngred.uid}`;
-    dispatch = jest.fn();
 
-    store = {
-      getState: () => ({
-        topbit: { ...emptyState.topbit, display: TopBitDisplay.MEALS },
-        today: [thisMeal, thatMeal]
-      }),
-      dispatch,
-      subscribe: jest.fn(),
-      replaceReducer: jest.fn()
+    const initialState = {
+      topbit: { ...emptyState.topbit, display: TopBitDisplay.MEALS },
+      today: [thisMeal, thatMeal]
     };
+
+    createdActions = [];
+    store = createStore(
+      (state, a) => { createdActions.push(a); return state; },
+      initialState
+    );
 
     ref = {current: {focus: jest.fn()} as unknown as HTMLElement};
     wrapper = mount(
@@ -63,7 +57,7 @@ describe('When the track food button is clicked on meals view', () => {
     wrapper.find('#trackFoodSubmit_meal0').simulate('click');
 
     const expectedIngred = {namedMacros: thisIngred, amount: newAmount};
-    expect(dispatch).toHaveBeenCalledWith(actions.addFoodToMeal(expectedIngred, 0));
+    expect(createdActions).toContainEqual(actions.addFoodToMeal(expectedIngred, 0));
   });
   it(`can add to multiple meals`, () => {
     const newAmount1 = 100;
@@ -82,10 +76,10 @@ describe('When the track food button is clicked on meals view', () => {
     wrapper.find('#trackFoodSubmit_meal1').simulate('click');
 
     const expectedIngred1 = {namedMacros: thisIngred, amount: newAmount1};
-    expect(dispatch).toHaveBeenCalledWith(actions.addFoodToMeal(expectedIngred1, 0));
+    expect(createdActions).toContainEqual(actions.addFoodToMeal(expectedIngred1, 0));
 
     const expectedIngred2 = {namedMacros: thisIngred, amount: newAmount2};
-    expect(dispatch).toHaveBeenCalledWith(actions.addFoodToMeal(expectedIngred2, 1));
+    expect(createdActions).toContainEqual(actions.addFoodToMeal(expectedIngred2, 1));
   });
   it('returns focus to provided ref', () => {
     wrapper.find('#trackFoodSubmit_meal1').simulate('click');
@@ -98,39 +92,35 @@ describe('When the track food button is clicked on meals view', () => {
 describe('When the track food button is clicked on create recipe view', () => {
   // tslint:disable-next-line:no-any
   let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
-  // TODO tests work, but how do pros test connected components in typescript?
-  let store: {
-    getState: () => { topbit: TopBitState},
-    // tslint:disable-next-line:no-any
-    dispatch: any,
-    // tslint:disable-next-line:no-any
-    subscribe: any,
-    // tslint:disable-next-line:no-any
-    replaceReducer: any
-  };
-  let dispatch: () => null;
+
+  // tslint:disable-next-line:no-any
+  let store: Store<{}, any>;
+  // tslint:disable-next-line:no-any
+  let createdActions: any[];
+
   let ref: React.RefObject<HTMLElement>;
   let thisIngred: NamedMacros;
 
   beforeEach(() => {
     let [fat, carbs, protein, calories, amount] = [1, 2, 3, 4, 5];
     thisIngred = {uid: 'foo_uid', name: 'foo', fat, carbs, protein, calories, amount, unit: FOOD_UNIT.g};
-    dispatch = jest.fn();
-    store = {
-      getState: () => ({
-        topbit: {
-          ...emptyState.topbit,
-          display: TopBitDisplay.CREATE_RECIPE,
-          recipe: {
-            ...emptyState.topbit.recipe,
-            foods: []
-          }
+
+    const initialState = {
+      topbit: {
+        ...emptyState.topbit,
+        display: TopBitDisplay.CREATE_RECIPE,
+        recipe: {
+          ...emptyState.topbit.recipe,
+          foods: []
         }
-      }),
-      dispatch,
-      subscribe: jest.fn(),
-      replaceReducer: jest.fn()
+      }
     };
+
+    createdActions = [];
+    store = createStore(
+      (state, a) => { createdActions.push(a); return state; },
+      initialState
+    );
 
     ref = {current: {focus: jest.fn()} as unknown as HTMLElement};
     wrapper = mount(
@@ -151,7 +141,7 @@ describe('When the track food button is clicked on create recipe view', () => {
     wrapper.find('#trackFoodSubmit_recipe').simulate('click');
 
     const expectedIngred = {namedMacros: thisIngred, amount: newAmount};
-    expect(dispatch).toHaveBeenCalledWith(actions.addFoodToRecipe(expectedIngred));
+    expect(createdActions).toContainEqual(actions.addFoodToRecipe(expectedIngred));
   });
 
   it('returns focus to provided ref', () => {

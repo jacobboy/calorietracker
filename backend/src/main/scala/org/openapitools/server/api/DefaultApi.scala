@@ -137,7 +137,7 @@ class DefaultApi(implicit val swagger: Swagger, settings: Settings) extends Scal
     handleGetStorageError(storage.getLatestRecipes(limit))
   }
 
-  val searchByNameOperation = (apiOperation[List[NamedMacros]]("searchAll")
+  val searchByNameOperation = (apiOperation[SearchResponse]("searchAll")
     summary "Search for ingredients and recipes by name"
     parameters (
       queryParam[String]("q").description("search key"),
@@ -148,7 +148,10 @@ class DefaultApi(implicit val swagger: Swagger, settings: Settings) extends Scal
     val q = params.getOrElse("q", halt(400))
     val sort = params.getAs[String]("sort")
     val limit = params.getAs[Int]("limit").getOrElse(10)
-    handleGetStorageError(storage.getIngredientsAndRecipes(q, limit))
+    val ingredientsAndRecipes = storage.getRecipesAndIngredients(q, limit)
+    handleGetStorageError(
+      ingredientsAndRecipes.map(
+        inr => new SearchResponse(inr._1, inr._2)))
   }
 
   // TODO remove this

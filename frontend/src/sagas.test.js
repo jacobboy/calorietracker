@@ -21,6 +21,7 @@ import { cloneableGenerator } from '@redux-saga/testing-utils';
 import { DataSource } from './ndbapi';
 import { actions } from './actions';
 import { FOOD_UNIT } from './classes';
+import { NamedMacros } from './client';
 
 describe('The load ingredients saga', () => {
   const gen = cloneableGenerator(loadInitialIngredients)();
@@ -29,8 +30,9 @@ describe('The load ingredients saga', () => {
       // TODO how am i supposed to assert this?
       expect(gen.next().value).toEqual(call(MacroMacroFp().findIngredients()));
     }); */
+  const foundMacros: NamedMacros[] = [];
   it('puts a LOAD_INGREDIENT_SUCCESS on success', () => {
-    expect(gen.clone().next([]).value).toEqual(put({ type: LOAD_INGREDIENTS_SUCCESS, payload: [] }));
+    expect(gen.clone().next(foundMacros).value).toEqual(put({ type: LOAD_INGREDIENTS_SUCCESS, payload: foundMacros }));
   });
 
   it('puts a LOAD_INGREDIENT_FAILED on failure', () => {

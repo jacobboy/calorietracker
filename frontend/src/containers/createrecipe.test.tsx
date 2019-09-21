@@ -6,8 +6,9 @@ import { FOOD_UNIT } from '../classes';
 import CreateRecipeInput from '../containers/createrecipe';
 import { AmountOfNamedMacros } from 'src/client';
 import { scaleQuantity } from 'src/transforms';
-import { CREATE_RECIPE_SUBMIT, REMOVE_FOOD_FROM_RECIPE, REPLACE_FOOD_IN_RECIPE } from 'src/constants';
-import { actions } from 'src/actions';
+import { CREATE_RECIPE_SUBMIT, REMOVE_FOOD_FROM_RECIPE } from 'src/constants';
+import { actions } from '../actions';
+import { Store, createStore } from 'redux';
 
 function mockIngredients(nFoods: number) {
   const foods = [];
@@ -36,28 +37,20 @@ describe('Recipes', () => {
   // tslint:disable-next-line:no-any
   let wrapper: enzyme.ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
   let foods: AmountOfNamedMacros[];
-  // TODO tests work, but how do pros test connected components in typescript?
-  let store: {
-    getState: () => { topbit: { recipe: { foods: AmountOfNamedMacros[] }} },
-    // tslint:disable-next-line:no-any
-    dispatch: any,
-    // tslint:disable-next-line:no-any
-    subscribe: any,
-    // tslint:disable-next-line:no-any
-    replaceReducer: any
-  };
-  let dispatch: () => null;
-  /* let store: Store<{topbit: TopBitState, saved: {recipes: Recipe[]}}, AnyAction>; */
+
+  // tslint:disable-next-line:no-any
+  let store: Store<{}, any>;
+  // tslint:disable-next-line:no-any
+  let createdActions: any[];
 
   beforeEach(() => {
     foods = mockIngredients(nFoods);
-    dispatch = jest.fn();
-    store = {
-      getState: () => ({ topbit: { recipe: { foods }}}),
-      dispatch,
-      subscribe: jest.fn(),
-      replaceReducer: jest.fn()
-    };
+    const initialState = { topbit: { recipe: { foods: foods }}};
+    createdActions = [];
+    store = createStore(
+      (state, a) => { createdActions.push(a); return state; },
+      initialState
+    );
 
     wrapper = mount(
       <Provider store={store}>
@@ -69,7 +62,7 @@ describe('Recipes', () => {
   for (let iIngred = 0; iIngred < nFoods; iIngred++) {
     it(`dispatches REMOVE_FOOD_FROM_RECIPE on food remove click`, () => {
       wrapper.find(`#removeFood_1_${iIngred}`).simulate('click');
-      expect(dispatch).toBeCalledWith({'payload': foods[iIngred], 'type': REMOVE_FOOD_FROM_RECIPE});
+      expect(createdActions).toContainEqual({'payload': foods[iIngred], 'type': REMOVE_FOOD_FROM_RECIPE});
      });
   }
 
@@ -110,7 +103,7 @@ describe('Recipes', () => {
     wrapper.find('#recipeUnitInput').simulate('change', { target: { value: unit } });
     wrapper.find('#saveRecipe').simulate('submit');
 
-    expect(dispatch).toHaveBeenCalledWith(
+    expect(createdActions).toContainEqual(
       {
         type: CREATE_RECIPE_SUBMIT,
         payload: actions.saveRecipe(title, foods, portionSize, totalSize, unit).payload
@@ -134,7 +127,7 @@ describe('Recipes', () => {
       'change', { target: { value: newFood.amount.toString() } }
     );
     wrapper.find('#saveRecipe').simulate('submit');
-    expect(dispatch).lastCalledWith(
+    expect(createdActions).toContainEqual(
       {
         type: CREATE_RECIPE_SUBMIT,
         payload: actions.saveRecipe(title, [foods[0], foods[foodToChangeIdx]], portionSize, totalSize, unit).payload

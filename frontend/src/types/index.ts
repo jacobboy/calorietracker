@@ -1,5 +1,5 @@
 import { DataSource } from '../ndbapi';
-import { AmountOfNamedMacros, NamedMacros, Meal } from 'src/client';
+import { AmountOfNamedMacros, NamedMacros, Meal } from '../client';
 import { SearchItem } from 'src/usdaclient';
 
 export interface SavedState {

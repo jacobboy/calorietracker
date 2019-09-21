@@ -287,8 +287,12 @@ class Storage(implicit settings: Settings) {
     getMacrosFromQuery(s"type:recipe", limit = limit)
   }
 
-  def getIngredientsAndRecipes(searchString: String, limit: Int = 10): Either[StorageError, List[NamedMacros]] = {
-    getMacrosFromQuery(s"name:($searchString)", limit = limit)
+  def getRecipesAndIngredients(
+    searchString: String, limit: Int = 10): Either[StorageError, Tuple2[List[NamedMacros], List[NamedMacros]]] = {
+    for (
+      recipes <- getMacrosFromQuery(s"type:(recipe) name:($searchString)", limit = limit);
+      ingredients <- getMacrosFromQuery(s"type:(ingredient OR usda) name:($searchString)", limit = limit)
+    ) yield new Tuple2(recipes, ingredients)
   }
 
   def deleteItem(uid: String) = {

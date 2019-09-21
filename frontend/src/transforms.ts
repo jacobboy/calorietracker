@@ -1,4 +1,4 @@
-import { Macros, AmountOfNamedMacros } from './client';
+import { Macros, AmountOfNamedMacros } from 'src/client';
 
 export interface MacrosAndPercents extends Macros {
   proteinPct: number;

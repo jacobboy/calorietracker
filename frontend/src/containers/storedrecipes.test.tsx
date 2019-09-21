@@ -1,13 +1,12 @@
 import { ReactWrapper, mount } from 'enzyme';
 import * as React from 'react';
 import { Provider } from 'react-redux';
-import { Store, AnyAction, createStore } from 'redux';
+import { Store, createStore } from 'redux';
 import { FOOD_UNIT, makeTestNamedMacros, makeTestRecipe } from '../classes';
 import StoredRecipes from '../containers/storedrecipes';
-import { reducer } from '../reducers';
 import { TopBitDisplay } from '../types';
-import { AmountOfNamedMacros, Recipe } from 'src/client';
-import { actions } from 'src/actions';
+import { AmountOfNamedMacros, Recipe } from '../client';
+import { actions } from '../actions';
 
 function mockIngredients(nFoods: number) {
   const foods = [];
@@ -34,16 +33,9 @@ describe('The stored recipes component', () => {
   // tslint:disable-next-line:no-any
   let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
   // tslint:disable-next-line:no-any
-  let store: {
-    getState: () => { },
-    // tslint:disable-next-line:no-any
-    dispatch: any,
-    // tslint:disable-next-line:no-any
-    subscribe: any,
-    // tslint:disable-next-line:no-any
-    replaceReducer: any
-  };
-  let dispatch: () => null;
+  let store: Store<{}, any>;
+  // tslint:disable-next-line:no-any
+  let createdActions: any[];
 
   let foods: AmountOfNamedMacros[];
   let recipe: Recipe;
@@ -52,7 +44,7 @@ describe('The stored recipes component', () => {
     foods = mockIngredients(2);
     recipe = makeTestRecipe('Test Recipe 2', foods, 100);
 
-    let state = {
+    let initialState = {
       topbit: {
         display: TopBitDisplay.CREATE_RECIPE,
         recipe: {
@@ -67,17 +59,16 @@ describe('The stored recipes component', () => {
         searchRecipes: []
       }
     };
-    dispatch = jest.fn();
-    store = {
-      getState: () => state,
-      dispatch,
-      subscribe: jest.fn(),
-      replaceReducer: jest.fn()
-    };
+    createdActions = [];
+    store = createStore(
+      (state, a) => { createdActions.push(a); return state; },
+      initialState
+    );
 
     foods = mockIngredients(2);
     recipe = makeTestRecipe('Test Recipe 2', foods, 100);
   });
+
   it('adds recipes to the state on add recipe click', () => {
     wrapper = mount(
       <Provider store={store}>
@@ -85,8 +76,9 @@ describe('The stored recipes component', () => {
       </Provider>
     );
     wrapper.find(`#copy_${recipe.uid}`).simulate('click');
-    expect(dispatch).toHaveBeenCalledWith(actions.copyRecipe(recipe.uid));
+    expect(createdActions).toContainEqual(actions.copyRecipe(recipe.uid));
   });
+
   it('only displays recipes that match the search criteria', () => {
     wrapper = mount(
       <Provider store={store}>

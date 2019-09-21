@@ -31,8 +31,8 @@ export class MealsComponent extends React.Component<MealsComponentProps, {}> {
     this.ensureAtLeastOneMeal(this.props.today);
   }
 
-  componentWillReceiveProps(nextProps: MealsComponentProps) {
-    this.ensureAtLeastOneMeal(nextProps.today);
+  componentDidUpdate(prevProps: MealsComponentProps) {
+    this.ensureAtLeastOneMeal(this.props.today);
   }
 
   /* handleFoodAmountChange(mealIdx: number) {

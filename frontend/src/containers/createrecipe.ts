@@ -3,7 +3,7 @@ import { actions, Actions } from '../actions/';
 import { StoreState } from '../types/index';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { AmountOfNamedMacros } from 'src/client';
+import { AmountOfNamedMacros } from '../client';
 
 function mapStateToProps(state: StoreState) {
   return {

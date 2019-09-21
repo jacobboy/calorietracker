@@ -117,8 +117,8 @@ const reducerActions = {
   selectDataSource: (dataSource: DataSource) => createAction(SELECT_DATASOURCE, dataSource),
   foodSearchInput: (searchString: string) => createAction(FOODSEARCH_INPUT, searchString),
   usdaFoodSearchSucceeded: (searchResults: SearchItem[]) => createAction(USDA_FOODSEARCH_SUCCESS, searchResults),
-  macroMacroFoodSearchSucceeded: (namedMacros: NamedMacros[]) => createAction(
-    MACROMACRO_FOODSEARCH_SUCCESS, namedMacros
+  macroMacroFoodSearchSucceeded: (searchResults: {recipes: NamedMacros[], ingredients: NamedMacros[]}) => createAction(
+    MACROMACRO_FOODSEARCH_SUCCESS, searchResults
   ),
   usdaFoodSearchFailed: () => createAction(USDA_FOODSEARCH_FAILED),
   macroMacroFoodSearchFailed: () => createAction(MACROMACRO_FOODSEARCH_FAILED),

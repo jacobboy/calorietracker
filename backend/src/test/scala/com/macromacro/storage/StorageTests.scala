@@ -173,9 +173,10 @@ class StorageSpec extends FunSuite with BeforeAndAfterEach with BeforeAndAfterAl
     val newRecipe = NewRecipe("search test 3", foods, totalSize, portionSize, "g")
     val namedMacros = storage.save(newRecipe)
 
-    val results = storage.getIngredientsAndRecipes("search")
+    val results = storage.getRecipesAndIngredients("search")
     assert(results.isRight)
-    assert(results.right.getOrElse(null).length === 3)
+    assert(results.right.getOrElse(null)._1.length === 1)
+    assert(results.right.getOrElse(null)._2.length === 2)
   }
 
   test("a USDA ingredient can be saved and retrieved") {

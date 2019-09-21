@@ -6,30 +6,23 @@ import { mount } from 'enzyme';
 import { FOOD_UNIT } from 'src/classes';
 import { CREATE_INGREDIENT_SUBMIT } from 'src/constants';
 import { macrosFromAmountOf } from 'src/transforms';
+import { createStore, Store } from 'redux';
 
 describe('When ingredient create button is clicked', () => {
   // tslint:disable-next-line:no-any
   let wrapper: enzyme.ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
-  let store: {
-    getState: () => { },
-    // tslint:disable-next-line:no-any
-    dispatch: any,
-    // tslint:disable-next-line:no-any
-    subscribe: any,
-    // tslint:disable-next-line:no-any
-    replaceReducer: any
-  };
-  let dispatch: () => null;
+
+  // tslint:disable-next-line:no-any
+  let store: Store<{}, any>;
+  // tslint:disable-next-line:no-any
+  let createdActions: any[];
 
   beforeEach(() => {
-    window.localStorage.clear();
-    dispatch = jest.fn();
-    store = {
-      getState: () => ({}),
-      dispatch,
-      subscribe: jest.fn(),
-      replaceReducer: jest.fn()
-    };
+    createdActions = [];
+    store = createStore(
+      (state, actions) => { createdActions.push(actions); return state; },
+      {}
+    );
 
     wrapper = mount(
       <Provider store={store}>
@@ -61,7 +54,7 @@ describe('When ingredient create button is clicked', () => {
       amount,
       unit: FOOD_UNIT.g
     };
-    expect(dispatch).toBeCalledWith({'payload': expectedFood, 'type': CREATE_INGREDIENT_SUBMIT});
+    expect(createdActions).toContainEqual({'payload': expectedFood, 'type': CREATE_INGREDIENT_SUBMIT});
   });
 
   it(`scales the ingredient appropriately`, () => {
@@ -87,6 +80,6 @@ describe('When ingredient create button is clicked', () => {
       unit: FOOD_UNIT.g
     };
 
-    expect(dispatch).toBeCalledWith({'payload': expectedFood, 'type': CREATE_INGREDIENT_SUBMIT});
+    expect(createdActions).toContainEqual({'payload': expectedFood, 'type': CREATE_INGREDIENT_SUBMIT});
   });
 });

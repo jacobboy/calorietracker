@@ -1,5 +1,5 @@
-import { all, call, put, takeLatest } from 'redux-saga/effects';
-import { DefaultApiFp as MacroMacroFp, NamedMacros, Recipe, AmountOfNamedMacros, DefaultApi } from './client';
+import { all, call, put } from 'redux-saga/effects';
+import { DefaultApi as MacroMacro, NamedMacros, Recipe, AmountOfNamedMacros, Configuration, InlineResponse200 } from './client';
 import { DefaultApi as UsdaClient, SearchResponse, SearchDsEnum } from './usdaclient';
 import { ActionsTypeMap, actions } from './actions';
 import {
@@ -16,26 +16,35 @@ import {
   SAVE_SEARCH_ITEM,
   SAVE_SEARCH_ITEM_FAILED
 } from './constants';
-import { macrosFromFood, DataSource } from './ndbapi';
+import { DataSource } from './ndbapi';
 import { takeLeading } from './sagahelpers';
 
 // TODO How am I supposed to test sagas without exporting them all?
 // attempts to test the root saga have failed so far
 
+function macroMacro() {
+  return new MacroMacro(new Configuration({ basePath: process.env.REACT_APP_MACROMACRO_HOST! }));
+}
+
 export function* loadInitialIngredients() {
+  const fn: () => Promise<NamedMacros[]> = () => macroMacro().findIngredients({});
   try {
-    const macros: NamedMacros[] = yield call(MacroMacroFp().findIngredients());
+    // TODO this complains about undefined when i `yield call(fn)`
+    const macros: NamedMacros[] = yield call(fn);
     yield put({ type: LOAD_INGREDIENTS_SUCCESS, payload: macros });
   } catch (response) {
+    console.log(response.message);
     yield put({ type: LOAD_INGREDIENTS_FAILED, payload: response.message });
   }
 }
 
 export function* loadInitialRecipes() {
   try {
-    const macros: NamedMacros[] = yield call(MacroMacroFp().findRecipes());
+    const fn = () => macroMacro().findRecipes({});
+    const macros: NamedMacros[] = yield call(fn);
     yield put({ type: LOAD_RECIPES_SUCCESS, payload: macros });
   } catch (response) {
+    console.log(response.message);
     yield put({ type: LOAD_RECIPES_FAILED, payload: response.message });
   }
 }
@@ -49,9 +58,11 @@ function* loadInitialIngredientsAndRecipes() {
 
 function* createIngredient(action: ActionsTypeMap['createIngredientSubmit']) {
   try {
-    const macros: NamedMacros = yield call(MacroMacroFp().createIngredient(action.payload));
+    const fn = () => macroMacro().createIngredient({ newIngredient: action.payload });
+    const macros: NamedMacros = yield call(fn);
     yield put(actions.createIngredientSucceeded(macros));
   } catch (response) {
+    console.log(response.message);
     yield put({ type: CREATE_INGREDIENT_FAILED, payload: response.message });
   }
 }
@@ -73,6 +84,7 @@ export function* searchUsdaForFood(action: ActionsTypeMap['foodSearchSubmit']) {
     const usdaSearchResults: SearchResponse = yield call(usdaSearchFunc, searchRequest);
     yield put(actions.usdaFoodSearchSucceeded(usdaSearchResults.list.item));
   } catch (response) {
+    console.log(response.message);
     /* TODO ...usda doesn't 400 actually, just a search that _says_ 400
     unfortunately, it looks like ATM the client generator doesn't handle oneOf
     How to handle the error response? */
@@ -82,9 +94,11 @@ export function* searchUsdaForFood(action: ActionsTypeMap['foodSearchSubmit']) {
 
 export function* searchMacroMacroForFood(action: ActionsTypeMap['foodSearchSubmit']) {
   try {
-    const macroMacroSearchResults: NamedMacros[] = yield call(MacroMacroFp().searchByName(action.payload.searchString));
+    const fn = () => macroMacro().searchByName({ q: action.payload.searchString });
+    const macroMacroSearchResults: InlineResponse200 = yield call(fn);
     yield put(actions.macroMacroFoodSearchSucceeded(macroMacroSearchResults));
   } catch (response) {
+    console.log(response.message);
     /* TODO ...usda doesn't 400 actually, just a search that _says_ 400
        unfortunately, it looks like ATM the client generator doesn't handle oneoF
        How to handle the error response? */
@@ -93,7 +107,8 @@ export function* searchMacroMacroForFood(action: ActionsTypeMap['foodSearchSubmi
 }
 
 function* copyRecipe(action: ActionsTypeMap['copyRecipe']) {
-  const recipe: Recipe = yield call(MacroMacroFp().findRecipeByUID(action.payload));
+  const fn = () => macroMacro().findRecipeByUID({ uid: action.payload });
+  const recipe: Recipe = yield call(fn);
   yield put(actions.addFoodsToRecipe(recipe));
 }
 
@@ -103,15 +118,15 @@ function namedMacroToIngredient(nm: AmountOfNamedMacros) {
 
 export function* saveRecipe(action: ActionsTypeMap['saveRecipe']) {
   try {
-    const recipe = yield call(
-      MacroMacroFp().createRecipe({
+    const fn = () => macroMacro().createRecipe({
+      newRecipe: {
         name: action.payload.name,
         foods: action.payload.foods.map(namedMacroToIngredient),
         portionSize: action.payload.portionSize,
         amount: action.payload.amount,
         unit: action.payload.unit
-      })
-    );
+    }});
+    const recipe = yield call(fn);
     yield put(actions.createRecipeSucceeded(recipe));
   } catch (response) {
     console.log(response.message);
@@ -122,7 +137,8 @@ function* saveSearchItem(action: ActionsTypeMap['saveSearchItem']) {
   try {
     // little hack
     const uid = `ndbno::v1::${action.payload}`;
-    const namedMacros = yield call(MacroMacroFp().findIngredientByUID(uid));
+    const fn = () => macroMacro().findIngredientByUID({uid: uid});
+    const namedMacros = yield call(fn);
     yield put(actions.saveSearchItemSucceeded(namedMacros));
   } catch (response) {
     console.log(response.message);
