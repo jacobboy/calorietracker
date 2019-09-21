@@ -6,6 +6,8 @@ buildf :
 	rm -f backend/src/main/webapp/manifest.json
 	rm -f backend/src/main/webapp/service-worker.js
 	rm -rf backend/src/main/webapp/static/
+	rm -rf backend/src/main/webapp/precache*
+	rm -rf backend/src/main/webapp/workbox*
 	mv frontend/build/* backend/src/main/webapp
 
 buildb :
