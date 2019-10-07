@@ -1,5 +1,6 @@
 * TODO Bugs
-** clicking add to meal causes focus reset and amount reverts to 100
+** search doesn't allow copy recipe?
+** Mobile broken - clicking add to meal causes focus reset and amount reverts to 100, so mobile has no way to submit
 ** math in total field on create recipe doesn't work
 ** Can't have 0 for a nutrient in an ingredient
 ** Searching for quaker steel oats and clicking more details results in TypeError
@@ -18,8 +19,9 @@
 ** oh man idk
 
 * TODO Features
-** simultaneously create multiple recipes
+** fat rendering
 ** scale search row to see if it matches your food before saving
+** simultaneously create multiple recipes
 ** unit conversion / options
 *** what other units can we get from the USDA
 ** Recipe and ingredient input validation
