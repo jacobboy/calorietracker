@@ -8,6 +8,7 @@ interface Props {
 
 interface State {
   input: string;
+  changed: boolean;
 }
 
 export class MathInput extends React.Component<Props, State> {
@@ -20,12 +21,13 @@ export class MathInput extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      input: this.props.amount.toString()
+      input: this.props.amount.toString(),
+      changed: false
     };
   }
 
   componentDidUpdate(prevProps: Props) {
-    if (this.props.amount !== prevProps.amount) {
+    if (!this.state.changed && this.props.amount !== prevProps.amount) {
       // Don't allow parent to overwrite in the middle of math
       if (!this.state.input.split('').some(char => this.OPERATIONS.has(char))) {
         this.setState({input: this.props.amount.toString()});
@@ -58,7 +60,8 @@ export class MathInput extends React.Component<Props, State> {
     const val = e.target.value;
     if (this.isMath(val)) {
       this.setState({
-        input: val
+        input: val,
+        changed: true
       });
       const input = this.doMath(val);
       if (input) {
@@ -68,7 +71,7 @@ export class MathInput extends React.Component<Props, State> {
   }
 
   handleBlur() {
-    this.setState({input: this.props.amount.toString()});
+    this.setState({input: this.props.amount.toString(), changed: false});
     this.props.onChange(this.props.amount);
   }
 

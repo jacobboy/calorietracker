@@ -39,6 +39,7 @@ export function StoredRecipes(props: StoredRecipesProps) {
               <StoredIngredientRow
                 key={'search_' + item.uid}
                 item={item}
+                onCopyClick={props.onCopyRecipeClick}
                 focusRef={props.focusRef}
               />
             )
