@@ -11,7 +11,7 @@ buildf :
 	mv frontend/build/* backend/src/main/webapp
 
 buildb :
-	cd backend && sbt compile && echo "govApiKey=${GOV_API_KEY}" > target/scala-2.12/classes/application.conf && cd -
+	cd backend && sbt package && echo "govApiKey=${GOV_API_KEY}" > target/scala-2.12/classes/application.conf && cd -
 
 deploy : buildf buildb
 	${APPENGINE_SDK_HOME}/bin/appcfg.sh --runtime=java8 update backend/target/webapp
