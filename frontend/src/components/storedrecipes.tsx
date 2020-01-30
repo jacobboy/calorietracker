@@ -28,7 +28,7 @@ export function StoredRecipes(props: StoredRecipesProps) {
           {findRecipes(props.recentRecipes, props.searchText).map(
             item => (
               <StoredIngredientRow
-                key={item.uid}
+                key={`recent_${item.uid}`}
                 item={item}
                 onCopyClick={props.onCopyRecipeClick}
                 focusRef={props.focusRef}
@@ -37,7 +37,7 @@ export function StoredRecipes(props: StoredRecipesProps) {
           {props.searchRecipes.map(
             item => (
               <StoredIngredientRow
-                key={'search_' + item.uid}
+                key={`search_${item.uid}`}
                 item={item}
                 onCopyClick={props.onCopyRecipeClick}
                 focusRef={props.focusRef}

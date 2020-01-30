@@ -46,7 +46,7 @@ export interface StoreState {
 
 export const emptyState: StoreState = {
   topbit: {
-    display: TopBitDisplay.MEALS,
+    display: TopBitDisplay.CREATE_RECIPE,
     recipe: {
       foods: [],
       /* amount: 100,
