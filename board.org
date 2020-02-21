@@ -1,3 +1,7 @@
+* Use new FDC API
+* Ability to remove ingredients
+* alternate measurements (cups, liters), and indivisible units (1 egg, 1 pancake)
+* improved USDA search
 * login and user-specific data
 * document how to set up backend and appcfg, or at least the need for it
 ** Also look into Cloud SDK, apparently appcfg is deprecated?

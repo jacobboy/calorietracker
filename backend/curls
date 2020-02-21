@@ -66,12 +66,42 @@ GET :api/ingredients
 # Get latest recipes
 GET :api/recipes
 
+
 # USDA report
 
 :GOV_API_KEY := (getenv "GOV_API_KEY")
 
 GET https://api.nal.usda.gov/ndb/V2/reports?ndbno=40&type=b&format=json&api_key=:GOV_API_KEY
 
-
 # Search USDA
 GET https://api.nal.usda.gov/ndb/search/?format=json&q=funrice&sort=n&max=25&offset=0&api_key=:GOV_API_KEY
+
+
+# New FDA db
+
+:FDC_API_KEY := (getenv "FDC_API_KEY")
+
+# Search
+
+POST https://api.nal.usda.gov/fdc/v1/search?api_key=:FDC_API_KEY
+Content-Type: application/json
+{
+  "generalSearchInput": "Cheddar cheese",
+  "includeDataTypes": {
+    "Branded": false,
+    "Survey (FNDDS)": false,
+    "Foundation": true
+  }
+}
+
+# Get branded food
+
+GET https://api.nal.usda.gov/fdc/v1/494681?api_key=:FDC_API_KEY
+
+# Get survey food
+
+GET https://api.nal.usda.gov/fdc/v1/336711?api_key=:FDC_API_KEY
+
+# Get foundation food
+
+GET https://api.nal.usda.gov/fdc/v1/328637?api_key=:FDC_API_KEY
