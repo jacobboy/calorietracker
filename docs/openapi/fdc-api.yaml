@@ -203,19 +203,28 @@ components:
         - foods
 
     FoodReport:  # TODO actually can assemble the base food type and subtypes
+      type: object
       properties:
-        foodClass:
-          description: TODO
+        fdcId:
+          type: integer
+        dataType:
           type: string
         description:
           description: TODO
+          type: string
+        # foodGroup:  ? docs say it exists, idk
+        publicationDate:
+          type: string
+        scientificName:
+          type: string
+        foodKey:
           type: string
         foodNutrients:
           description: TODO
           type: array
           items:
             $ref: '#/components/schema/FoodNutrientItem'
-        foodComponents:
+        foodPortions:
           type: array
           items:
             type: object
@@ -224,54 +233,8 @@ components:
                 type: integer
               fdcId:
                 type: integer
-              name:
-                type: string
-              pctWeight:
+              amount:
                 type: number
-              isRefuse:
-                enum: ["Y", "N"]
-              gramWeight:
-                type: number
-              dataPoints:
-                type: number
-              min_year_acquired:
-                type: string
-        foodAttributes:
-          type: array
-          items:
-            type: object # TODO
-        tableAliasName:
-          type: string
-        brandOwner:
-          type: string
-        gtinUpc:
-          type: string
-        foodCode:
-          type: string
-        startDate:
-          type: string
-        endDate:
-          type: string
-        wweiaFoodCategory:
-          type: object
-          properties:
-            wweiaFoodCategoryCode:
-              type: integer
-            wweiaFoodCategoryDescription:
-              type: string
-        fdcId:
-          type: integer
-        dataType:
-          type: string
-        publicationDate:
-          type: string
-        foodPortions:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
               measureUnit:
                 type: object
                 properties:
@@ -281,47 +244,114 @@ components:
                     type: string
                   abbreviation:
                     type: string
+                required:
+                  - id
+                  - name
+                  - abbreviation
+              portionDescription:
+                type: string
               modifier:
                 type: string
               gramWeight:
                 type: string
-              portionDescription:
+              dataPoints:
+                type: integer
+              footnote:
                 type: string
+              minYearAcquired:
+                type: integer
               sequenceNumber:
                 type: integer
-        inputFoods:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-              unit:
-                type: string
-              portionDescription:
-                type: string
-              portionCode:
-                type: string
-              srCode:
-                type: integer
-              srDescription:
-                type: string
-              foodDescription:
-                type: string
-              gramWeight:
-                type: number
-              surveyFlag:
-                type: integer
-              amount:
-                type: number
-              sequenceNumber:
-                type: integer
-        changes:
-          type: string
+            required:
+              - id
+              - measureUnit
+              - gramWeight
+              - sequenceNumber
+
       required:
-        # TODO
         - fdcId
+        - dataType
+        - description
+        - publicationDate
         - foodNutrients
+
+      #   foodComponents:
+      #     type: array
+      #     items:
+      #       type: object
+      #       properties:
+      #         id:
+      #           type: integer
+      #         fdcId:
+      #           type: integer
+      #         name:
+      #           type: string
+      #         pctWeight:
+      #           type: number
+      #         isRefuse:
+      #           enum: ["Y", "N"]
+      #         gramWeight:
+      #           type: number
+      #         dataPoints:
+      #           type: number
+      #         min_year_acquired:
+      #           type: string
+      #   foodAttributes:
+      #     type: array
+      #     items:
+      #       type: object # TODO
+      #   tableAliasName:
+      #     type: string
+      #   brandOwner:
+      #     type: string
+      #   gtinUpc:
+      #     type: string
+      #   foodCode:
+      #     type: string
+      #   startDate:
+      #     type: string
+      #   endDate:
+      #     type: string
+      #   wweiaFoodCategory:
+      #     type: object
+      #     properties:
+      #       wweiaFoodCategoryCode:
+      #         type: integer
+      #       wweiaFoodCategoryDescription:
+      #         type: string
+      #   inputFoods:
+      #     type: array
+      #     items:
+      #       type: object
+      #       properties:
+      #         id:
+      #           type: integer
+      #         unit:
+      #           type: string
+      #         portionDescription:
+      #           type: string
+      #         portionCode:
+      #           type: string
+      #         srCode:
+      #           type: integer
+      #         srDescription:
+      #           type: string
+      #         foodDescription:
+      #           type: string
+      #         gramWeight:
+      #           type: number
+      #         surveyFlag:
+      #           type: integer
+      #         amount:
+      #           type: number
+      #         sequenceNumber:
+      #           type: integer
+      #   changes:
+      #     type: string
+      # required:
+      #   # TODO
+      #   - fdcId
+      #   - foodNutrients
 
     FoodNutrientItem:
       type: object
@@ -330,8 +360,14 @@ components:
           type: string
         id:
           type: integer
+        fdcId:
+          type: integer
         nutrient:
           $ref: '#/components/schema/Nutrient'
+        amount:
+          type: number
+        dataPoints:
+          type: integer
         foodNutrientDerivation:
           type: object
           properties:
@@ -350,16 +386,24 @@ components:
                   type: string
                 description:
                   type: string
-        amount:
-          type: number
-        max:
+        standardError:
           type: number
         min:
           type: number
+        max:
+          type: number
         median:
           type: number
+        footnote:
+          type: string
+        min_year_acquired:
+          type: integer
+        # nutrientAnalysisDetails:
+        #   type: array
+        #   items:
+        #     type: object
       required:
-        - type
+        - id
         - nutrient
         - amount
 
