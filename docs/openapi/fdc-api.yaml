@@ -40,11 +40,6 @@ paths:
             application/json:
               schema:
                 $ref: SearchResponse
-                # ...usda doesn't 400 actually, just a search that _says_ 400
-                #    unfortunately, it looks like ATM the client generator doesn't handle oneoF
-                # oneOf:
-                #   - $ref: SearchResponse
-                #   - $ref: ErrorResponse
         '400':
           description: Search error
           content:
@@ -146,60 +141,60 @@ components:
               type: integer
             totalPages:
               type: integer
-            foods:
-              type: list
-              items:
-                type: object
-                properties:
-                  fdcId:
-                    type: integer
-                  description:
-                    type: string
-                  scientificName:
-                    description: The scientific name of the food.
-                    type: string
-                  commonNames:
-                    description: Any other common names for the food.
-                    type: string
-                  additionalDescriptions:
-                    description: Any additional descriptions of the food.
-                    type: object
-                  dataType:
-                    description: The type of the food data
-                    type: string
-                    enum: ["Survey (FNDDS)", "Branded", "Foundation"]
-                  foodCode:
-                    description: A unique ID identifying the food within FNDDS.
-                    type: string
-                  gtinUpc:
-                    description: GTIN or UPC code identifying the food.
-                    type: string
-                  ndbNumber:
-                    description: Unique number assigned for foundation foods.
-                    type: string
-                  publishedDate:
-                    description: Date the item was published to FDC.
-                    type: string
-                  brandOwner:
-                    description: Brand owner for the food.
-                    type: string
-                  ingredients:
-                    description: The list of ingredients (as it appears on the product label).
-                    type: string
-                  allHighlightFields:
-                    description: Fields that were found matching the criteria.
-                    type: string
-                  score:
-                    description: Relative score indicating how well the food matches the search criteria.
-                    type: number
-                required:
-                  - fdcId
-                  - description
-                  - dataType
-                  - gtinUpc
-                  - publishedDate
-                  - allHighlightFields
-                  - score
+          foods:
+            type: list
+            items:
+              type: object
+              properties:
+                fdcId:
+                  type: integer
+                description:
+                  type: string
+                scientificName:
+                  description: The scientific name of the food.
+                  type: string
+                commonNames:
+                  description: Any other common names for the food.
+                  type: string
+                additionalDescriptions:
+                  description: Any additional descriptions of the food.
+                  type: object
+                dataType:
+                  description: The type of the food data
+                  type: string
+                  enum: ["Survey (FNDDS)", "Branded", "Foundation"]
+                foodCode:
+                  description: A unique ID identifying the food within FNDDS.
+                  type: string
+                gtinUpc:
+                  description: GTIN or UPC code identifying the food.
+                  type: string
+                ndbNumber:
+                  description: Unique number assigned for foundation foods.
+                  type: string
+                publishedDate:
+                  description: Date the item was published to FDC.
+                  type: string
+                brandOwner:
+                  description: Brand owner for the food.
+                  type: string
+                ingredients:
+                  description: The list of ingredients (as it appears on the product label).
+                  type: string
+                allHighlightFields:
+                  description: Fields that were found matching the criteria.
+                  type: string
+                score:
+                  description: Relative score indicating how well the food matches the search criteria.
+                  type: number
+              required:
+                - fdcId
+                - description
+                - dataType
+                - gtinUpc
+                - publishedDate
+                - allHighlightFields
+                - score
       required:
         - foodSearchCriteria
         - totalHits
@@ -207,7 +202,7 @@ components:
         - totalPages
         - foods
 
-    FoodReport:
+    FoodReport:  # TODO actually can assemble the base food type and subtypes
       properties:
         foodClass:
           description: TODO
@@ -217,45 +212,9 @@ components:
           type: string
         foodNutrients:
           description: TODO
-          type: object
-          properties:
-            type:
-              type: string
-            id:
-              type: integer
-            nutrient:
-              type: object
-              properties:
-                id:
-                  type: integer
-                number:
-                  type: string
-                name:
-                  type: string
-                rank:
-                  type: integer
-                unitName:
-                  type: string  # TODO enum?
-            foodNutrientDerivation:
-              type: object
-              properties:
-                id:
-                  type: integer
-                code:
-                  type: string
-                description:
-                  type: string
-                foodNutrientSource:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                    code:
-                      type: string
-                    description:
-                      type: string
-            amount:
-              type: number
+          type: array
+          items:
+            $ref: '#/components/schema/FoodNutrientItem'
         foodComponents:
           type: array
           items:
@@ -282,6 +241,10 @@ components:
           items:
             type: object # TODO
         tableAliasName:
+          type: string
+        brandOwner:
+          type: string
+        gtinUpc:
           type: string
         foodCode:
           type: string
@@ -355,8 +318,70 @@ components:
                 type: integer
         changes:
           type: string
-      # required:
+      required:
         # TODO
+        - fdcId
+        - foodNutrients
+
+    FoodNutrientItem:
+      type: object
+      properties:
+        type:
+          type: string
+        id:
+          type: integer
+        nutrient:
+          $ref: '#/components/schema/Nutrient'
+        foodNutrientDerivation:
+          type: object
+          properties:
+            id:
+              type: integer
+            code:
+              type: string
+            description:
+              type: string
+            foodNutrientSource:
+              type: object
+              properties:
+                id:
+                  type: integer
+                code:
+                  type: string
+                description:
+                  type: string
+        amount:
+          type: number
+        max:
+          type: number
+        min:
+          type: number
+        median:
+          type: number
+      required:
+        - type
+        - nutrient
+        - amount
+
+    Nutrient:
+      type: object
+      properties:
+        id:
+          type: integer
+        number:
+          type: string
+        name:
+          type: string
+        rank:
+          type: integer
+        unitName:
+          type: string  # TODO enum?
+      required:
+        - id
+        - number
+        - name
+        - rank
+        - unitName
 
     ErrorResponse:
       type: object
