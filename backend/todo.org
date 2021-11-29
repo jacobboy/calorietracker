@@ -1,3 +1,9 @@
+* Moving off of Search
+** figure out firestore
+*** testing
+*** create and load data
+** figure out docker
+** figure out deploying to flex with docker
 * Bugs
 ** catch and log 500s
 ** favicon.ico and manifest.json are 404ing
