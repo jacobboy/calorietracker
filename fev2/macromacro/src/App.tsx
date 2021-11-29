@@ -9,28 +9,67 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Configuration, FDCApi, SearchResultFood } from "./usda";
+import { AbridgedFoodNutrient, Configuration, FDCApi, SearchResultFood } from "./usda";
 
 const ariaLabel = { 'aria-label': 'description' };
+
+interface Macros {
+  calories?: number,
+  carbs?: number,
+  fat?: number,
+  protein?: number,
+  totalFiber?: number,
+  solubleFiber?: number,
+  insolubleFiber?: number
+}
 
 function App() {
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResultFood[]>([]);
 
+  function getMacros(foodNutrients: AbridgedFoodNutrient[]): Macros {
+    const macros: Macros = {}
+
+    const macrosMap = {
+      calories: "208",
+      carbs: "205",
+      protein: "203",
+      fat: "204",
+    }
+
+    foodNutrients.forEach((nutrient) => {
+      Object.entries(macrosMap).forEach(([field, nutrientNumber]) => {
+        if (nutrient.nutrientNumber === "208") {
+          macros.calories = nutrient.value
+        } else if (nutrient.nutrientNumber === "205") {
+          macros.carbs = nutrient.value
+        } else if (nutrient.nutrientNumber === "203") {
+          macros.protein = nutrient.value
+        } else if (nutrient.nutrientNumber === "204") {
+          macros.fat = nutrient.value
+        }
+      })
+    })
+
+    return macros;
+  }
+
   function createData(searchResult: SearchResultFood) {
       return {
+        dataType: searchResult.dataType,
+        brandOwnder: searchResult.brandOwner,
+        fdcId: searchResult.fdcId,
         name: searchResult.description,
-        calories: 0,
-        protein: 0,
-        carbs: 0,
-        fat: 0
+        measures: '',
+        ...getMacros(searchResult.foodNutrients || []),
+        servingSize: searchResult.servingSize,
+        servingSizeUnit: searchResult.servingSizeUnit,
+        householdServingFullText: searchResult.householdServingFullText
       }
   }
 
   async function search(event: React.FormEvent<HTMLFormElement>) {
-    console.log('searching');
     if (searchText) {
-      console.log('has search teext')
       const config = new Configuration({
         apiKey: 'bu776D0hQ8ZBGC3g1eoUB3iNwknI6MJhNo1xzwRh',
         baseOptions: {
@@ -40,16 +79,11 @@ function App() {
       const api = new FDCApi(config)
       api.getFoodsSearch(searchText).then(
           (response) => {
-            if (response.data.foods) {
+            if (response.data && response.data.foods) {
               setSearchResults(response.data.foods)
-              console.log(searchResults)
-            } else {
-              console.log('nothing found')
             }
           }
-      ).catch((error) => {
-        console.log('oops')
-      })
+      )
     }
     event.preventDefault();
   }
@@ -66,6 +100,9 @@ function App() {
             <TableHead>
               <TableRow>
                 <TableCell>Food (100g serving)</TableCell>
+                <TableCell align="right">Data Type</TableCell>
+                <TableCell align="right">Brand Owner</TableCell>
+                <TableCell align="right">Serving Size</TableCell>
                 <TableCell align="right">Calories</TableCell>
                 <TableCell align="right">Fat&nbsp;(g)</TableCell>
                 <TableCell align="right">Carbs&nbsp;(g)</TableCell>
@@ -78,7 +115,12 @@ function App() {
                       key={row.name}
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
-                    <TableCell component="th" scope="row">{row.name}</TableCell>
+                    <TableCell component="th" scope="row">
+                      <a target="_blank" rel="noreferrer" href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${row.fdcId}/nutrients`}>{row.name}</a>
+                    </TableCell>
+                    <TableCell align="right">{row.dataType}</TableCell>
+                    <TableCell align="right">{row.brandOwnder}</TableCell>
+                    <TableCell align="right">{`${row.servingSize} ${row.servingSizeUnit}`}</TableCell>
                     <TableCell align="right">{row.calories}</TableCell>
                     <TableCell align="right">{row.fat}</TableCell>
                     <TableCell align="right">{row.carbs}</TableCell>

@@ -83,7 +83,7 @@ export interface AbridgedFoodItem {
     'foodCode'?: string;
 }
 /**
- * 
+ * TODO fixed this one
  * @export
  * @interface AbridgedFoodNutrient
  */
@@ -93,19 +93,19 @@ export interface AbridgedFoodNutrient {
      * @type {number}
      * @memberof AbridgedFoodNutrient
      */
-    'number'?: number;
+    'nutrientNumber'?: string;
     /**
      * 
      * @type {string}
      * @memberof AbridgedFoodNutrient
      */
-    'name'?: string;
+    'nutrientName'?: string;
     /**
      * 
      * @type {number}
      * @memberof AbridgedFoodNutrient
      */
-    'amount'?: number;
+    'value'?: number;
     /**
      * 
      * @type {string}
@@ -1660,6 +1660,12 @@ export interface SearchResultFood {
      * @memberof SearchResultFood
      */
     'foodNutrients'?: Array<AbridgedFoodNutrient>;
+
+    // TODO added these
+    servingSize?: number;
+    servingSizeUnit?: string;
+    householdServingFullText?: string;
+
     /**
      * Date the item was published to FDC.
      * @type {string}
