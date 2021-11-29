@@ -27,7 +27,7 @@ function App() {
       }
   }
 
-  async function search() {
+  async function search(event: React.FormEvent<HTMLFormElement>) {
     console.log('searching');
     if (searchText) {
       console.log('has search teext')
@@ -51,6 +51,7 @@ function App() {
         console.log('oops')
       })
     }
+    event.preventDefault();
   }
 
   return (
