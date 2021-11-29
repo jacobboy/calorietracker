@@ -1,6 +1,0 @@
-# https://stackoverflow.com/a/246128
-# get current directory of script, regardless of how i'm being executed
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )/"
-
-openapi-generator generate -i https://app.swaggerhub.com/apis/fdcnal/food-data_central_api/1.0.0#/ -g typescript-axios -o ${DIR}/../../fev2/macromacro/src/
-
