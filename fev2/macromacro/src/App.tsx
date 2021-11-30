@@ -122,7 +122,7 @@ function getOneFood(fdcId: number): Promise<DetailedMacros> {
             // TODO what to do for survey foods?
             return getDetailedMacros(food.foodNutrients || [])
           } else {
-            throw new Error('no food nutrients')
+            return {}
           }
         } else {
           throw new Error('got a woopsies')
@@ -146,7 +146,7 @@ function Row(row: RowData, getFood: () => void, macros?: DetailedMacros) {
 
   return (
       <React.Fragment>
-        <TableRow sx={{ '& > *': { borderBottom: 'unset' } }} key={row.fdcId}>
+        <TableRow sx={{ '& > *': { borderBottom: 'unset' } }} key={`${row.fdcId}-simple`}>
           <TableCell>
             <IconButton
                 aria-label="expand row"
@@ -167,7 +167,7 @@ function Row(row: RowData, getFood: () => void, macros?: DetailedMacros) {
           <TableCell align="right">{row.carbs}</TableCell>
           <TableCell align="right">{row.protein}</TableCell>
         </TableRow>
-        <TableRow>
+        <TableRow key={`${row.fdcId}-something`}>
           <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
             <Collapse in={open} timeout="auto" unmountOnExit={false}>
               <Box sx={{ margin: 1 }}>
@@ -176,7 +176,7 @@ function Row(row: RowData, getFood: () => void, macros?: DetailedMacros) {
                 </Typography>
                 <Table size="small" aria-label="purchases">
                   <TableHead>
-                    <TableRow>
+                    <TableRow key={`${row.fdcId}-details-header`}>
                       <TableCell>Calories</TableCell>
                       <TableCell>Protein</TableCell>
                       <TableCell align="right">Fat</TableCell>
@@ -187,7 +187,7 @@ function Row(row: RowData, getFood: () => void, macros?: DetailedMacros) {
                   </TableHead>
                   {macros &&
                     <TableBody>
-                      <TableRow key={row.fdcId}>
+                      <TableRow key={`${row.fdcId}-details`}>
                         <TableCell component="th" scope="row">{macros.calories}</TableCell>
                         <TableCell>{macros.protein}</TableCell>
                         <TableCell align="right">{macros.fat}</TableCell>
@@ -260,7 +260,7 @@ function App() {
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
-              <TableRow>
+              <TableRow key='header'>
                 <TableCell />
                 <TableCell>Food (100g serving)</TableCell>
                 <TableCell align="right">Data Type</TableCell>

@@ -1788,6 +1788,12 @@ export interface SurveyFoodItem {
      */
     'foodPortions'?: Array<FoodPortion>;
     /**
+     * TODO added this
+     * @type {Array<FoodNutrient>}
+     * @memberof FoundationFoodItem
+     */
+    'foodNutrients'?: Array<FoodNutrient>;
+    /**
      * 
      * @type {Array<InputFoodSurvey>}
      * @memberof SurveyFoodItem
