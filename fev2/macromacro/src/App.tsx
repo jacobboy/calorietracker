@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import './App.css';
 import Input from '@mui/material/Input';
 import Table from '@mui/material/Table';
@@ -23,7 +23,8 @@ import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, TextField } from "@mui/material";
+import { Parser } from "expr-eval";
 
 enum Unit {
   g = 'g',
@@ -206,7 +207,71 @@ function getApiClient(): FDCApi {
   return new FDCApi(config);
 }
 
-function Row(row: RowData, macros: PortionMacros[], open: boolean, toggleOpen: () => void) {
+export interface MathInputState {
+  input: string,
+  isValid: boolean,
+  evaluated: number
+}
+
+function MathInput(
+    value: string,
+    isValid: boolean,
+    onChange: (input: string, evaluated: number, isValid: boolean) => void
+) {
+  function handleChange(event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
+    try {
+      const evaluated = Parser.evaluate(event.target.value)
+      onChange(event.target.value, evaluated, true)
+    } catch(error) {
+      onChange(event.target.value, 0, false)
+    }
+  }
+
+  return <TextField
+      error={!isValid}
+      // id="outlined-error"
+      // label="Error"
+      value={value}
+      placeholder="37 * 2 / 3"
+      onChange={handleChange}
+  />
+}
+
+function PortionTableRow(
+    row: RowData,
+    idx: number,
+    macro: PortionMacros,
+    portionAmount: MathInputState,
+    changePortionAmount: (input: string, evaluated: number, isValid: boolean) => void
+) {
+  return (
+      <TableRow key={`${row.fdcId}-${idx}-details`}>
+        {/*// TODO what is this component and scope*/}
+        <TableCell component="th" scope="row">
+          {MathInput(portionAmount.input, portionAmount.isValid, changePortionAmount)}
+        </TableCell>
+        <TableCell align="right">{macro.description}</TableCell>
+        <TableCell align="right">{macro.amount}</TableCell>
+        <TableCell align="right">{macro.unit}</TableCell>
+        <TableCell align="right">{round(macro.calories)}</TableCell>
+        <TableCell align="right">{round(macro.protein)}</TableCell>
+        <TableCell align="right">{round(macro.fat)}</TableCell>
+        <TableCell align="right">{round(macro.carbs)}</TableCell>
+        <TableCell align="right">{round(macro.totalFiber)}</TableCell>
+        <TableCell align="right">{round(macro.sugar)}</TableCell>
+      </TableRow>
+  );
+}
+
+function Row(
+    row: RowData,
+    macros: PortionMacros[],
+    open: boolean,
+    toggleOpen: () => void,
+    portionAmounts: Record<number, MathInputState>,
+    changePortionAmount: (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void
+) {
+
   const thinking = open && macros.length === 0
   return (
       <React.Fragment>
@@ -241,6 +306,7 @@ function Row(row: RowData, macros: PortionMacros[], open: boolean, toggleOpen: (
                 <Table size="small" aria-label="purchases">
                   <TableHead>
                     <TableRow key={`${row.fdcId}-details-header`}>
+                      <TableCell align="left">Add amount to recipe</TableCell>
                       <TableCell align="right">Description</TableCell>
                       <TableCell align="right">Amount</TableCell>
                       <TableCell align="right">Unit</TableCell>
@@ -258,19 +324,12 @@ function Row(row: RowData, macros: PortionMacros[], open: boolean, toggleOpen: (
                           <tr><td colSpan={9}><CircularProgress /></td></tr>
                           :
                           macros.map(
-                              (macro, idx) => (
-                                  <TableRow key={`${row.fdcId}-${idx}-details`}>
-                                    {/*// TODO what is this component and scope*/}
-                                    <TableCell component="th" scope="row">{macro.description}</TableCell>
-                                    <TableCell>{macro.amount}</TableCell>
-                                    <TableCell align="right">{macro.unit}</TableCell>
-                                    <TableCell align="right">{round(macro.calories)}</TableCell>
-                                    <TableCell align="right">{round(macro.protein)}</TableCell>
-                                    <TableCell align="right">{round(macro.fat)}</TableCell>
-                                    <TableCell align="right">{round(macro.carbs)}</TableCell>
-                                    <TableCell align="right">{round(macro.totalFiber)}</TableCell>
-                                    <TableCell align="right">{round(macro.sugar)}</TableCell>
-                                  </TableRow>
+                              (macro, idx) => PortionTableRow(
+                                  row,
+                                  idx,
+                                  macro,
+                                  portionAmounts[idx] || {input: '', isValid: true, evaluated: 0},
+                                  changePortionAmount(idx)
                               )
                           )
                     }
@@ -297,6 +356,7 @@ function App() {
   const [detailedMacros, setDetailedMacros] = useState<Record<string, PortionMacros[]>>({})
   const [rowsOpen, setRowsOpen] = useState<Record<string, boolean>>({})
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([])
+  const [enteredAmounts, setEnteredAmounts] = useState<Record<number, Record<number, MathInputState>>>({})
 
   function createData(searchResult: SearchResultFood): RowData {
       return {
@@ -352,6 +412,22 @@ function App() {
     setRecipeItems(recipeItems.filter((x) => x !== recipeItem))
   }
 
+  function changePortionAmount(fdcId: number) {
+    return ( portionIdx: number) => {
+      return (input: string, evaluated: number, isValid: boolean) => {
+        setEnteredAmounts(
+            {
+              ...enteredAmounts,
+              [fdcId]: {
+                ...(enteredAmounts[fdcId] || {}),
+                [portionIdx]: {input, evaluated, isValid}
+              }
+            }
+        )
+      }
+    }
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -381,7 +457,9 @@ function App() {
                         row,
                         detailedMacros[row.fdcId] || [],
                         rowsOpen[row.fdcId],
-                        () => toggleOpen(row.fdcId)
+                        () => toggleOpen(row.fdcId),
+                        enteredAmounts[row.fdcId] || {},
+                        changePortionAmount(row.fdcId)
                     )
                 )
               }
