@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
 import Input from '@mui/material/Input';
-// import { initializeApp } from 'firebase/app';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -10,11 +9,14 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import {
-  AbridgedFoodItem,
-  AbridgedFoodNutrient, BrandedFoodItem,
+  AbridgedFoodNutrient,
+  BrandedFoodItem,
   Configuration,
-  FDCApi, FoodNutrient, FoundationFoodItem,
-  SearchResultFood, SRLegacyFoodItem, SurveyFoodItem
+  FDCApi,
+  FoundationFoodItem,
+  SearchResultFood,
+  SRLegacyFoodItem,
+  SurveyFoodItem
 } from "./usda";
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -22,6 +24,10 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+
+enum Unit {
+  g
+}
 
 const ariaLabel = { 'aria-label': 'description' };
 
@@ -32,11 +38,14 @@ interface Macros {
   protein?: number
 }
 
-interface DetailedMacros extends Macros {
+interface PortionMacros extends Macros {
   totalFiber?: number,
   solubleFiber?: number,
   insolubleFiber?: number,
-  sugar?: number
+  sugar?: number,
+  amount: number,
+  unit: Unit,
+  description: string
 }
 
 interface RowData extends Macros {
@@ -44,14 +53,17 @@ interface RowData extends Macros {
   brandOwner?: string,
   fdcId: number,
   name: string,
-  measures?: '',
   servingSize?: number,
   servingSizeUnit?: string,
   householdServingFullText?: string
 }
 
-function getDetailedMacros(foodNutrients: FoodNutrient[]): DetailedMacros {
-  const macros: DetailedMacros = {}
+function getDetailedMacrosForMeasures(foodItem: BrandedFoodItem | FoundationFoodItem | SRLegacyFoodItem | SurveyFoodItem): PortionMacros[] {
+  const macros100g: PortionMacros = {
+    amount: 100,
+    unit: Unit.g,
+    description: '100 g'
+  }
 
   const macrosMap = {
     calories: "208",
@@ -60,29 +72,36 @@ function getDetailedMacros(foodNutrients: FoodNutrient[]): DetailedMacros {
     fat: "204",
     totalFiber: "291",
     sugar: "269"
-  }
+  };
 
-  foodNutrients.forEach((nutrient) => {
-    Object.entries(macrosMap).forEach(([field, nutrientNumber]) => {
-      if (nutrient.nutrient) {
-        if (nutrient.nutrient.number === "208") {
-          macros.calories = nutrient.amount
-        } else if (nutrient.nutrient.number === "205") {
-          macros.carbs = nutrient.amount
-        } else if (nutrient.nutrient.number === "203") {
-          macros.protein = nutrient.amount
-        } else if (nutrient.nutrient.number === "204") {
-          macros.fat = nutrient.amount
-        } else if (nutrient.nutrient.number === "291") {
-          macros.totalFiber = nutrient.amount
-        } else if (nutrient.nutrient.number === "269") {
-          macros.sugar = nutrient.amount
+  (foodItem.foodNutrients || []).forEach((nutrient) => {
+    (Object.entries(macrosMap) as [keyof typeof macrosMap, string][]).forEach(
+        ([field, nutrientNumber]) => {
+          if (nutrient.nutrient) {
+            if (nutrient.nutrient.number === nutrientNumber) {
+              macros100g[field] = nutrient.amount
+            }
+          }
         }
-      }
-    })
+    )
+
+      // if (nutrient.nutrient) {
+      //   if (nutrient.nutrient.number === "208") {
+      //     macros100g.calories = nutrient.amount
+      //   } else if (nutrient.nutrient.number === "205") {
+      //     macros100g.carbs = nutrient.amount
+      //   } else if (nutrient.nutrient.number === "203") {
+      //     macros100g.protein = nutrient.amount
+      //   } else if (nutrient.nutrient.number === "204") {
+      //     macros100g.fat = nutrient.amount
+      //   } else if (nutrient.nutrient.number === "291") {
+      //     macros100g.totalFiber = nutrient.amount
+      //   } else if (nutrient.nutrient.number === "269") {
+      //     macros100g.sugar = nutrient.amount
+      //   }
   })
 
-  return macros;
+  return [macros100g];
 }
 
 function getMacros(foodNutrients: AbridgedFoodNutrient[]): Macros {
@@ -112,17 +131,16 @@ function getMacros(foodNutrients: AbridgedFoodNutrient[]): Macros {
   return macros;
 }
 
-function getOneFood(fdcId: number): Promise<DetailedMacros> {
+function getMeasuresForOneFood(fdcId: number): Promise<PortionMacros[]> {
   const api = getApiClient()
   return api.getFullFood(fdcId.toString()).then(
       (response) => {
         if (response.data) {
           const food = response.data
           if ('foodNutrients' in food) {
-            // TODO what to do for survey foods?
-            return getDetailedMacros(food.foodNutrients || [])
+            return getDetailedMacrosForMeasures(food)
           } else {
-            return {}
+            return []
           }
         } else {
           throw new Error('got a woopsies')
@@ -141,8 +159,8 @@ function getApiClient(): FDCApi {
   return new FDCApi(config);
 }
 
-function Row(row: RowData, getFood: () => void, macros?: DetailedMacros) {
-  const open = macros !== undefined
+function Row(row: RowData, getFood: () => void, macros: PortionMacros[]) {
+  const open = macros.length > 0
 
   return (
       <React.Fragment>
@@ -171,9 +189,9 @@ function Row(row: RowData, getFood: () => void, macros?: DetailedMacros) {
           <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
             <Collapse in={open} timeout="auto" unmountOnExit={false}>
               <Box sx={{ margin: 1 }}>
-                <Typography variant="h6" gutterBottom component="div">
-                  History
-                </Typography>
+                {/*<Typography variant="h6" gutterBottom component="div">*/}
+                {/*  History*/}
+                {/*</Typography>*/}
                 <Table size="small" aria-label="purchases">
                   <TableHead>
                     <TableRow key={`${row.fdcId}-details-header`}>
@@ -185,18 +203,22 @@ function Row(row: RowData, getFood: () => void, macros?: DetailedMacros) {
                       <TableCell align="right">Sugar</TableCell>
                     </TableRow>
                   </TableHead>
-                  {macros &&
-                    <TableBody>
-                      <TableRow key={`${row.fdcId}-details`}>
-                        <TableCell component="th" scope="row">{macros.calories}</TableCell>
-                        <TableCell>{macros.protein}</TableCell>
-                        <TableCell align="right">{macros.fat}</TableCell>
-                        <TableCell align="right">{macros.carbs}</TableCell>
-                        <TableCell align="right">{macros.totalFiber}</TableCell>
-                        <TableCell align="right">{macros.sugar}</TableCell>
-                      </TableRow>
-                    </TableBody>
-                  }
+                  <TableBody>
+                    {
+                      macros.map(
+                          (macro, idx) => (
+                              <TableRow key={`${row.fdcId}-${idx}-details`}>
+                                <TableCell component="th" scope="row">{macro.calories}</TableCell>
+                                <TableCell>{macro.protein}</TableCell>
+                                <TableCell align="right">{macro.fat}</TableCell>
+                                <TableCell align="right">{macro.carbs}</TableCell>
+                                <TableCell align="right">{macro.totalFiber}</TableCell>
+                                <TableCell align="right">{macro.sugar}</TableCell>
+                              </TableRow>
+                          )
+                      )
+                    }
+                  </TableBody>
                 </Table>
               </Box>
             </Collapse>
@@ -209,7 +231,7 @@ function Row(row: RowData, getFood: () => void, macros?: DetailedMacros) {
 function App() {
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResultFood[]>([]);
-  const [detailedMacros, setDetailedMacros] = useState<Record<string, DetailedMacros>>({})
+  const [detailedMacros, setDetailedMacros] = useState<Record<string, PortionMacros[]>>({})
 
   function createData(searchResult: SearchResultFood): RowData {
       return {
@@ -217,7 +239,6 @@ function App() {
         brandOwner: searchResult.brandOwner,
         fdcId: searchResult.fdcId,
         name: searchResult.description,
-        measures: '',
         ...getMacros(searchResult.foodNutrients || []),
         servingSize: searchResult.servingSize,
         servingSizeUnit: searchResult.servingSizeUnit,
@@ -240,7 +261,7 @@ function App() {
   }
 
   async function getFood(fdcId: number) {
-    getOneFood(fdcId).then(
+    getMeasuresForOneFood(fdcId).then(
         (detailedMacro) => {
           setDetailedMacros({
             ...detailedMacros,
@@ -275,7 +296,7 @@ function App() {
             <TableBody>
               {
                 searchResults.map(createData).map(
-                    (row) => Row(row, () => getFood(row.fdcId), detailedMacros[row.fdcId])
+                    (row) => Row(row, () => getFood(row.fdcId), detailedMacros[row.fdcId] || [])
                 )
               }
             </TableBody>
