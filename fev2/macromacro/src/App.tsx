@@ -38,7 +38,7 @@ function round(x?: number) {
   return x !== undefined ? Math.round(x * 10) / 10 : x
 }
 
-interface Macros {
+interface SimpleMacros {
   calories?: number,
   carbs?: number,
   fat?: number,
@@ -48,16 +48,20 @@ interface Macros {
   description: string
 }
 
-interface PortionMacros extends Macros {
+interface DetailedMacros extends SimpleMacros {
   totalFiber?: number,
   // solubleFiber?: number,
   // insolubleFiber?: number,
   sugar?: number,
-  source: Source,
-  id?: number
 }
 
-interface RowData extends Macros {
+interface PortionMacros extends DetailedMacros {
+  source: Source,
+  id?: number,
+  baseMacros: DetailedMacros
+}
+
+interface RowData extends SimpleMacros {
   dataType?: string,
   brandOwner?: string,
   fdcId: number,
@@ -79,7 +83,7 @@ const macrosMap = {
 };
 
 function multiply100gMacro(
-    macros100g: PortionMacros,
+    macros100g: DetailedMacros,
     description: string,
     amount: number,
     source: Source,
@@ -96,6 +100,7 @@ function multiply100gMacro(
     amount: amount,
     unit: macros100g.unit,
     description: description,
+    baseMacros: macros100g,
     source,
     id
   }
@@ -104,11 +109,10 @@ function multiply100gMacro(
 function getDetailedMacrosForMeasures(
     foodItem: BrandedFoodItem | FoundationFoodItem | SRLegacyFoodItem | SurveyFoodItem
 ): PortionMacros[] {
-  const macros100g: PortionMacros = {
+  const macros100g: DetailedMacros = {
     amount: 100,
     unit: Unit.g,
     description: '100 g',
-    source: '100g'
   };
 
   (foodItem.foodNutrients || []).forEach((nutrient) => {
@@ -151,16 +155,17 @@ function getDetailedMacrosForMeasures(
           amount: foodItem.servingSize || 0,
           unit: Unit[((foodItem.servingSizeUnit || 'g') as keyof typeof Unit)],
           description: foodItem.householdServingFullText || `${foodItem.servingSize || 'not set'} ${foodItem.servingSizeUnit || 'not set'}`,
-          source: 'labelNutrients'
+          source: 'labelNutrients',
+          baseMacros: macros100g
         }
     )
   }
 
-  return [macros100g, ...portions];
+  return [{...macros100g, baseMacros: macros100g, source: '100g'}, ...portions];
 }
 
-function getMacros(foodNutrients: AbridgedFoodNutrient[]): Macros {
-  const macros: Macros = {
+function getMacros(foodNutrients: AbridgedFoodNutrient[]): SimpleMacros {
+  const macros: SimpleMacros = {
     unit: Unit.g,
     amount: 100,
     description: '100 g'
