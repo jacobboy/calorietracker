@@ -23,6 +23,7 @@ import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { CircularProgress } from "@mui/material";
 
 enum Unit {
   g = 'g',
@@ -181,9 +182,8 @@ function getApiClient(): FDCApi {
   return new FDCApi(config);
 }
 
-function Row(row: RowData, getFood: () => void, macros: PortionMacros[]) {
-  const open = macros.length > 0
-
+function Row(row: RowData, macros: PortionMacros[], open: boolean, toggleOpen: () => void) {
+  const thinking = open && macros.length === 0
   return (
       <React.Fragment>
         <TableRow sx={{ '& > *': { borderBottom: 'unset' } }} key={`${row.fdcId}-simple`}>
@@ -191,7 +191,7 @@ function Row(row: RowData, getFood: () => void, macros: PortionMacros[]) {
             <IconButton
                 aria-label="expand row"
                 size="small"
-                onClick={() => getFood()}
+                onClick={() => toggleOpen()}
             >
               {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
             </IconButton>
@@ -228,26 +228,32 @@ function Row(row: RowData, getFood: () => void, macros: PortionMacros[]) {
                       <TableCell align="right">Sugar</TableCell>
                     </TableRow>
                   </TableHead>
-                  <TableBody>
-                    {
-                      macros.map(
-                          (macro, idx) => (
-                              <TableRow key={`${row.fdcId}-${idx}-details`}>
-                                {/*// TODO what is this component and scope*/}
-                                <TableCell component="th" scope="row">{macro.description}</TableCell>
-                                <TableCell>{macro.amount}</TableCell>
-                                <TableCell align="right">{macro.unit}</TableCell>
-                                <TableCell align="right">{macro.calories}</TableCell>
-                                <TableCell align="right">{macro.protein}</TableCell>
-                                <TableCell align="right">{macro.fat}</TableCell>
-                                <TableCell align="right">{macro.carbs}</TableCell>
-                                <TableCell align="right">{macro.totalFiber}</TableCell>
-                                <TableCell align="right">{macro.sugar}</TableCell>
-                              </TableRow>
-                          )
-                      )
-                    }
-                  </TableBody>
+                  {
+                    thinking ?
+                        <CircularProgress />
+                        :
+                        <TableBody>
+                          {
+                            macros.map(
+                                (macro, idx) => (
+                                    <TableRow key={`${row.fdcId}-${idx}-details`}>
+                                      {/*// TODO what is this component and scope*/}
+                                      <TableCell component="th"
+                                                 scope="row">{macro.description}</TableCell>
+                                      <TableCell>{macro.amount}</TableCell>
+                                      <TableCell align="right">{macro.unit}</TableCell>
+                                      <TableCell align="right">{macro.calories}</TableCell>
+                                      <TableCell align="right">{macro.protein}</TableCell>
+                                      <TableCell align="right">{macro.fat}</TableCell>
+                                      <TableCell align="right">{macro.carbs}</TableCell>
+                                      <TableCell align="right">{macro.totalFiber}</TableCell>
+                                      <TableCell align="right">{macro.sugar}</TableCell>
+                                    </TableRow>
+                                )
+                            )
+                          }
+                        </TableBody>
+                  }
                 </Table>
               </Box>
             </Collapse>
@@ -261,6 +267,7 @@ function App() {
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResultFood[]>([]);
   const [detailedMacros, setDetailedMacros] = useState<Record<string, PortionMacros[]>>({})
+  const [rowsOpen, setRowsOpen] = useState<Record<string, boolean>>({})
 
   function createData(searchResult: SearchResultFood): RowData {
       return {
@@ -287,15 +294,25 @@ function App() {
     event.preventDefault();
   }
 
-  async function getFood(fdcId: number) {
-    getMeasuresForOneFood(fdcId).then(
-        (detailedMacro) => {
-          setDetailedMacros({
-            ...detailedMacros,
-            [fdcId]: detailedMacro
-          })
-        }
-    )
+  function getFood(fdcId: number) {
+    if (!(fdcId in detailedMacros)) {
+      getMeasuresForOneFood(fdcId).then(
+          (detailedMacro) => {
+            setDetailedMacros({
+              ...detailedMacros,
+              [fdcId]: detailedMacro
+            })
+          }
+      )
+    }
+  }
+
+  function toggleOpen(fdcId: number) {
+    getFood(fdcId)
+    setRowsOpen({
+      ...rowsOpen,
+      [fdcId]: !rowsOpen[fdcId]
+    })
   }
 
   return (
@@ -323,7 +340,12 @@ function App() {
             <TableBody>
               {
                 searchResults.map(createData).map(
-                    (row) => Row(row, () => getFood(row.fdcId), detailedMacros[row.fdcId] || [])
+                    (row) => Row(
+                        row,
+                        detailedMacros[row.fdcId] || [],
+                        rowsOpen[row.fdcId],
+                        () => toggleOpen(row.fdcId)
+                    )
                 )
               }
             </TableBody>
