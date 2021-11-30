@@ -25,7 +25,8 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 enum Unit {
-  g
+  g = 'g',
+  ml = 'ml'
 }
 
 const ariaLabel = { 'aria-label': 'description' };
@@ -35,6 +36,9 @@ interface Macros {
   carbs?: number,
   fat?: number,
   protein?: number
+  amount: number,
+  unit: Unit,
+  description: string
 }
 
 interface PortionMacros extends Macros {
@@ -42,9 +46,6 @@ interface PortionMacros extends Macros {
   // solubleFiber?: number,
   // insolubleFiber?: number,
   sugar?: number,
-  amount: number,
-  unit: Unit,
-  description: string
 }
 
 interface RowData extends Macros {
@@ -52,8 +53,6 @@ interface RowData extends Macros {
   brandOwner?: string,
   fdcId: number,
   name: string,
-  servingSize?: number,
-  servingSizeUnit?: string,
   householdServingFullText?: string
 }
 
@@ -84,7 +83,9 @@ function multiply100gMacro(macros100g: PortionMacros, description: string, amoun
   }
 }
 
-function getDetailedMacrosForMeasures(foodItem: BrandedFoodItem | FoundationFoodItem | SRLegacyFoodItem | SurveyFoodItem): PortionMacros[] {
+function getDetailedMacrosForMeasures(
+    foodItem: BrandedFoodItem | FoundationFoodItem | SRLegacyFoodItem | SurveyFoodItem
+): PortionMacros[] {
   const macros100g: PortionMacros = {
     amount: 100,
     unit: Unit.g,
@@ -118,12 +119,32 @@ function getDetailedMacrosForMeasures(foodItem: BrandedFoodItem | FoundationFood
       }
     })
   }
+  // branded
+  if ('labelNutrients' in foodItem) {
+    portions.push(
+        {
+          calories: foodItem.labelNutrients?.calories?.value,
+          carbs: foodItem.labelNutrients?.carbohydrates?.value,
+          fat: foodItem.labelNutrients?.fat?.value,
+          protein: foodItem.labelNutrients?.protein?.value,
+          totalFiber: foodItem.labelNutrients?.fiber?.value,
+          sugar: foodItem.labelNutrients?.sugars?.value,
+          amount: foodItem.servingSize || 0,
+          unit: Unit[((foodItem.servingSizeUnit || 'g') as keyof typeof Unit)],
+          description: foodItem.householdServingFullText || `${foodItem.servingSize || 'not set'} ${foodItem.servingSizeUnit || 'not set'}`
+        }
+    )
+  }
 
   return [macros100g, ...portions];
 }
 
 function getMacros(foodNutrients: AbridgedFoodNutrient[]): Macros {
-  const macros: Macros = {}
+  const macros: Macros = {
+    unit: Unit.g,
+    amount: 100,
+    description: '100 g'
+  }
 
   foodNutrients.forEach((nutrient) => {
     (Object.entries(simpleMacrosMap) as [keyof typeof simpleMacrosMap, string][]).forEach(
@@ -180,7 +201,7 @@ function Row(row: RowData, getFood: () => void, macros: PortionMacros[]) {
           </TableCell>
           <TableCell align="right">{row.dataType}</TableCell>
           <TableCell align="right">{row.brandOwner}</TableCell>
-          <TableCell align="right">{`${row.servingSize} ${row.servingSizeUnit}`}</TableCell>
+          <TableCell align="right">{`${row.amount} ${row.unit}`}</TableCell>
           <TableCell align="right">{row.calories}</TableCell>
           <TableCell align="right">{row.fat}</TableCell>
           <TableCell align="right">{row.carbs}</TableCell>
@@ -196,8 +217,11 @@ function Row(row: RowData, getFood: () => void, macros: PortionMacros[]) {
                 <Table size="small" aria-label="purchases">
                   <TableHead>
                     <TableRow key={`${row.fdcId}-details-header`}>
-                      <TableCell>Calories</TableCell>
-                      <TableCell>Protein</TableCell>
+                      <TableCell align="right">Description</TableCell>
+                      <TableCell align="right">Amount</TableCell>
+                      <TableCell align="right">Unit</TableCell>
+                      <TableCell align="right">Calories</TableCell>
+                      <TableCell align="right">Protein</TableCell>
                       <TableCell align="right">Fat</TableCell>
                       <TableCell align="right">Carbs</TableCell>
                       <TableCell align="right">Total Fiber</TableCell>
@@ -209,8 +233,12 @@ function Row(row: RowData, getFood: () => void, macros: PortionMacros[]) {
                       macros.map(
                           (macro, idx) => (
                               <TableRow key={`${row.fdcId}-${idx}-details`}>
-                                <TableCell component="th" scope="row">{macro.calories}</TableCell>
-                                <TableCell>{macro.protein}</TableCell>
+                                {/*// TODO what is this component and scope*/}
+                                <TableCell component="th" scope="row">{macro.description}</TableCell>
+                                <TableCell>{macro.amount}</TableCell>
+                                <TableCell align="right">{macro.unit}</TableCell>
+                                <TableCell align="right">{macro.calories}</TableCell>
+                                <TableCell align="right">{macro.protein}</TableCell>
                                 <TableCell align="right">{macro.fat}</TableCell>
                                 <TableCell align="right">{macro.carbs}</TableCell>
                                 <TableCell align="right">{macro.totalFiber}</TableCell>
@@ -241,9 +269,7 @@ function App() {
         fdcId: searchResult.fdcId,
         name: searchResult.description,
         ...getMacros(searchResult.foodNutrients || []),
-        servingSize: searchResult.servingSize,
-        servingSizeUnit: searchResult.servingSizeUnit,
-        householdServingFullText: searchResult.householdServingFullText
+        // householdServingFullText: searchResult.householdServingFullText
       }
   }
 
@@ -284,10 +310,10 @@ function App() {
             <TableHead>
               <TableRow key='header'>
                 <TableCell />
-                <TableCell>Food (100g serving)</TableCell>
+                <TableCell>Food</TableCell>
                 <TableCell align="right">Data Type</TableCell>
                 <TableCell align="right">Brand Owner</TableCell>
-                <TableCell align="right">Serving Size</TableCell>
+                <TableCell align="right">Amount </TableCell>
                 <TableCell align="right">Calories</TableCell>
                 <TableCell align="right">Fat&nbsp;(g)</TableCell>
                 <TableCell align="right">Carbs&nbsp;(g)</TableCell>

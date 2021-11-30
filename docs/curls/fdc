@@ -9,7 +9,7 @@ Content-Type: application/json
 {
   "generalSearchInput": "Cheddar cheese",
   "includeDataTypes": {
-    "Branded": false,
+    "Branded": true,
     "Survey (FNDDS)": false,
     "Foundation": true
   }
@@ -17,7 +17,7 @@ Content-Type: application/json
 
 # Get branded food
 
-GET https://api.nal.usda.gov/fdc/v1/494681?api_key=:FDC_API_KEY
+GET https://api.nal.usda.gov/fdc/v1/2057648?api_key=:FDC_API_KEY
 
 # Get survey food
 
