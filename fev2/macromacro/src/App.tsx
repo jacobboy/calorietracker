@@ -228,32 +228,29 @@ function Row(row: RowData, macros: PortionMacros[], open: boolean, toggleOpen: (
                       <TableCell align="right">Sugar</TableCell>
                     </TableRow>
                   </TableHead>
-                  {
-                    thinking ?
-                        <CircularProgress />
-                        :
-                        <TableBody>
-                          {
-                            macros.map(
-                                (macro, idx) => (
-                                    <TableRow key={`${row.fdcId}-${idx}-details`}>
-                                      {/*// TODO what is this component and scope*/}
-                                      <TableCell component="th"
-                                                 scope="row">{macro.description}</TableCell>
-                                      <TableCell>{macro.amount}</TableCell>
-                                      <TableCell align="right">{macro.unit}</TableCell>
-                                      <TableCell align="right">{macro.calories}</TableCell>
-                                      <TableCell align="right">{macro.protein}</TableCell>
-                                      <TableCell align="right">{macro.fat}</TableCell>
-                                      <TableCell align="right">{macro.carbs}</TableCell>
-                                      <TableCell align="right">{macro.totalFiber}</TableCell>
-                                      <TableCell align="right">{macro.sugar}</TableCell>
-                                    </TableRow>
-                                )
-                            )
-                          }
-                        </TableBody>
-                  }
+                  <TableBody>
+                    {
+                      thinking ?
+                          <tr><td colSpan={9}><CircularProgress /></td></tr>
+                          :
+                          macros.map(
+                              (macro, idx) => (
+                                  <TableRow key={`${row.fdcId}-${idx}-details`}>
+                                    {/*// TODO what is this component and scope*/}
+                                    <TableCell component="th" scope="row">{macro.description}</TableCell>
+                                    <TableCell>{macro.amount}</TableCell>
+                                    <TableCell align="right">{macro.unit}</TableCell>
+                                    <TableCell align="right">{macro.calories}</TableCell>
+                                    <TableCell align="right">{macro.protein}</TableCell>
+                                    <TableCell align="right">{macro.fat}</TableCell>
+                                    <TableCell align="right">{macro.carbs}</TableCell>
+                                    <TableCell align="right">{macro.totalFiber}</TableCell>
+                                    <TableCell align="right">{macro.sugar}</TableCell>
+                                  </TableRow>
+                              )
+                          )
+                    }
+                  </TableBody>
                 </Table>
               </Box>
             </Collapse>
