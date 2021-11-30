@@ -2257,6 +2257,12 @@ export const FDCApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getFood(fdcId, format, nutrients, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+
+        async getFullFood(fdcId: string, nutrients?: Array<number>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BrandedFoodItem | FoundationFoodItem | SRLegacyFoodItem | SurveyFoodItem>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getFood(fdcId, 'full', nutrients, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+
         /**
          * Retrieves a list of food items by a list of up to 20 FDC IDs. Optional format and nutrients can be specified. Invalid FDC ID\'s or ones that are not found are omitted and an empty set is returned if there are no matches.
          * @summary Fetches details for multiple food items using input FDC IDs
@@ -2489,6 +2495,11 @@ export class FDCApi extends BaseAPI {
      */
     public getFood(fdcId: string, format?: 'abridged' | 'full', nutrients?: Array<number>, options?: AxiosRequestConfig) {
         return FDCApiFp(this.configuration).getFood(fdcId, format, nutrients, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    // TODO added this
+    public getFullFood(fdcId: string, nutrients?: Array<number>, options?: AxiosRequestConfig) {
+        return FDCApiFp(this.configuration).getFullFood(fdcId, nutrients, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
