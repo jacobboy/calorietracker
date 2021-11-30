@@ -30,6 +30,8 @@ enum Unit {
   ml = 'ml'
 }
 
+type Source = 'portion' | '100g' | 'labelNutrients'
+
 const ariaLabel = { 'aria-label': 'description' };
 
 function round(x?: number) {
@@ -51,6 +53,8 @@ interface PortionMacros extends Macros {
   // solubleFiber?: number,
   // insolubleFiber?: number,
   sugar?: number,
+  source: Source,
+  id?: number
 }
 
 interface RowData extends Macros {
@@ -74,7 +78,13 @@ const macrosMap = {
   sugar: "269"
 };
 
-function multiply100gMacro(macros100g: PortionMacros, description: string, amount: number): PortionMacros {
+function multiply100gMacro(
+    macros100g: PortionMacros,
+    description: string,
+    amount: number,
+    source: Source,
+    id?: number
+): PortionMacros {
   const scalePerGram = amount / macros100g.amount
   return {
     calories: macros100g.calories !== undefined ? macros100g.calories * scalePerGram : undefined,
@@ -85,7 +95,9 @@ function multiply100gMacro(macros100g: PortionMacros, description: string, amoun
     sugar: macros100g.sugar !== undefined ? macros100g.sugar * scalePerGram : undefined,
     amount: amount,
     unit: macros100g.unit,
-    description: description
+    description: description,
+    source,
+    id
   }
 }
 
@@ -95,7 +107,8 @@ function getDetailedMacrosForMeasures(
   const macros100g: PortionMacros = {
     amount: 100,
     unit: Unit.g,
-    description: '100 g'
+    description: '100 g',
+    source: '100g'
   };
 
   (foodItem.foodNutrients || []).forEach((nutrient) => {
@@ -112,6 +125,7 @@ function getDetailedMacrosForMeasures(
   if ('foodPortions' in foodItem && foodItem.foodPortions) {
     foodItem.foodPortions.forEach((foodPortion) => {
       let description;
+      // foundation foods have measure units?
       if (foodPortion.measureUnit?.name && foodPortion.measureUnit.name !== 'undetermined') {
         description = `${foodPortion.measureUnit?.name} ${foodPortion.portionDescription || 'not set'}`
       } else {
@@ -120,14 +134,8 @@ function getDetailedMacrosForMeasures(
 
       // 0 so i can see in the UI when this was missing
       const gramWeight = foodPortion.gramWeight || 0
-      // foundation foods
-      if ('measureUnit' in foodPortion) {
-        portions.push(multiply100gMacro(macros100g, description, gramWeight)
-        )
-      // survey foods
-      } else if ('portionDescription' in foodPortion) {
-        portions.push(multiply100gMacro(macros100g, description, gramWeight))
-      }
+
+      portions.push(multiply100gMacro(macros100g, description, gramWeight, 'portion', foodPortion.id))
     })
   }
   // branded
@@ -142,7 +150,8 @@ function getDetailedMacrosForMeasures(
           sugar: foodItem.labelNutrients?.sugars?.value,
           amount: foodItem.servingSize || 0,
           unit: Unit[((foodItem.servingSizeUnit || 'g') as keyof typeof Unit)],
-          description: foodItem.householdServingFullText || `${foodItem.servingSize || 'not set'} ${foodItem.servingSizeUnit || 'not set'}`
+          description: foodItem.householdServingFullText || `${foodItem.servingSize || 'not set'} ${foodItem.servingSizeUnit || 'not set'}`,
+          source: 'labelNutrients'
         }
     )
   }
@@ -270,11 +279,19 @@ function Row(row: RowData, macros: PortionMacros[], open: boolean, toggleOpen: (
   );
 }
 
+interface RecipeItem {
+  name: string,
+  fdcId: number,
+  macros100g: PortionMacros,
+  amount: number
+}
+
 function App() {
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResultFood[]>([]);
   const [detailedMacros, setDetailedMacros] = useState<Record<string, PortionMacros[]>>({})
   const [rowsOpen, setRowsOpen] = useState<Record<string, boolean>>({})
+  const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([])
 
   function createData(searchResult: SearchResultFood): RowData {
       return {
@@ -320,6 +337,14 @@ function App() {
       ...rowsOpen,
       [fdcId]: !rowsOpen[fdcId]
     })
+  }
+
+  function addRecipeItem(recipeItem: RecipeItem) {
+    setRecipeItems([...recipeItems, recipeItem])
+  }
+
+  function removeRecipeItem(recipeItem: RecipeItem) {
+    setRecipeItems(recipeItems.filter((x) => x !== recipeItem))
   }
 
   return (
