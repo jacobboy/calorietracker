@@ -240,13 +240,22 @@ function PortionTableRow(
     idx: number,
     macro: PortionMacros,
     portionAmount: MathInputState,
-    changePortionAmount: (input: string, evaluated: number, isValid: boolean) => void
+    changePortionAmount: (input: string, evaluated: number, isValid: boolean) => void,
+    addRecipeItem: () => void
 ) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    if (portionAmount.isValid) {
+      addRecipeItem()
+    }
+    e.preventDefault()
+  }
   return (
       <TableRow key={`${row.fdcId}-${idx}-details`}>
         {/*// TODO what is this component and scope*/}
         <TableCell component="th" scope="row">
-          {MathInput(portionAmount.input, portionAmount.isValid, changePortionAmount)}
+          <form onSubmit={e => handleSubmit(e)}>
+            {MathInput(portionAmount.input, portionAmount.isValid, changePortionAmount)}
+          </form>
         </TableCell>
         <TableCell align="right">{macro.description}</TableCell>
         <TableCell align="right">{macro.amount}</TableCell>
@@ -261,13 +270,47 @@ function PortionTableRow(
   );
 }
 
+function RecipeRow(
+    recipeItem: RecipeItem,
+    idx: number
+    // changePortionAmount: (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void,
+) {
+
+  const macros = multiply100gMacro(
+      recipeItem.macros.baseMacros,
+      recipeItem.macros.description,
+      recipeItem.amount * recipeItem.macros.amount,
+      recipeItem.macros.source,
+      recipeItem.macros.id
+  )
+
+  return (
+      <React.Fragment key={`${recipeItem.fdcId}-${idx}-recipe-frag`}>
+        <TableRow sx={{ '& > *': { borderBottom: 'unset' } }} key={`${recipeItem.fdcId}-${idx}-recipeitem`}>
+          <TableCell component="th" scope="row">
+            <a target="_blank" rel="noreferrer" href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${recipeItem.fdcId}/nutrients`}>{recipeItem.name}</a>
+          </TableCell>
+          <TableCell align="right">{recipeItem.amount}</TableCell>
+          <TableCell align="right">{recipeItem.macros.description}</TableCell>
+          <TableCell align="right">{round(macros.calories)}</TableCell>
+          <TableCell align="right">{round(macros.fat)}</TableCell>
+          <TableCell align="right">{round(macros.carbs)}</TableCell>
+          <TableCell align="right">{round(macros.protein)}</TableCell>
+          <TableCell align="right">{round(macros.totalFiber)}</TableCell>
+          <TableCell align="right">{round(macros.sugar)}</TableCell>
+        </TableRow>
+      </React.Fragment>
+  );
+}
+
 function Row(
     row: RowData,
     macros: PortionMacros[],
     open: boolean,
     toggleOpen: () => void,
     portionAmounts: Record<number, MathInputState>,
-    changePortionAmount: (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void
+    changePortionAmount: (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void,
+    addRecipeItem: (portionIdx: number) => () => void
 ) {
 
   const thinking = open && macros.length === 0
@@ -327,7 +370,8 @@ function Row(
                                   idx,
                                   macro,
                                   portionAmounts[idx] || {input: '', isValid: true, evaluated: 0},
-                                  changePortionAmount(idx)
+                                  changePortionAmount(idx),
+                                  addRecipeItem(idx)
                               )
                           )
                     }
@@ -344,7 +388,7 @@ function Row(
 interface RecipeItem {
   name: string,
   fdcId: number,
-  macros100g: PortionMacros,
+  macros: PortionMacros,
   amount: number
 }
 
@@ -402,8 +446,19 @@ function App() {
     })
   }
 
-  function addRecipeItem(recipeItem: RecipeItem) {
-    setRecipeItems([...recipeItems, recipeItem])
+  function addRecipeItem(fdcId: number) {
+    return (portionIdx: number) => {
+      return () => {
+        const fromPortion: PortionMacros = detailedMacros[fdcId][portionIdx]
+        const recipeItem: RecipeItem = {
+          name: fromPortion.description,
+          fdcId: fdcId,
+          macros: fromPortion,
+          amount: enteredAmounts[fdcId][portionIdx].evaluated
+        }
+        setRecipeItems([...recipeItems, recipeItem])
+      }
+    }
   }
 
   function removeRecipeItem(recipeItem: RecipeItem) {
@@ -429,6 +484,31 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow key='header'>
+                <TableCell />
+                <TableCell>Food</TableCell>
+                <TableCell align="right">Amount</TableCell>
+                <TableCell align="right">Description</TableCell>
+                <TableCell align="right">Calories</TableCell>
+                <TableCell align="right">Fat&nbsp;(g)</TableCell>
+                <TableCell align="right">Carbs&nbsp;(g)</TableCell>
+                <TableCell align="right">Protein&nbsp;(g)</TableCell>
+                <TableCell align="right">Total Fiber</TableCell>
+                <TableCell align="right">Sugar</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {
+                recipeItems.map(
+                    (recipeItem, idx) => RecipeRow(recipeItem, idx)
+                )
+              }
+            </TableBody>
+          </Table>
+        </TableContainer>
         <form onSubmit={search}>
           <Input placeholder="Placeholder" value={searchText} onChange={e => setSearchText(e.target.value)} inputProps={ariaLabel} />
           <input type="submit" value="Submit" />
@@ -441,7 +521,7 @@ function App() {
                 <TableCell>Food</TableCell>
                 <TableCell align="right">Data Type</TableCell>
                 <TableCell align="right">Brand Owner</TableCell>
-                <TableCell align="right">Amount </TableCell>
+                <TableCell align="right">Amount</TableCell>
                 <TableCell align="right">Calories</TableCell>
                 <TableCell align="right">Fat&nbsp;(g)</TableCell>
                 <TableCell align="right">Carbs&nbsp;(g)</TableCell>
@@ -457,7 +537,8 @@ function App() {
                         rowsOpen[row.fdcId],
                         () => toggleOpen(row.fdcId),
                         enteredAmounts[row.fdcId] || {},
-                        changePortionAmount(row.fdcId)
+                        changePortionAmount(row.fdcId),
+                        addRecipeItem(row.fdcId)
                     )
                 )
               }
