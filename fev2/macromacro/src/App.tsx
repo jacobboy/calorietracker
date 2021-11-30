@@ -229,8 +229,6 @@ function MathInput(
 
   return <TextField
       error={!isValid}
-      // id="outlined-error"
-      // label="Error"
       value={value}
       placeholder="37 * 2 / 3"
       onChange={handleChange}
@@ -274,7 +272,7 @@ function Row(
 
   const thinking = open && macros.length === 0
   return (
-      <React.Fragment>
+      <React.Fragment key={`${row.fdcId}-frag`}>
         <TableRow sx={{ '& > *': { borderBottom: 'unset' } }} key={`${row.fdcId}-simple`}>
           <TableCell>
             <IconButton
