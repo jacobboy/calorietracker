@@ -21,7 +21,7 @@ GET https://api.nal.usda.gov/fdc/v1/2057648?api_key=:FDC_API_KEY
 
 # Get survey food
 
-GET https://api.nal.usda.gov/fdc/v1/1100211?api_key=:FDC_API_KEY
+GET https://api.nal.usda.gov/fdc/v1/1098134?api_key=:FDC_API_KEY
 
 # Get foundation food
 

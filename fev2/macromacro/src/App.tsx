@@ -71,13 +71,14 @@ const macrosMap = {
 };
 
 function multiply100gMacro(macros100g: PortionMacros, description: string, amount: number): PortionMacros {
+  const scalePerGram = amount / macros100g.amount
   return {
-    calories: macros100g.calories !== undefined ? macros100g.calories * amount : undefined,
-    carbs: macros100g.carbs !== undefined ? macros100g.carbs * amount : undefined,
-    protein: macros100g.protein !== undefined ? macros100g.protein * amount : undefined,
-    fat: macros100g.fat !== undefined ? macros100g.fat * amount : undefined,
-    totalFiber: macros100g.totalFiber !== undefined ? macros100g.totalFiber * amount : undefined,
-    sugar: macros100g.sugar !== undefined ? macros100g.sugar * amount : undefined,
+    calories: macros100g.calories !== undefined ? macros100g.calories * scalePerGram : undefined,
+    carbs: macros100g.carbs !== undefined ? macros100g.carbs * scalePerGram : undefined,
+    protein: macros100g.protein !== undefined ? macros100g.protein * scalePerGram : undefined,
+    fat: macros100g.fat !== undefined ? macros100g.fat * scalePerGram : undefined,
+    totalFiber: macros100g.totalFiber !== undefined ? macros100g.totalFiber * scalePerGram : undefined,
+    sugar: macros100g.sugar !== undefined ? macros100g.sugar * scalePerGram : undefined,
     amount: amount,
     unit: macros100g.unit,
     description: description
