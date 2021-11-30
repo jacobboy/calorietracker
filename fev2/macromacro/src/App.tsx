@@ -32,6 +32,10 @@ enum Unit {
 
 const ariaLabel = { 'aria-label': 'description' };
 
+function round(x?: number) {
+  return x !== undefined ? Math.round(x * 10) / 10 : x
+}
+
 interface Macros {
   calories?: number,
   carbs?: number,
@@ -107,7 +111,12 @@ function getDetailedMacrosForMeasures(
   const portions: PortionMacros[] = []
   if ('foodPortions' in foodItem && foodItem.foodPortions) {
     foodItem.foodPortions.forEach((foodPortion) => {
-      const description = `${foodPortion.measureUnit?.name || 'not set'} ${foodPortion.portionDescription || 'not set'}`
+      let description;
+      if (foodPortion.measureUnit?.name && foodPortion.measureUnit.name !== 'undetermined') {
+        description = `${foodPortion.measureUnit?.name} ${foodPortion.portionDescription || 'not set'}`
+      } else {
+        description = foodPortion.portionDescription || 'not set'
+      }
 
       // 0 so i can see in the UI when this was missing
       const gramWeight = foodPortion.gramWeight || 0
@@ -203,10 +212,10 @@ function Row(row: RowData, macros: PortionMacros[], open: boolean, toggleOpen: (
           <TableCell align="right">{row.dataType}</TableCell>
           <TableCell align="right">{row.brandOwner}</TableCell>
           <TableCell align="right">{`${row.amount} ${row.unit}`}</TableCell>
-          <TableCell align="right">{row.calories}</TableCell>
-          <TableCell align="right">{row.fat}</TableCell>
-          <TableCell align="right">{row.carbs}</TableCell>
-          <TableCell align="right">{row.protein}</TableCell>
+          <TableCell align="right">{round(row.calories)}</TableCell>
+          <TableCell align="right">{round(row.fat)}</TableCell>
+          <TableCell align="right">{round(row.carbs)}</TableCell>
+          <TableCell align="right">{round(row.protein)}</TableCell>
         </TableRow>
         <TableRow key={`${row.fdcId}-something`}>
           <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -241,12 +250,12 @@ function Row(row: RowData, macros: PortionMacros[], open: boolean, toggleOpen: (
                                     <TableCell component="th" scope="row">{macro.description}</TableCell>
                                     <TableCell>{macro.amount}</TableCell>
                                     <TableCell align="right">{macro.unit}</TableCell>
-                                    <TableCell align="right">{macro.calories}</TableCell>
-                                    <TableCell align="right">{macro.protein}</TableCell>
-                                    <TableCell align="right">{macro.fat}</TableCell>
-                                    <TableCell align="right">{macro.carbs}</TableCell>
-                                    <TableCell align="right">{macro.totalFiber}</TableCell>
-                                    <TableCell align="right">{macro.sugar}</TableCell>
+                                    <TableCell align="right">{round(macro.calories)}</TableCell>
+                                    <TableCell align="right">{round(macro.protein)}</TableCell>
+                                    <TableCell align="right">{round(macro.fat)}</TableCell>
+                                    <TableCell align="right">{round(macro.carbs)}</TableCell>
+                                    <TableCell align="right">{round(macro.totalFiber)}</TableCell>
+                                    <TableCell align="right">{round(macro.sugar)}</TableCell>
                                   </TableRow>
                               )
                           )
