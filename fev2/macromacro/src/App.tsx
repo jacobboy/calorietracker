@@ -21,7 +21,6 @@ import {
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
@@ -40,8 +39,8 @@ interface Macros {
 
 interface PortionMacros extends Macros {
   totalFiber?: number,
-  solubleFiber?: number,
-  insolubleFiber?: number,
+  // solubleFiber?: number,
+  // insolubleFiber?: number,
   sugar?: number,
   amount: number,
   unit: Unit,
@@ -58,74 +57,81 @@ interface RowData extends Macros {
   householdServingFullText?: string
 }
 
+const simpleMacrosMap = {
+  calories: "208",
+  carbs: "205",
+  protein: "203",
+  fat: "204"
+};
+
+const macrosMap = {
+  ...simpleMacrosMap,
+  totalFiber: "291",
+  sugar: "269"
+};
+
+function multiply100gMacro(macros100g: PortionMacros, description: string, amount: number): PortionMacros {
+  return {
+    calories: macros100g.calories !== undefined ? macros100g.calories * amount : undefined,
+    carbs: macros100g.carbs !== undefined ? macros100g.carbs * amount : undefined,
+    protein: macros100g.protein !== undefined ? macros100g.protein * amount : undefined,
+    fat: macros100g.fat !== undefined ? macros100g.fat * amount : undefined,
+    totalFiber: macros100g.totalFiber !== undefined ? macros100g.totalFiber * amount : undefined,
+    sugar: macros100g.sugar !== undefined ? macros100g.sugar * amount : undefined,
+    amount: amount,
+    unit: macros100g.unit,
+    description: description
+  }
+}
+
 function getDetailedMacrosForMeasures(foodItem: BrandedFoodItem | FoundationFoodItem | SRLegacyFoodItem | SurveyFoodItem): PortionMacros[] {
   const macros100g: PortionMacros = {
     amount: 100,
     unit: Unit.g,
     description: '100 g'
-  }
-
-  const macrosMap = {
-    calories: "208",
-    carbs: "205",
-    protein: "203",
-    fat: "204",
-    totalFiber: "291",
-    sugar: "269"
   };
 
   (foodItem.foodNutrients || []).forEach((nutrient) => {
     (Object.entries(macrosMap) as [keyof typeof macrosMap, string][]).forEach(
         ([field, nutrientNumber]) => {
-          if (nutrient.nutrient) {
-            if (nutrient.nutrient.number === nutrientNumber) {
+          if (nutrient.nutrient?.number === nutrientNumber) {
               macros100g[field] = nutrient.amount
-            }
           }
         }
     )
-
-      // if (nutrient.nutrient) {
-      //   if (nutrient.nutrient.number === "208") {
-      //     macros100g.calories = nutrient.amount
-      //   } else if (nutrient.nutrient.number === "205") {
-      //     macros100g.carbs = nutrient.amount
-      //   } else if (nutrient.nutrient.number === "203") {
-      //     macros100g.protein = nutrient.amount
-      //   } else if (nutrient.nutrient.number === "204") {
-      //     macros100g.fat = nutrient.amount
-      //   } else if (nutrient.nutrient.number === "291") {
-      //     macros100g.totalFiber = nutrient.amount
-      //   } else if (nutrient.nutrient.number === "269") {
-      //     macros100g.sugar = nutrient.amount
-      //   }
   })
 
-  return [macros100g];
+  const portions: PortionMacros[] = []
+  if ('foodPortions' in foodItem && foodItem.foodPortions) {
+    foodItem.foodPortions.forEach((foodPortion) => {
+      const description = `${foodPortion.measureUnit?.name || 'not set'} ${foodPortion.portionDescription || 'not set'}`
+
+      // 0 so i can see in the UI when this was missing
+      const gramWeight = foodPortion.gramWeight || 0
+      // foundation foods
+      if ('measureUnit' in foodPortion) {
+        portions.push(multiply100gMacro(macros100g, description, gramWeight)
+        )
+      // survey foods
+      } else if ('portionDescription' in foodPortion) {
+        portions.push(multiply100gMacro(macros100g, description, gramWeight))
+      }
+    })
+  }
+
+  return [macros100g, ...portions];
 }
 
 function getMacros(foodNutrients: AbridgedFoodNutrient[]): Macros {
   const macros: Macros = {}
 
-  const macrosMap = {
-    calories: "208",
-    carbs: "205",
-    protein: "203",
-    fat: "204",
-  }
-
   foodNutrients.forEach((nutrient) => {
-    Object.entries(macrosMap).forEach(([field, nutrientNumber]) => {
-      if (nutrient.nutrientNumber === "208") {
-        macros.calories = nutrient.value
-      } else if (nutrient.nutrientNumber === "205") {
-        macros.carbs = nutrient.value
-      } else if (nutrient.nutrientNumber === "203") {
-        macros.protein = nutrient.value
-      } else if (nutrient.nutrientNumber === "204") {
-        macros.fat = nutrient.value
-      }
-    })
+    (Object.entries(simpleMacrosMap) as [keyof typeof simpleMacrosMap, string][]).forEach(
+        ([field, nutrientNumber]) => {
+          if (nutrient.nutrientNumber === nutrientNumber) {
+            macros[field] = nutrient.value
+          }
+        })
   })
 
   return macros;
@@ -136,12 +142,7 @@ function getMeasuresForOneFood(fdcId: number): Promise<PortionMacros[]> {
   return api.getFullFood(fdcId.toString()).then(
       (response) => {
         if (response.data) {
-          const food = response.data
-          if ('foodNutrients' in food) {
-            return getDetailedMacrosForMeasures(food)
-          } else {
-            return []
-          }
+          return getDetailedMacrosForMeasures(response.data)
         } else {
           throw new Error('got a woopsies')
         }
