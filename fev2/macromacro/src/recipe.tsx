@@ -33,7 +33,7 @@ export function RecipeRow(
                     <a target="_blank" rel="noreferrer"
                        href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${recipeItem.fdcId}/nutrients`}>{recipeItem.name}</a>
                 </TableCell>
-                <TableCell align="right">{recipeItem.amount}</TableCell>
+                <TableCell align="right">{round(recipeItem.amount)}</TableCell>
                 <TableCell align="right">{recipeItem.macros.description}</TableCell>
                 <TableCell align="right">{round(macros.calories)}</TableCell>
                 <TableCell align="right">{round(macros.fat)}</TableCell>

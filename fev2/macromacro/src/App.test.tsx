@@ -27,7 +27,7 @@ beforeAll(() => {
 );
 
 
-test('renders learn react link', async () => {
+test('Can add an ingredient to the recipe', async () => {
     render(<App/>);
 
     const inputElement = screen.getByRole('textbox');

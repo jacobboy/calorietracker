@@ -160,15 +160,15 @@ export function IngredientSearch(
     addRecipeItem: (fdcId: number) => (portionIdx: number) => () => void
 ) {
     return <>
-        <form onSubmit={search}>
-            <Input placeholder="Placeholder" value={searchText}
-                   onChange={e => setSearchText(e.target.value)} inputProps={ariaLabel}/>
-            <input type="submit" value="Submit"/>
-        </form>
         <TableContainer component={Paper}>
             <header>
                 Search
             </header>
+            <form onSubmit={search}>
+                <Input placeholder="Placeholder" value={searchText}
+                       onChange={e => setSearchText(e.target.value)} inputProps={ariaLabel}/>
+                <input type="submit" value="Submit"/>
+            </form>
             <Table sx={{minWidth: 650}} aria-label="simple table">
                 <TableHead>
                     <TableRow key='header'>
