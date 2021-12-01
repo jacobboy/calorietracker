@@ -13,6 +13,10 @@ import { DetailedMacros, PortionMacros, SimpleMacros, Source, Unit } from "./cla
 import { macrosMap, simpleMacrosMap } from "./mappings";
 
 
+export function scaleUpOrUndefined(scale: number, x?: number): number | undefined {
+    return x !== undefined ? x * scale : undefined
+}
+
 export function multiply100gMacro(
     macros100g: DetailedMacros,
     description: string,
@@ -22,12 +26,12 @@ export function multiply100gMacro(
 ): PortionMacros {
     const scalePerGram = amount / macros100g.amount
     return {
-        calories: macros100g.calories !== undefined ? macros100g.calories * scalePerGram : undefined,
-        carbs: macros100g.carbs !== undefined ? macros100g.carbs * scalePerGram : undefined,
-        protein: macros100g.protein !== undefined ? macros100g.protein * scalePerGram : undefined,
-        fat: macros100g.fat !== undefined ? macros100g.fat * scalePerGram : undefined,
-        totalFiber: macros100g.totalFiber !== undefined ? macros100g.totalFiber * scalePerGram : undefined,
-        sugar: macros100g.sugar !== undefined ? macros100g.sugar * scalePerGram : undefined,
+        calories: scaleUpOrUndefined(scalePerGram, macros100g.calories),
+        carbs: scaleUpOrUndefined(scalePerGram, macros100g.carbs),
+        protein: scaleUpOrUndefined(scalePerGram, macros100g.protein),
+        fat: scaleUpOrUndefined(scalePerGram, macros100g.fat),
+        totalFiber: scaleUpOrUndefined(scalePerGram, macros100g.totalFiber),
+        sugar: scaleUpOrUndefined(scalePerGram, macros100g.sugar),
         amount: amount,
         unit: macros100g.unit,
         description: description,

@@ -2,7 +2,11 @@ import { MathInputState } from "./conversions";
 
 export enum Unit {
     g = 'g',
-    ml = 'ml'
+    ml = 'ml',
+    cup = 'cup',
+    lb = 'lb',
+    oz = 'oz',
+    flOz = 'fl oz'
 }
 
 export type Source = 'portion' | '100g' | 'labelNutrients'
@@ -26,6 +30,9 @@ export interface DetailedMacros extends SimpleMacros {
 
 export interface PortionMacros extends DetailedMacros {
     source: Source,
+    /*
+    if source is 'portion', id indicates the portion id
+    */
     id?: number,
     baseMacros: DetailedMacros
 }
@@ -44,4 +51,12 @@ export interface RecipeItem {
     fdcId: number,
     macros: PortionMacros,
     amount: MathInputState
+}
+
+export interface Recipe {
+    date: Date,
+    uuid: string,
+    ingredients: RecipeItem[],
+    amount: MathInputState,
+    unit: Unit
 }
