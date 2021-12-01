@@ -1,3 +1,5 @@
+import { MathInputState } from "./conversions";
+
 export enum Unit {
     g = 'g',
     ml = 'ml'
@@ -41,5 +43,5 @@ export interface RecipeItem {
     name: string,
     fdcId: number,
     macros: PortionMacros,
-    amount: number
+    amount: MathInputState
 }

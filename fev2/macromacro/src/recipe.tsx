@@ -8,19 +8,19 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { RecipeItem } from "./classes";
-import { multiply100gMacro, round } from "./conversions";
+import { MathInput, multiply100gMacro, round } from "./conversions";
 
 
 export function RecipeRow(
     recipeItem: RecipeItem,
-    idx: number
-    // changePortionAmount: (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void,
+    idx: number,
+    changeRecipeItemAmount: (input: string, evaluated: number, isValid: boolean) => void
 ) {
 
     const macros = multiply100gMacro(
         recipeItem.macros.baseMacros,
         recipeItem.macros.description,
-        recipeItem.amount * recipeItem.macros.amount,
+        recipeItem.amount.evaluated * recipeItem.macros.amount,
         recipeItem.macros.source,
         recipeItem.macros.id
     )
@@ -33,7 +33,7 @@ export function RecipeRow(
                     <a target="_blank" rel="noreferrer"
                        href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${recipeItem.fdcId}/nutrients`}>{recipeItem.name}</a>
                 </TableCell>
-                <TableCell align="right">{round(recipeItem.amount)}</TableCell>
+                <TableCell align="right">{MathInput(recipeItem.amount.input, recipeItem.amount.isValid, changeRecipeItemAmount)}</TableCell>
                 <TableCell align="right">{recipeItem.macros.description}</TableCell>
                 <TableCell align="right">{round(macros.calories)}</TableCell>
                 <TableCell align="right">{round(macros.fat)}</TableCell>
@@ -46,7 +46,10 @@ export function RecipeRow(
     );
 }
 
-export function Recipe(recipeItems: RecipeItem[]) {
+export function Recipe(
+    recipeItems: RecipeItem[],
+    changeRecipeItemAmount: (idx: number) => (input: string, evaluated: number, isValid: boolean) => void
+) {
     return (
         <TableContainer component={Paper}>
             <header className="App-header">
@@ -69,7 +72,7 @@ export function Recipe(recipeItems: RecipeItem[]) {
                 <TableBody>
                     {
                         recipeItems.map(
-                            (recipeItem, idx) => RecipeRow(recipeItem, idx)
+                            (recipeItem, idx) => RecipeRow(recipeItem, idx, changeRecipeItemAmount(idx))
                         )
                     }
                 </TableBody>

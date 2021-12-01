@@ -76,16 +76,28 @@ function App() {
           name: getNameFromFdcId(fdcId),
           fdcId: fdcId,
           macros: fromPortion,
-          amount: enteredAmounts[fdcId][portionIdx].evaluated
+          amount: enteredAmounts[fdcId][portionIdx]
         }
         setRecipeItems((prevState: RecipeItem[]) => [...prevState, recipeItem])
       }
     }
   }
 
-  function removeRecipeItem(recipeItem: RecipeItem) {
-    setRecipeItems(recipeItems.filter((x) => x !== recipeItem))
+  function changeRecipeItemAmount(idx: number) {
+    return (input: string, evaluated: number, isValid: boolean) => {
+        setRecipeItems((prevState) => {
+          const oldItem = prevState[idx]
+          const newItem: RecipeItem = {
+            name: oldItem.name,
+            fdcId: oldItem.fdcId,
+            macros: oldItem.macros,
+            amount: {input, evaluated, isValid}
+          }
+          return [...prevState.slice(0, idx), newItem, ...prevState.slice(idx +1)]
+        });
+    }
   }
+
 
   function changePortionAmount(fdcId: number) {
     return ( portionIdx: number) => {
@@ -105,7 +117,7 @@ function App() {
 
   return (
     <div className="App">
-      {Recipe(recipeItems)}
+      {Recipe(recipeItems, changeRecipeItemAmount)}
       {IngredientSearch(
           search,
           searchText,
