@@ -8,3 +8,8 @@
 # spinner when details is loading
 # foods where default isn't 100g?
 # branded foods '"Calculated from value per serving size measure"'
+
+
+
+# Current
+## name is not in the RecipeItem
