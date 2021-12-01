@@ -88,6 +88,16 @@ export interface AbridgedFoodItem {
  * @interface AbridgedFoodNutrient
  */
 export interface AbridgedFoodNutrient {
+    // TODO added this
+    'nutrientId'?: number;
+    'derivationId'?: number;
+    'foodNutrientSourceId'?: number;
+    'foodNutrientSourceCode'?: string;
+    'foodNutrientSourceDescription'?: string;
+    'rank': number;
+    'indentLevel'?: number;
+    'foodNutrientId': number;
+    'percentDailyValue'?: number;
     /**
      * 
      * @type {number}
@@ -855,6 +865,9 @@ export interface FoodPortion {
  * @interface FoodSearchCriteria
  */
 export interface FoodSearchCriteria {
+    'generalSearchInput'?: string;
+    'numberOfResultsPerPage': number;
+    'requireAllWords'?: boolean;
     /**
      * Search terms to use in the search. The string may also include standard [search operators](https://fdc.nal.usda.gov/help.html#bkmk-2)
      * @type {string}
@@ -1593,6 +1606,8 @@ export interface SampleFoodItem {
  * @interface SearchResult
  */
 export interface SearchResult {
+    // TODO added this
+    'pageList'?: number[];
     /**
      * 
      * @type {FoodSearchCriteria}
@@ -1630,6 +1645,21 @@ export interface SearchResult {
  * @interface SearchResultFood
  */
 export interface SearchResultFood {
+    // TODO added this
+    'lowercaseDescription'?: string;
+    'publishedDate'?: string;
+    'marketCountry'?: string;
+    'foodCategory'?: string;
+    'modifiedDate'?: string;
+    "dataSource"?: string;
+    "packageWeight"?: string;
+    'finalFoodInputFoods'?: [];
+    "foodMeasures"?: [];
+    "foodAttributes"?: [];
+    "foodAttributeTypes"?: [];
+    "foodVersionIds"?: [];
+
+    
     /**
      * Unique ID of the food.
      * @type {number}
@@ -1653,7 +1683,7 @@ export interface SearchResultFood {
      * @type {string}
      * @memberof SearchResultFood
      */
-    'foodCode'?: string;
+    'foodCode'?: string | number;
     /**
      * 
      * @type {Array<AbridgedFoodNutrient>}
@@ -1684,6 +1714,9 @@ export interface SearchResultFood {
      * @memberof SearchResultFood
      */
     'brandOwner'?: string;
+
+    // TODO added this
+    'brandName'?: string
     /**
      * GTIN or UPC code identifying the food. Only applies to Branded Foods.
      * @type {string}

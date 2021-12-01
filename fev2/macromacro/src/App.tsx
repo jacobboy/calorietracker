@@ -65,6 +65,7 @@ interface PortionMacros extends DetailedMacros {
 interface RowData extends SimpleMacros {
   dataType?: string,
   brandOwner?: string,
+  brandName?: string,
   fdcId: number,
   name: string,
   householdServingFullText?: string
@@ -331,6 +332,7 @@ function Row(
           </TableCell>
           <TableCell align="right">{row.dataType}</TableCell>
           <TableCell align="right">{row.brandOwner}</TableCell>
+          <TableCell align="right">{row.brandName}</TableCell>
           <TableCell align="right">{`${row.amount} ${row.unit}`}</TableCell>
           <TableCell align="right">{round(row.calories)}</TableCell>
           <TableCell align="right">{round(row.fat)}</TableCell>
@@ -404,6 +406,7 @@ function App() {
       return {
         dataType: searchResult.dataType,
         brandOwner: searchResult.brandOwner,
+        brandName: searchResult.brandName,
         fdcId: searchResult.fdcId,
         name: searchResult.description,
         ...getMacros(searchResult.foodNutrients || []),
@@ -484,68 +487,70 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow key='header'>
-                <TableCell />
-                <TableCell>Food</TableCell>
-                <TableCell align="right">Amount</TableCell>
-                <TableCell align="right">Description</TableCell>
-                <TableCell align="right">Calories</TableCell>
-                <TableCell align="right">Fat&nbsp;(g)</TableCell>
-                <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-                <TableCell align="right">Protein&nbsp;(g)</TableCell>
-                <TableCell align="right">Total Fiber</TableCell>
-                <TableCell align="right">Sugar</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {
-                recipeItems.map(
-                    (recipeItem, idx) => RecipeRow(recipeItem, idx)
-                )
-              }
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <form onSubmit={search}>
-          <Input placeholder="Placeholder" value={searchText} onChange={e => setSearchText(e.target.value)} inputProps={ariaLabel} />
-          <input type="submit" value="Submit" />
-        </form>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow key='header'>
-                <TableCell />
-                <TableCell>Food</TableCell>
-                <TableCell align="right">Data Type</TableCell>
-                <TableCell align="right">Brand Owner</TableCell>
-                <TableCell align="right">Amount</TableCell>
-                <TableCell align="right">Calories</TableCell>
-                <TableCell align="right">Fat&nbsp;(g)</TableCell>
-                <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-                <TableCell align="right">Protein&nbsp;(g)</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {
-                searchResults.map(createData).map(
-                    (row) => Row(
-                        row,
-                        detailedMacros[row.fdcId] || [],
-                        rowsOpen[row.fdcId],
-                        () => toggleOpen(row.fdcId),
-                        enteredAmounts[row.fdcId] || {},
-                        changePortionAmount(row.fdcId),
-                        addRecipeItem(row.fdcId)
-                    )
-                )
-              }
-            </TableBody>
-          </Table>
-        </TableContainer>
+        Recipe
       </header>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow key='header'>
+              <TableCell />
+              <TableCell>Food</TableCell>
+              <TableCell align="right">Amount</TableCell>
+              <TableCell align="right">Description</TableCell>
+              <TableCell align="right">Calories</TableCell>
+              <TableCell align="right">Fat&nbsp;(g)</TableCell>
+              <TableCell align="right">Carbs&nbsp;(g)</TableCell>
+              <TableCell align="right">Protein&nbsp;(g)</TableCell>
+              <TableCell align="right">Total Fiber</TableCell>
+              <TableCell align="right">Sugar</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {
+              recipeItems.map(
+                  (recipeItem, idx) => RecipeRow(recipeItem, idx)
+              )
+            }
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <form onSubmit={search}>
+        <Input placeholder="Placeholder" value={searchText} onChange={e => setSearchText(e.target.value)} inputProps={ariaLabel} />
+        <input type="submit" value="Submit" />
+      </form>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow key='header'>
+              <TableCell />
+              <TableCell>Food</TableCell>
+              <TableCell align="right">Data Type</TableCell>
+              <TableCell align="right">Brand Owner</TableCell>
+              <TableCell align="right">Brand Name</TableCell>
+              <TableCell align="right">Amount</TableCell>
+              <TableCell align="right">Calories</TableCell>
+              <TableCell align="right">Fat&nbsp;(g)</TableCell>
+              <TableCell align="right">Carbs&nbsp;(g)</TableCell>
+              <TableCell align="right">Protein&nbsp;(g)</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {
+              searchResults.map(createData).map(
+                  (row) => Row(
+                      row,
+                      detailedMacros[row.fdcId] || [],
+                      rowsOpen[row.fdcId],
+                      () => toggleOpen(row.fdcId),
+                      enteredAmounts[row.fdcId] || {},
+                      changePortionAmount(row.fdcId),
+                      addRecipeItem(row.fdcId)
+                  )
+              )
+            }
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
   );
 }
