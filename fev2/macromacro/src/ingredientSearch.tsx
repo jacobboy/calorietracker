@@ -99,7 +99,7 @@ export function Row(
                             {/*<Typography variant="h6" gutterBottom component="div">*/}
                             {/*  History*/}
                             {/*</Typography>*/}
-                            <Table size="small" aria-label="purchases">
+                            <Table size="small" aria-label="food details">
                                 <TableHead>
                                     <TableRow key={`${row.fdcId}-details-header`}>
                                         <TableCell align="left">Add amount to recipe</TableCell>
@@ -149,7 +149,7 @@ export function Row(
 export function IngredientSearch(
     search: (event: React.FormEvent<HTMLFormElement>) => Promise<void>,
     searchText: string,
-    setSearchText: (value: (((prevState: string) => string) | string)) => void,
+    setSearchText: (value: string) => void,
     searchData: RowData[],
     createData: (searchResult: SearchResultFood) => RowData,
     detailedMacros: Record<string, PortionMacros[]>,
@@ -160,15 +160,15 @@ export function IngredientSearch(
     addRecipeItem: (fdcId: number) => (portionIdx: number) => () => void
 ) {
     return <>
-        <header>
-            Search
-        </header>
         <form onSubmit={search}>
             <Input placeholder="Placeholder" value={searchText}
                    onChange={e => setSearchText(e.target.value)} inputProps={ariaLabel}/>
             <input type="submit" value="Submit"/>
         </form>
         <TableContainer component={Paper}>
+            <header>
+                Search
+            </header>
             <Table sx={{minWidth: 650}} aria-label="simple table">
                 <TableHead>
                     <TableRow key='header'>

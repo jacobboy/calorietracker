@@ -47,11 +47,11 @@ export function RecipeRow(
 }
 
 export function Recipe(recipeItems: RecipeItem[]) {
-    return <>
-        <header className="App-header">
-            Recipe
-        </header>
+    return (
         <TableContainer component={Paper}>
+            <header className="App-header">
+                Recipe
+            </header>
             <Table sx={{minWidth: 650}} aria-label="simple table">
                 <TableHead>
                     <TableRow key='header'>
@@ -75,5 +75,5 @@ export function Recipe(recipeItems: RecipeItem[]) {
                 </TableBody>
             </Table>
         </TableContainer>
-    </>;
+    );
 }

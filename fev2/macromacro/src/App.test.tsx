@@ -29,6 +29,7 @@ beforeAll(() => {
 
 test('renders learn react link', async () => {
     render(<App/>);
+
     const inputElement = screen.getByRole('textbox');
     expect(inputElement).toBeInTheDocument();
 
@@ -42,15 +43,17 @@ test('renders learn react link', async () => {
     const row = screen.getAllByText('BREAD')[0].closest('tr')!
 
     const button = getByLabelText(row, 'expand row')
+
     act(() => {
         userEvent.click(button)
     })
-    const td = (await findByText(row, 'Add amount to recipe')).closest('td')!
+    const entryTable = (await screen.findByText( 'Add amount to recipe')).closest('table')!
 
-    const firstPortionInput = within(td).getAllByRole('textbox')[0]
-    userEvent.type(firstPortionInput, '50')
+    const firstPortionInput = (await within(entryTable).findAllByRole('textbox'))[0]
+    userEvent.type(firstPortionInput, '0.5')
     userEvent.type(firstPortionInput, '{enter}')
 
-    const recipesTable = screen.getByText('Recipe').closest('table')!
-    within(recipesTable).getByText('50')
+    // const recipesTable = screen.getAllByLabelText('simple table')[0]
+    const recipesTable = screen.getByText('Recipe').parentElement!
+    expect(within(recipesTable).getByText('131.5')).toBeInTheDocument()
 });
