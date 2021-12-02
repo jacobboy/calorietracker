@@ -146,6 +146,47 @@ export function Row(
     );
 }
 
+function IngredientsTable(
+    searchData: RowData[],
+    detailedMacros: Record<string, PortionMacros[]>,
+    rowsOpen: Record<string, boolean>,
+    toggleOpen: (fdcId: number) => void, enteredAmounts: Record<number, Record<number, MathInputState>>,
+    changePortionAmount: (fdcId: number) => (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void,
+    addRecipeItem: (fdcId: number) => (portionIdx: number) => () => void
+) {
+    return <Table sx={{minWidth: 650}} aria-label="simple table">
+        <TableHead>
+            <TableRow key='header'>
+                <TableCell/>
+                <TableCell>Food</TableCell>
+                <TableCell align="right">Data Type</TableCell>
+                <TableCell align="right">Brand Owner</TableCell>
+                <TableCell align="right">Brand Name</TableCell>
+                <TableCell align="right">Amount</TableCell>
+                <TableCell align="right">Calories</TableCell>
+                <TableCell align="right">Fat&nbsp;(g)</TableCell>
+                <TableCell align="right">Carbs&nbsp;(g)</TableCell>
+                <TableCell align="right">Protein&nbsp;(g)</TableCell>
+            </TableRow>
+        </TableHead>
+        <TableBody>
+            {
+                searchData.map(
+                    (row) => Row(
+                        row,
+                        detailedMacros[row.fdcId] || [],
+                        rowsOpen[row.fdcId],
+                        () => toggleOpen(row.fdcId),
+                        enteredAmounts[row.fdcId] || {},
+                        changePortionAmount(row.fdcId),
+                        addRecipeItem(row.fdcId)
+                    )
+                )
+            }
+        </TableBody>
+    </Table>;
+}
+
 export function IngredientSearch(
     search: (event: React.FormEvent<HTMLFormElement>) => Promise<void>,
     searchText: string,
@@ -169,37 +210,7 @@ export function IngredientSearch(
                        onChange={e => setSearchText(e.target.value)} inputProps={ariaLabel}/>
                 <input type="submit" value="Submit"/>
             </form>
-            <Table sx={{minWidth: 650}} aria-label="simple table">
-                <TableHead>
-                    <TableRow key='header'>
-                        <TableCell/>
-                        <TableCell>Food</TableCell>
-                        <TableCell align="right">Data Type</TableCell>
-                        <TableCell align="right">Brand Owner</TableCell>
-                        <TableCell align="right">Brand Name</TableCell>
-                        <TableCell align="right">Amount</TableCell>
-                        <TableCell align="right">Calories</TableCell>
-                        <TableCell align="right">Fat&nbsp;(g)</TableCell>
-                        <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-                        <TableCell align="right">Protein&nbsp;(g)</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {
-                        searchData.map(
-                            (row) => Row(
-                                row,
-                                detailedMacros[row.fdcId] || [],
-                                rowsOpen[row.fdcId],
-                                () => toggleOpen(row.fdcId),
-                                enteredAmounts[row.fdcId] || {},
-                                changePortionAmount(row.fdcId),
-                                addRecipeItem(row.fdcId)
-                            )
-                        )
-                    }
-                </TableBody>
-            </Table>
+            {IngredientsTable(searchData, detailedMacros, rowsOpen, toggleOpen, enteredAmounts, changePortionAmount, addRecipeItem)}
         </TableContainer>
     </>;
 }

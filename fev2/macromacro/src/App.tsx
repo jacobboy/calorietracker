@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 import { SearchResultFood } from "./usda";
-import { PortionMacros, RecipeItem, RowData } from "./classes";
+import { Ingredient, PortionMacros, RecipeItem, RowData } from "./classes";
 import { getMacros, MathInputState } from "./conversions";
 import { getApiClient, getMeasuresForOneFood } from "./calls";
 import { Recipe } from "./recipe";
@@ -21,6 +21,7 @@ function App() {
   const [rowsOpen, setRowsOpen] = useState<Record<string, boolean>>({})
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([])
   const [enteredAmounts, setEnteredAmounts] = useState<Record<number, Record<number, MathInputState>>>({})
+  const [createdIngredients, setCreatedIngredients] = useState<Ingredient[]>([])
 
   function createData(searchResult: SearchResultFood): RowData {
       return {
@@ -120,15 +121,15 @@ function App() {
     }
   }
 
-  function createIngredient() {
-
+  function createIngredient(ingredient: Ingredient) {
+    setCreatedIngredients((prevState) => [...prevState, ingredient])
   }
 
   return (
     <div className="App">
       {Recipe(recipeItems, changeRecipeItemAmount)}
-      {CreateIngredient()}
-      {CreatedIngredients()}
+      {CreateIngredient(createIngredient)}
+      {CreatedIngredients(createdIngredients)}
       {IngredientSearch(
           search,
           searchText,

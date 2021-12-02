@@ -63,3 +63,15 @@ export interface Recipe {
     unit: Unit
 }
 
+export interface IngredientPortion {
+    unit: Unit,
+    amount: number
+}
+
+export interface Ingredient {
+    name: string,
+    macros: DetailedMacros,
+    portions: IngredientPortion[],
+    dateCreated: Date
+}
+
