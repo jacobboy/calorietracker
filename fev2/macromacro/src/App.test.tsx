@@ -30,13 +30,14 @@ beforeAll(() => {
 test('Can add an ingredient to the recipe', async () => {
     render(<App/>);
 
-    const inputElement = screen.getByRole('textbox');
-    expect(inputElement).toBeInTheDocument();
+    const searchTable = screen.getByText('Search').closest('div')!
+    const searchInput = within(searchTable).getByRole('textbox');
+    expect(searchInput).toBeInTheDocument();
 
-    userEvent.type(inputElement, 'bread')
-    expect(inputElement).toHaveValue('bread')
+    userEvent.type(searchInput, 'bread')
+    expect(searchInput).toHaveValue('bread')
 
-    userEvent.type(inputElement, '{enter}')
+    userEvent.type(searchInput, '{enter}')
 
     expect(await screen.findByText(searchResponse.foods![0].brandOwner!)).toBeInTheDocument();
 
