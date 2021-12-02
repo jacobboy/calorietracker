@@ -25,8 +25,8 @@ export interface SimpleMacros {
 
 export interface DetailedMacros extends SimpleMacros {
     totalFiber?: number,
-    // solubleFiber?: number,
-    // insolubleFiber?: number,
+    solubleFiber?: number,
+    insolubleFiber?: number,
     sugar?: number,
 }
 
@@ -34,6 +34,7 @@ export interface PortionMacros extends DetailedMacros {
     source: PortionSource,
     /*
     if source is 'portion', id indicates the portion id
+    TODO rename
     */
     id?: number,
     baseMacros: DetailedMacros
@@ -65,5 +66,5 @@ export interface Recipe {
 }
 
 export interface CreatedIngredient extends DetailedMacros {
-
+    
 }
