@@ -9,7 +9,9 @@ export enum Unit {
     flOz = 'fl oz'
 }
 
-export type Source = 'portion' | '100g' | 'labelNutrients'
+export type PortionSource = 'portion' | '100g' | 'labelNutrients'
+
+export type Source = 'fdcApi' | 'createIngredient' | 'createRecipe'
 
 export interface SimpleMacros {
     calories?: number,
@@ -29,7 +31,7 @@ export interface DetailedMacros extends SimpleMacros {
 }
 
 export interface PortionMacros extends DetailedMacros {
-    source: Source,
+    source: PortionSource,
     /*
     if source is 'portion', id indicates the portion id
     */
@@ -50,7 +52,8 @@ export interface RecipeItem {
     name: string,
     fdcId: number,
     macros: PortionMacros,
-    amount: MathInputState
+    amount: MathInputState,
+    source: Source
 }
 
 export interface Recipe {
@@ -59,4 +62,8 @@ export interface Recipe {
     ingredients: RecipeItem[],
     amount: MathInputState,
     unit: Unit
+}
+
+export interface CreatedIngredient extends DetailedMacros {
+
 }

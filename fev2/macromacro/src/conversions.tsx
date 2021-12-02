@@ -9,7 +9,7 @@ import {
 } from "./usda";
 import { TextField } from "@mui/material";
 import { Parser } from "expr-eval";
-import { DetailedMacros, PortionMacros, SimpleMacros, Source, Unit } from "./classes";
+import { DetailedMacros, PortionMacros, SimpleMacros, PortionSource, Unit } from "./classes";
 import { macrosMap, simpleMacrosMap } from "./mappings";
 
 
@@ -21,7 +21,7 @@ export function multiply100gMacro(
     macros100g: DetailedMacros,
     description: string,
     amount: number,
-    source: Source,
+    source: PortionSource,
     id?: number
 ): PortionMacros {
     const scalePerGram = amount / macros100g.amount

@@ -58,6 +58,6 @@ test('Can add an ingredient to the recipe', async () => {
     const breadCell = within(recipesTable).getByText('BREAD')
     expect(breadCell).toBeInTheDocument()
 
-    const breadRow = breadCell.closest('tr')
+    const breadRow = breadCell.closest('tr')!
     expect(within(breadRow).getByText('131.5')).toBeInTheDocument()
 });

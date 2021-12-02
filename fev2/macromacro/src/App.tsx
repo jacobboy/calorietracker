@@ -6,11 +6,14 @@ import { getMacros, MathInputState } from "./conversions";
 import { getApiClient, getMeasuresForOneFood } from "./calls";
 import { Recipe } from "./recipe";
 import { IngredientSearch } from "./ingredientSearch";
+import { CreateIngredient } from "./createIngredient";
+import { CreatedIngredients } from "./createdIngredients";
 
 
 function App() {
   const [searchText, setSearchText] = useState('');
-  const [searchResults, setSearchResults] = useState<SearchResultFood[]>([]);
+  // const [searchResults, setSearchResults] = useState<SearchResultFood[]>([]);
+  // TODO move searchData into IngredientSearch?
   const [searchData, setSearchData] = useState<RowData[]>([])
   const [detailedMacros, setDetailedMacros] = useState<Record<string, PortionMacros[]>>({})
   const [rowsOpen, setRowsOpen] = useState<Record<string, boolean>>({})
@@ -35,7 +38,7 @@ function App() {
       api.getFoodsSearch(searchText).then(
           (response) => {
             if (response.data && response.data.foods) {
-              setSearchResults(response.data.foods)
+              // setSearchResults(response.data.foods)
               setSearchData(response.data.foods.map(createData))
             }
           }
@@ -68,7 +71,7 @@ function App() {
     return searchData.find((searchDatum) => searchDatum.fdcId === fdcId)!.name
   }
 
-  function addRecipeItem(fdcId: number) {
+  function addFdcRecipeItem(fdcId: number) {
     return (portionIdx: number) => {
       return () => {
         const fromPortion: PortionMacros = detailedMacros[fdcId][portionIdx]
@@ -76,7 +79,8 @@ function App() {
           name: getNameFromFdcId(fdcId),
           fdcId: fdcId,
           macros: fromPortion,
-          amount: enteredAmounts[fdcId][portionIdx]
+          amount: enteredAmounts[fdcId][portionIdx],
+          source: 'fdcApi'
         }
         setRecipeItems((prevState: RecipeItem[]) => [...prevState, recipeItem])
       }
@@ -91,7 +95,8 @@ function App() {
             name: oldItem.name,
             fdcId: oldItem.fdcId,
             macros: oldItem.macros,
-            amount: {input, evaluated, isValid}
+            amount: {input, evaluated, isValid},
+            source: oldItem.source
           }
           return [...prevState.slice(0, idx), newItem, ...prevState.slice(idx +1)]
         });
@@ -115,9 +120,15 @@ function App() {
     }
   }
 
+  function createIngredient() {
+
+  }
+
   return (
     <div className="App">
       {Recipe(recipeItems, changeRecipeItemAmount)}
+      {CreateIngredient()}
+      {CreatedIngredients()}
       {IngredientSearch(
           search,
           searchText,
@@ -129,7 +140,7 @@ function App() {
           toggleOpen,
           enteredAmounts,
           changePortionAmount,
-          addRecipeItem
+          addFdcRecipeItem
       )}
     </div>
   );
