@@ -21,8 +21,7 @@ export function multiply100gMacro(
     macros100g: DetailedMacros,
     description: string,
     amount: number,
-    source: PortionSource,
-    id?: number
+    source: PortionSource
 ): PortionMacros {
     const scalePerGram = amount / macros100g.amount
     return {
@@ -36,8 +35,8 @@ export function multiply100gMacro(
         unit: macros100g.unit,
         description: description,
         baseMacros: macros100g,
-        source,
-        id
+        portionSource: source,
+        dataProvenance: "fdcApi"
     }
 }
 
@@ -74,7 +73,7 @@ export function getDetailedMacrosForMeasures(
             // 0 so i can see in the UI when this was missing
             const gramWeight = foodPortion.gramWeight || 0
 
-            portions.push(multiply100gMacro(macros100g, description, gramWeight, 'portion', foodPortion.id))
+            portions.push(multiply100gMacro(macros100g, description, gramWeight, {source: 'portion', id: foodPortion.id}))
         })
     }
     // branded
@@ -90,13 +89,14 @@ export function getDetailedMacrosForMeasures(
                 amount: foodItem.servingSize || 0,
                 unit: Unit[((foodItem.servingSizeUnit || 'g') as keyof typeof Unit)],
                 description: foodItem.householdServingFullText || `${foodItem.servingSize || 'not set'} ${foodItem.servingSizeUnit || 'not set'}`,
-                source: 'labelNutrients',
-                baseMacros: macros100g
+                portionSource: {source: 'labelNutrients'},
+                baseMacros: macros100g,
+                dataProvenance: "fdcApi"
             }
         )
     }
 
-    return [{...macros100g, baseMacros: macros100g, source: '100g'}, ...portions];
+    return [{...macros100g, baseMacros: macros100g, portionSource: {source: '100g'}, dataProvenance: "fdcApi"}, ...portions];
 }
 
 export function getMacros(foodNutrients: AbridgedFoodNutrient[]): SimpleMacros {

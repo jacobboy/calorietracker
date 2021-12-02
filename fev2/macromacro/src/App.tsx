@@ -77,10 +77,9 @@ function App() {
         const fromPortion: PortionMacros = detailedMacros[fdcId][portionIdx]
         const recipeItem: RecipeItem = {
           name: getNameFromFdcId(fdcId),
-          fdcId: fdcId,
+          id: fdcId,
           macros: fromPortion,
           amount: enteredAmounts[fdcId][portionIdx],
-          source: 'fdcApi'
         }
         setRecipeItems((prevState: RecipeItem[]) => [...prevState, recipeItem])
       }
@@ -93,10 +92,9 @@ function App() {
           const oldItem = prevState[idx]
           const newItem: RecipeItem = {
             name: oldItem.name,
-            fdcId: oldItem.fdcId,
+            id: oldItem.id,
             macros: oldItem.macros,
             amount: {input, evaluated, isValid},
-            source: oldItem.source
           }
           return [...prevState.slice(0, idx), newItem, ...prevState.slice(idx +1)]
         });

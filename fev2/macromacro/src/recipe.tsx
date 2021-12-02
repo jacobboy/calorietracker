@@ -31,12 +31,12 @@ export function RecipeRow(
 ) {
 
     return (
-        <React.Fragment key={`${recipeItem.fdcId}-${idx}-recipe-frag`}>
+        <React.Fragment key={`${recipeItem.id}-${idx}-recipe-frag`}>
             <TableRow sx={{'& > *': {borderBottom: 'unset'}}}
-                      key={`${recipeItem.fdcId}-${idx}-recipeitem`}>
+                      key={`${recipeItem.id}-${idx}-recipeitem`}>
                 <TableCell component="th" scope="row">
                     <a target="_blank" rel="noreferrer"
-                       href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${recipeItem.fdcId}/nutrients`}>{recipeItem.name}</a>
+                       href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${recipeItem.id}/nutrients`}>{recipeItem.name}</a>
                 </TableCell>
                 <TableCell align="right">{MathInput(recipeItem.amount.input, recipeItem.amount.isValid, changeRecipeItemAmount)}</TableCell>
                 <TableCell align="right">{recipeItem.macros.description}</TableCell>
@@ -62,8 +62,7 @@ export function Recipe(
         recipeItem.macros.baseMacros,
         recipeItem.macros.description,
         recipeItem.amount.evaluated * recipeItem.macros.amount,
-        recipeItem.macros.source,
-        recipeItem.macros.id
+        recipeItem.macros.portionSource
     ))
 
     const totalRecipeAmount = sum(recipeItems.map((recipeItem) => recipeItem.amount.evaluated))

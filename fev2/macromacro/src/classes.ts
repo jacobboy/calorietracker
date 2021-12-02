@@ -9,7 +9,10 @@ export enum Unit {
     flOz = 'fl oz'
 }
 
-export type PortionSource = 'portion' | '100g' | 'labelNutrients'
+export type PortionSource = { source: 'portion', id?: number } |
+    { source: '100g' } |
+    { source: 'labelNutrients' } |
+    { source: 'g' } | { source: 'ml' }  // for created ingredients
 
 export type Source = 'fdcApi' | 'createIngredient' | 'createRecipe'
 
@@ -31,12 +34,8 @@ export interface DetailedMacros extends SimpleMacros {
 }
 
 export interface PortionMacros extends DetailedMacros {
-    source: PortionSource,
-    /*
-    if source is 'portion', id indicates the portion id
-    TODO rename
-    */
-    id?: number,
+    dataProvenance: Source,
+    portionSource: PortionSource,
     baseMacros: DetailedMacros
 }
 
@@ -51,10 +50,9 @@ export interface RowData extends SimpleMacros {
 
 export interface RecipeItem {
     name: string,
-    fdcId: number,
+    id: number,
     macros: PortionMacros,
-    amount: MathInputState,
-    source: Source
+    amount: MathInputState
 }
 
 export interface Recipe {
@@ -65,6 +63,3 @@ export interface Recipe {
     unit: Unit
 }
 
-export interface CreatedIngredient extends DetailedMacros {
-    
-}
