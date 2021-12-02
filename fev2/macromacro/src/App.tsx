@@ -8,6 +8,8 @@ import { Recipe } from "./recipe";
 import { IngredientSearch } from "./ingredientSearch";
 import { CreateIngredient } from "./createIngredient";
 import { CreatedIngredients } from "./createdIngredients";
+// import { firebaseApp } from './firebase-config'
+
 
 
 function App() {
