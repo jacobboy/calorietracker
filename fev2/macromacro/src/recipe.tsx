@@ -67,9 +67,10 @@ export function Recipe(
     ))
 
     const totalRecipeAmount = sum(recipeItems.map((recipeItem) => recipeItem.amount.evaluated))
+    const amountForTotalMacros = amount !== null ? amount : totalRecipeAmount
 
     const totalMacros = {
-        amount: amount !== null ? amount : totalRecipeAmount,
+        amount: amountForTotalMacros,
         unit: unit,
         calories: sum(recipeItems.map((recipeItem, idx) => macros[idx].calories!)),
         fat: sum(recipeItems.map((recipeItem, idx) => macros[idx].fat!)),
@@ -128,11 +129,14 @@ export function Recipe(
                         )
                     }
                 </TableBody>
+
+                {recipeItems.length > 0 &&
                 <TableFooter>
                     <TableRow>
                         <TableCell align="left">Total</TableCell>
-                        <TableCell align="right">{MathInput(amount.input, amount.isValid, handleRecipeAmountChange)}</TableCell>
-                        <TableCell align="right"/>
+                        <TableCell
+                            align="right">{MathInput(amount.input, amount.isValid, handleRecipeAmountChange)}</TableCell>
+                        <TableCell align="right">{`${amount.evaluated} ${unit}`}</TableCell>
                         <TableCell align="right">{totalMacros.calories}</TableCell>
                         <TableCell align="right">{totalMacros.fat}</TableCell>
                         <TableCell align="right">{totalMacros.carbs}</TableCell>
@@ -143,7 +147,7 @@ export function Recipe(
                     <TableRow>
                         <TableCell align="left">Per 100</TableCell>
                         <TableCell align="right">100</TableCell>
-                        <TableCell align="right"/>
+                        <TableCell align="right">{`100 ${unit}`}</TableCell>
                         <TableCell align="right">{per100Macros.calories}</TableCell>
                         <TableCell align="right">{per100Macros.fat}</TableCell>
                         <TableCell align="right">{per100Macros.carbs}</TableCell>
@@ -151,7 +155,7 @@ export function Recipe(
                         <TableCell align="right">{per100Macros.totalFiber}</TableCell>
                         <TableCell align="right">{per100Macros.sugar}</TableCell>
                     </TableRow>
-                </TableFooter>
+                </TableFooter>}
             </Table>
         </TableContainer>
     );

@@ -55,5 +55,9 @@ test('Can add an ingredient to the recipe', async () => {
 
     // const recipesTable = screen.getAllByLabelText('simple table')[0]
     const recipesTable = screen.getByText('Recipe').parentElement!
-    expect(within(recipesTable).getByText('131.5')).toBeInTheDocument()
+    const breadCell = within(recipesTable).getByText('BREAD')
+    expect(breadCell).toBeInTheDocument()
+
+    const breadRow = breadCell.closest('tr')
+    expect(within(breadRow).getByText('131.5')).toBeInTheDocument()
 });
