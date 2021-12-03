@@ -1,5 +1,5 @@
 import { Configuration, FDCApi } from "./usda";
-import { PortionMacros } from "./classes";
+import { IngredientId, PortionMacros } from "./classes";
 import { getDetailedMacrosForMeasures } from "./conversions";
 
 export function getApiClient(): FDCApi {
@@ -12,9 +12,9 @@ export function getApiClient(): FDCApi {
     return new FDCApi(config);
 }
 
-export function getMeasuresForOneFood(fdcId: number): Promise<PortionMacros[]> {
+export function getMeasuresForOneFood(id: IngredientId): Promise<PortionMacros[]> {
     const api = getApiClient()
-    return api.getFullFood(fdcId.toString()).then(
+    return api.getFullFood(id.toString()).then(
         (response) => {
             if (response.data) {
                 return getDetailedMacrosForMeasures(response.data)

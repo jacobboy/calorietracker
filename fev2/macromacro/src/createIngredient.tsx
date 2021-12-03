@@ -6,6 +6,8 @@ import LoadingButton from '@mui/lab/LoadingButton';
 
 const startIngredient = {
     name: 'One Slammin\' Ingredient',
+    // TODO
+    id: 'TODO will this come from firebase?',
     macros: {
         calories: 0,
         carbs: 0,
