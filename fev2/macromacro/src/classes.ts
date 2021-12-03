@@ -33,24 +33,47 @@ export interface DetailedMacros extends SimpleMacros {
     sugar?: number,
 }
 
+/*
+I think this is the minimum needed for sharing between ingredients
+and recipe
+*/
+export interface PortionAmountReference {
+    ingredientReference: {
+        dataProvenance: Source,
+        id: IngredientId
+    },
+    portionReference: PortionSource,
+    portion: PortionSource,
+    amount: number
+}
+
+/*
+the unit on the portion macro needs to be compatible with the unit
+on the detailed macros
+*/
 export interface PortionMacros extends DetailedMacros {
     dataProvenance: Source,
     portionSource: PortionSource,
     baseMacros: DetailedMacros
 }
 
-export interface RowData extends SimpleMacros {
+
+// TODO number for FDC foods, string for created ingredients
+//      make it multiple classes?
+export type IngredientId = string | number
+
+export interface IngredientRowData extends SimpleMacros {
     dataType?: string,
     brandOwner?: string,
     brandName?: string,
-    fdcId: number,
+    id: IngredientId,
     name: string,
     householdServingFullText?: string
 }
 
 export interface RecipeItem {
     name: string,
-    id: number,
+    id: IngredientId,
     macros: PortionMacros,
     amount: MathInputState
 }
@@ -70,6 +93,9 @@ export interface IngredientPortion {
 
 export interface Ingredient {
     name: string,
+    id: string,
+    brandOwner?: string,
+    brandName?: string,
     macros: DetailedMacros,
     portions: IngredientPortion[],
     dateCreated: Date

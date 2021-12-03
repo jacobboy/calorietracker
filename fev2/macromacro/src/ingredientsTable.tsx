@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
-import { PortionMacros, RowData } from "./classes";
+import { PortionMacros, IngredientRowData, IngredientId } from "./classes";
 import { MathInput, MathInputState, round } from "./conversions";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -15,7 +15,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { CircularProgress } from "@mui/material";
 
 function PortionTableRow(
-    row: RowData,
+    row: IngredientRowData,
     idx: number,
     macro: PortionMacros,
     portionAmount: MathInputState,
@@ -30,7 +30,7 @@ function PortionTableRow(
     }
 
     return (
-        <TableRow key={`${row.fdcId}-${idx}-details`}>
+        <TableRow key={`${row.id}-${idx}-details`}>
             {/*// TODO what is this component and scope*/}
             <TableCell component="th" scope="row">
                 <form onSubmit={e => handleSubmit(e)}>
@@ -51,19 +51,19 @@ function PortionTableRow(
 }
 
 function Row(
-    row: RowData,
+    row: IngredientRowData,
     macros: PortionMacros[],
     open: boolean,
     toggleOpen: () => void,
     portionAmounts: Record<number, MathInputState>,
     changePortionAmount: (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void,
-    addRecipeItem: (portionIdx: number) => () => void
+    addRecipeItem: (portionIdx: number, amount: MathInputState) => () => void
 ) {
 
     const thinking = open && macros.length === 0
     return (
-        <React.Fragment key={`${row.fdcId}-frag`}>
-            <TableRow sx={{'& > *': {borderBottom: 'unset'}}} key={`${row.fdcId}-simple`}>
+        <React.Fragment key={`${row.id}-frag`}>
+            <TableRow sx={{'& > *': {borderBottom: 'unset'}}} key={`${row.id}-simple`}>
                 <TableCell>
                     <IconButton
                         aria-label="expand row"
@@ -75,7 +75,7 @@ function Row(
                 </TableCell>
                 <TableCell component="th" scope="row">
                     <a target="_blank" rel="noreferrer"
-                       href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${row.fdcId}/nutrients`}>{row.name}</a>
+                       href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${row.id}/nutrients`}>{row.name}</a>
                 </TableCell>
                 <TableCell align="right">{row.dataType}</TableCell>
                 <TableCell align="right">{row.brandOwner}</TableCell>
@@ -86,7 +86,7 @@ function Row(
                 <TableCell align="right">{round(row.carbs)}</TableCell>
                 <TableCell align="right">{round(row.protein)}</TableCell>
             </TableRow>
-            <TableRow key={`${row.fdcId}-something`}>
+            <TableRow key={`${row.id}-something`}>
                 <TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={6}>
                     <Collapse in={open} timeout="auto" unmountOnExit={false}>
                         <Box sx={{margin: 1}}>
@@ -95,7 +95,7 @@ function Row(
                             {/*</Typography>*/}
                             <Table size="small" aria-label="food details">
                                 <TableHead>
-                                    <TableRow key={`${row.fdcId}-details-header`}>
+                                    <TableRow key={`${row.id}-details-header`}>
                                         <TableCell align="left">Add amount to recipe</TableCell>
                                         <TableCell align="right">Description</TableCell>
                                         <TableCell align="right">Amount</TableCell>
@@ -126,7 +126,11 @@ function Row(
                                                         evaluated: 0
                                                     },
                                                     changePortionAmount(idx),
-                                                    addRecipeItem(idx)
+                                                    addRecipeItem(idx, portionAmounts[idx] || {
+                                                        input: '',
+                                                        isValid: true,
+                                                        evaluated: 0
+                                                    })
                                                 )
                                             )
                                     }
@@ -141,12 +145,12 @@ function Row(
 }
 
 export function IngredientsTable(
-    searchData: RowData[],
+    searchData: IngredientRowData[],
     detailedMacros: Record<string, PortionMacros[]>,
     rowsOpen: Record<string, boolean>,
-    toggleOpen: (fdcId: number) => void, enteredAmounts: Record<number, Record<number, MathInputState>>,
-    changePortionAmount: (fdcId: number) => (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void,
-    addRecipeItem: (fdcId: number) => (portionIdx: number) => () => void
+    toggleOpen: (id: IngredientId) => void, enteredAmounts: Record<IngredientId, Record<number, MathInputState>>,
+    changePortionAmount: (id: IngredientId) => (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void,
+    addRecipeItem: (id: IngredientId, name: string) => (portionIdx: number, amount: MathInputState) => () => void
 ) {
     return <Table sx={{minWidth: 650}} aria-label="simple table">
         <TableHead>
@@ -168,12 +172,12 @@ export function IngredientsTable(
                 searchData.map(
                     (row) => Row(
                         row,
-                        detailedMacros[row.fdcId] || [],
-                        rowsOpen[row.fdcId],
-                        () => toggleOpen(row.fdcId),
-                        enteredAmounts[row.fdcId] || {},
-                        changePortionAmount(row.fdcId),
-                        addRecipeItem(row.fdcId)
+                        detailedMacros[row.id] || [],
+                        rowsOpen[row.id],
+                        () => toggleOpen(row.id),
+                        enteredAmounts[row.id] || {},
+                        changePortionAmount(row.id),
+                        addRecipeItem(row.id, row.name)
                     )
                 )
             }

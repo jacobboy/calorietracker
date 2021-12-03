@@ -17,6 +17,10 @@ export function scaleUpOrUndefined(scale: number, x?: number): number | undefine
     return x !== undefined ? x * scale : undefined
 }
 
+/*
+TODO this should take the incoming unit and raise an error if it can't be converted
+     also, base macros may not be grams
+*/
 export function multiply100gMacro(
     macros100g: DetailedMacros,
     description: string,

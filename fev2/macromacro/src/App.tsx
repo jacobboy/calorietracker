@@ -1,88 +1,56 @@
 import React, { useState } from 'react';
 import './App.css';
-import { SearchResultFood } from "./usda";
-import { Ingredient, PortionMacros, RecipeItem, RowData } from "./classes";
-import { getMacros, MathInputState } from "./conversions";
-import { getApiClient, getMeasuresForOneFood } from "./calls";
+import { Ingredient, IngredientId, IngredientRowData, PortionMacros, RecipeItem } from "./classes";
+import { MathInputState } from "./conversions";
+import { getMeasuresForOneFood } from "./calls";
 import { Recipe } from "./recipe";
 import { IngredientSearch } from "./ingredientSearch";
 import { CreateIngredient } from "./createIngredient";
-import { CreatedIngredients } from "./createdIngredients";
+
 // import { firebaseApp } from './firebase-config'
 
 
 
 function App() {
-  const [searchText, setSearchText] = useState('');
   // const [searchResults, setSearchResults] = useState<SearchResultFood[]>([]);
   // TODO move searchData into IngredientSearch?
-  const [searchData, setSearchData] = useState<RowData[]>([])
-  const [detailedMacros, setDetailedMacros] = useState<Record<string, PortionMacros[]>>({})
-  const [rowsOpen, setRowsOpen] = useState<Record<string, boolean>>({})
+  const [detailedMacros, setDetailedMacros] = useState<Record<IngredientId, PortionMacros[]>>({})
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([])
-  const [enteredAmounts, setEnteredAmounts] = useState<Record<number, Record<number, MathInputState>>>({})
   const [createdIngredients, setCreatedIngredients] = useState<Ingredient[]>([])
 
-  function createData(searchResult: SearchResultFood): RowData {
-      return {
-        dataType: searchResult.dataType,
-        brandOwner: searchResult.brandOwner,
-        brandName: searchResult.brandName,
-        fdcId: searchResult.fdcId,
-        name: searchResult.description,
-        ...getMacros(searchResult.foodNutrients || []),
-        // householdServingFullText: searchResult.householdServingFullText
-      }
-  }
-
-  async function search(event: React.FormEvent<HTMLFormElement>) {
-    if (searchText) {
-      const api = getApiClient();
-      api.getFoodsSearch(searchText).then(
-          (response) => {
-            if (response.data && response.data.foods) {
-              // setSearchResults(response.data.foods)
-              setSearchData(response.data.foods.map(createData))
-            }
-          }
-      )
+  function createCreatedIngredientRowData(ingredient: Ingredient): IngredientRowData {
+    return {
+      dataType: 'createdIngredient',
+      brandOwner: ingredient.brandOwner,
+      brandName: ingredient.brandName,
+      id: ingredient.id,
+      name: ingredient.name,
+      ...ingredient.macros,
+      // householdServingFullText: ingredient.householdServingFullText
     }
-    event.preventDefault();
   }
 
-  function getFood(fdcId: number) {
-    if (!(fdcId in detailedMacros)) {
-      getMeasuresForOneFood(fdcId).then(
+  function getFood(id: IngredientId) {
+    if (!(id in detailedMacros)) {
+      getMeasuresForOneFood(id).then(
           (detailedMacro) => {
-            setDetailedMacros((prevState: Record<string, PortionMacros[]>) => {
-              return {...prevState, [fdcId]: detailedMacro}
+            setDetailedMacros((prevState) => {
+              return {...prevState, [id]: detailedMacro}
             })
           }
       )
     }
   }
 
-  function toggleOpen(fdcId: number) {
-    getFood(fdcId)
-    setRowsOpen({
-      ...rowsOpen,
-      [fdcId]: !rowsOpen[fdcId]
-    })
-  }
-
-  function getNameFromFdcId(fdcId: number) {
-    return searchData.find((searchDatum) => searchDatum.fdcId === fdcId)!.name
-  }
-
-  function addFdcRecipeItem(fdcId: number) {
-    return (portionIdx: number) => {
+  function addFdcRecipeItem(id: IngredientId, name: string) {
+    return (portionIdx: number, enteredAmount: MathInputState) => {
       return () => {
-        const fromPortion: PortionMacros = detailedMacros[fdcId][portionIdx]
+        const fromPortion: PortionMacros = detailedMacros[id][portionIdx]
         const recipeItem: RecipeItem = {
-          name: getNameFromFdcId(fdcId),
-          id: fdcId,
+          name: name,
+          id: id,
           macros: fromPortion,
-          amount: enteredAmounts[fdcId][portionIdx],
+          amount: enteredAmount,
         }
         setRecipeItems((prevState: RecipeItem[]) => [...prevState, recipeItem])
       }
@@ -105,43 +73,21 @@ function App() {
   }
 
 
-  function changePortionAmount(fdcId: number) {
-    return ( portionIdx: number) => {
-      return (input: string, evaluated: number, isValid: boolean) => {
-        setEnteredAmounts(
-            {
-              ...enteredAmounts,
-              [fdcId]: {
-                ...(enteredAmounts[fdcId] || {}),
-                [portionIdx]: {input, evaluated, isValid}
-              }
-            }
-        )
-      }
-    }
-  }
-
   function createIngredient(ingredient: Ingredient) {
     setCreatedIngredients((prevState) => [...prevState, ingredient])
+    // TODO set detailed macros\
+    // handle is open for created ingredients
   }
 
   return (
     <div className="App">
       {Recipe(recipeItems, changeRecipeItemAmount)}
       {CreateIngredient(createIngredient)}
-      {CreatedIngredients(createdIngredients)}
       {IngredientSearch(
-          search,
-          searchText,
-          setSearchText,
-          searchData,
-          createData,
           detailedMacros,
-          rowsOpen,
-          toggleOpen,
-          enteredAmounts,
-          changePortionAmount,
-          addFdcRecipeItem
+          addFdcRecipeItem,
+          getFood,
+          createdIngredients.map(createCreatedIngredientRowData)
       )}
     </div>
   );

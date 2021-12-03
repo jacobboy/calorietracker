@@ -1,28 +1,78 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import Input from '@mui/material/Input';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 import { SearchResultFood } from "./usda";
-import { PortionMacros, RowData } from "./classes";
-import { MathInputState } from "./conversions";
+import { IngredientId, IngredientRowData, PortionMacros } from "./classes";
 import { IngredientsTable } from "./ingredientsTable";
+import { getApiClient } from "./calls";
+import { getMacros, MathInputState } from "./conversions";
 
 const ariaLabel = {'aria-label': 'description'};
 
 export function IngredientSearch(
-    search: (event: React.FormEvent<HTMLFormElement>) => Promise<void>,
-    searchText: string,
-    setSearchText: (value: string) => void,
-    searchData: RowData[],
-    createData: (searchResult: SearchResultFood) => RowData,
-    detailedMacros: Record<string, PortionMacros[]>,
-    rowsOpen: Record<string, boolean>,
-    toggleOpen: (fdcId: number) => void,
-    enteredAmounts: Record<number, Record<number, MathInputState>>,
-    changePortionAmount: (fdcId: number) => (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void,
-    addRecipeItem: (fdcId: number) => (portionIdx: number) => () => void
+    detailedMacros: Record<IngredientId, PortionMacros[]>,
+    addRecipeItem: (id: IngredientId, name: string) => (portionIdx: number, amount: MathInputState) => () => void,
+    getFood: (id: IngredientId) => void,
+    createdIngredients: IngredientRowData[]
 ) {
+    const [searchText, setSearchText] = useState('');
+    const [searchData, setSearchData] = useState<IngredientRowData[]>([])
+    const [rowsOpen, setRowsOpen] = useState<Record<IngredientId, boolean>>({})
+    const [enteredAmounts, setEnteredAmounts] = useState<Record<IngredientId, Record<number, MathInputState>>>({})
+
+    function toggleOpen(id: IngredientId) {
+        getFood(id)
+        setRowsOpen({
+            ...rowsOpen,
+            [id]: !rowsOpen[id]
+        })
+    }
+
+    function createSearchIngredientRowData(searchResult: SearchResultFood): IngredientRowData {
+        return {
+            dataType: searchResult.dataType,
+            brandOwner: searchResult.brandOwner,
+            brandName: searchResult.brandName,
+            id: searchResult.fdcId,
+            name: searchResult.description,
+            ...getMacros(searchResult.foodNutrients || []),
+            // householdServingFullText: searchResult.householdServingFullText
+        }
+    }
+
+    async function search(event: React.FormEvent<HTMLFormElement>) {
+        if (searchText) {
+            const api = getApiClient();
+            api.getFoodsSearch(searchText).then(
+                (response) => {
+                    if (response.data && response.data.foods) {
+                        // setSearchResults(response.data.foods)
+                        setSearchData(response.data.foods.map(createSearchIngredientRowData))
+                    }
+                }
+            )
+        }
+        event.preventDefault();
+    }
+
+    function changePortionAmount(id: IngredientId) {
+        return ( portionIdx: number) => {
+            return (input: string, evaluated: number, isValid: boolean) => {
+                setEnteredAmounts(
+                    {
+                        ...enteredAmounts,
+                        [id]: {
+                            ...(enteredAmounts[id] || {}),
+                            [portionIdx]: {input, evaluated, isValid}
+                        }
+                    }
+                )
+            }
+        }
+    }
+
     return <>
         <TableContainer component={Paper}>
             <header>
@@ -34,6 +84,7 @@ export function IngredientSearch(
                 <input type="submit" value="Submit"/>
             </form>
             {IngredientsTable(searchData, detailedMacros, rowsOpen, toggleOpen, enteredAmounts, changePortionAmount, addRecipeItem)}
+            {/*{IngredientsTable(searchData, detailedMacros, rowsOpen, toggleOpen, enteredAmounts, changePortionAmount, addRecipeItem)}*/}
         </TableContainer>
     </>;
 }
