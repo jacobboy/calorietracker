@@ -145,6 +145,7 @@ function Row(
 }
 
 export function IngredientsTable(
+    name: string,
     searchData: IngredientRowData[],
     detailedMacros: Record<IngredientId, PortionMacros[]>,
     rowsOpen: Record<string, boolean>,
@@ -152,35 +153,39 @@ export function IngredientsTable(
     changePortionAmount: (id: IngredientId) => (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void,
     addRecipeItem: (id: IngredientId, name: string) => (fromPortion: PortionMacros, amount: MathInputState) => () => void
 ) {
-    return <Table sx={{minWidth: 650}} aria-label="simple table">
-        <TableHead>
-            <TableRow key='header'>
-                <TableCell/>
-                <TableCell>Food</TableCell>
-                <TableCell align="right">Data Type</TableCell>
-                <TableCell align="right">Brand Owner</TableCell>
-                <TableCell align="right">Brand Name</TableCell>
-                <TableCell align="right">Amount</TableCell>
-                <TableCell align="right">Calories</TableCell>
-                <TableCell align="right">Fat&nbsp;(g)</TableCell>
-                <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-                <TableCell align="right">Protein&nbsp;(g)</TableCell>
-            </TableRow>
-        </TableHead>
-        <TableBody>
-            {
-                searchData.map(
-                    (row) => Row(
-                        row,
-                        detailedMacros[row.id] || [],
-                        rowsOpen[row.id],
-                        () => toggleOpen(row.id),
-                        enteredAmounts[row.id] || {},
-                        changePortionAmount(row.id),
-                        addRecipeItem(row.id, row.name)
+    return <div>
+        <header>{name}</header>
+        <Table sx={{minWidth: 650}} aria-label="simple table">
+            <TableHead>
+                <TableRow key='header'>
+                    <TableCell/>
+                    <TableCell>Food</TableCell>
+                    <TableCell align="right">Data Type</TableCell>
+                    <TableCell align="right">Brand Owner</TableCell>
+                    <TableCell align="right">Brand Name</TableCell>
+                    <TableCell align="right">Amount</TableCell>
+                    <TableCell align="right">Calories</TableCell>
+                    <TableCell align="right">Fat&nbsp;(g)</TableCell>
+                    <TableCell align="right">Carbs&nbsp;(g)</TableCell>
+                    <TableCell align="right">Protein&nbsp;(g)</TableCell>
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                {
+                    searchData.map(
+                        (row) => Row(
+                            row,
+                            detailedMacros[row.id] || [],
+                            rowsOpen[row.id],
+                            () => toggleOpen(row.id),
+                            enteredAmounts[row.id] || {},
+                            changePortionAmount(row.id),
+                            addRecipeItem(row.id, row.name)
+                        )
                     )
-                )
-            }
-        </TableBody>
-    </Table>;
+                }
+            </TableBody>
+        </Table>
+
+    </div>;
 }

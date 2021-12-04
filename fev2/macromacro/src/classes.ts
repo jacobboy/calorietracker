@@ -95,7 +95,7 @@ export interface CustomIngredient {
     brandOwner?: string,
     brandName?: string,
     portions: Quantity[],
-    dateCreated: Date
+    dateCreated: Date,
     macros100g: DetailedMacros,
 }
 

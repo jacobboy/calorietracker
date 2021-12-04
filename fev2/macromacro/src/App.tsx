@@ -13,8 +13,6 @@ import { persistCustomIngredient } from "./firebaseApi/api";
 
 
 function App() {
-  // const [searchResults, setSearchResults] = useState<SearchResultFood[]>([]);
-  // TODO move searchData into IngredientSearch?
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([])
   const [createdIngredients, setCreatedIngredients] = useState<CustomIngredient[]>([])
 

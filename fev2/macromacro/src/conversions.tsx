@@ -26,7 +26,7 @@ export function multiply100gMacro(
     description: string,
     amount: number,
     source: PortionSource
-): PortionMacros {
+): Omit<PortionMacros, 'dataProvenance'> {
     const scalePerGram = amount / macros100g.amount
     return {
         calories: scaleUpOrUndefined(scalePerGram, macros100g.calories),
@@ -39,12 +39,11 @@ export function multiply100gMacro(
         unit: macros100g.unit,
         description: description,
         baseMacros: macros100g,
-        portionSource: source,
-        dataProvenance: "fdcApi"
+        portionSource: source
     }
 }
 
-export function getDetailedMacrosForMeasures(
+export function getPortionMacrosForMeasures(
     foodItem: BrandedFoodItem | FoundationFoodItem | SRLegacyFoodItem | SurveyFoodItem
 ): PortionMacros[] {
     const macros100g: DetailedMacros = {
@@ -77,7 +76,12 @@ export function getDetailedMacrosForMeasures(
             // 0 so i can see in the UI when this was missing
             const gramWeight = foodPortion.gramWeight || 0
 
-            portions.push(multiply100gMacro(macros100g, description, gramWeight, {source: 'portion', id: foodPortion.id}))
+            const portionMacro: PortionMacros = {
+                dataProvenance: 'fdcApi',
+                ...multiply100gMacro(macros100g, description, gramWeight, {source: 'portion', id: foodPortion.id})
+            }
+
+            portions.push(portionMacro)
         })
     }
     // branded

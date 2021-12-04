@@ -4,10 +4,10 @@ import Input from '@mui/material/Input';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 import { SearchResultFood } from "./usda";
-import { CustomIngredient, IngredientId, IngredientRowData, PortionMacros, Unit } from "./classes";
+import { CustomIngredient, IngredientId, IngredientRowData, PortionMacros } from "./classes";
 import { IngredientsTable } from "./ingredientsTable";
 import { getApiClient, getMeasuresForOneFood } from "./calls";
-import { getMacros, MathInputState } from "./conversions";
+import { getMacros, MathInputState, multiply100gMacro } from "./conversions";
 
 const ariaLabel = {'aria-label': 'description'};
 
@@ -19,7 +19,7 @@ export function IngredientSearch(
     const [searchData, setSearchData] = useState<IngredientRowData[]>([])
     const [rowsOpen, setRowsOpen] = useState<Record<IngredientId, boolean>>({})
     const [enteredAmounts, setEnteredAmounts] = useState<Record<IngredientId, Record<number, MathInputState>>>({})
-    const [detailedMacros, setDetailedMacros] = useState<Record<IngredientId, PortionMacros[]>>({})
+    const [portionMacros, setPortionMacros] = useState<Record<IngredientId, PortionMacros[]>>({})
 
     function toggleOpen(id: IngredientId) {
         setRowsOpen({
@@ -29,10 +29,10 @@ export function IngredientSearch(
     }
 
     function fetchFdcPortions(id: IngredientId) {
-        if (!(id in detailedMacros)) {
+        if (!(id in portionMacros)) {
             getMeasuresForOneFood(id).then(
                 (detailedMacro) => {
-                    setDetailedMacros((prevState) => {
+                    setPortionMacros((prevState) => {
                         return {...prevState, [id]: detailedMacro}
                     })
                 }
@@ -100,9 +100,25 @@ export function IngredientSearch(
         }
     }
 
-    function createDetailedMacrosFromCreatedIngredient(ingredients: CustomIngredient[]): Record<IngredientId, PortionMacros[]> {
-        // TODO this is what i'm working on
-        return {}
+    function createPortionMacrosFromCreatedIngredient(ingredients: CustomIngredient[]): Record<IngredientId, PortionMacros[]> {
+        const allPortionMacros: Record<IngredientId, PortionMacros[]> = {}
+        ingredients.forEach((ingredient) => {
+            allPortionMacros[ingredient.id] = ingredient.portions.map(
+                    (portion, idx) => {
+                        return {
+                            dataProvenance: 'createIngredient',
+                            ...multiply100gMacro(
+                                ingredient.macros100g,
+                                portion.description,
+                                portion.amount,
+                                {source: 'portion', id: idx}
+                            )
+                        }
+                    }
+                )
+            }
+        )
+        return allPortionMacros
     }
 
     return <>
@@ -116,19 +132,21 @@ export function IngredientSearch(
                 <input type="submit" value="Submit"/>
             </form>
             {IngredientsTable(
-                searchData,
-                detailedMacros,
+                'Custom Ingredients',
+                createdIngredients.map(createCreatedIngredientRowData),
+                createPortionMacrosFromCreatedIngredient(createdIngredients),
                 rowsOpen,
-                fetchFdcPortionsAndToggleOpen,
+                toggleOpen,
                 enteredAmounts,
                 changePortionAmount,
                 addRecipeItem
             )}
             {IngredientsTable(
-                createdIngredients.map(createCreatedIngredientRowData),
-                createDetailedMacrosFromCreatedIngredient(createdIngredients),
+                'FDC Search Results',
+                searchData,
+                portionMacros,
                 rowsOpen,
-                toggleOpen,
+                fetchFdcPortionsAndToggleOpen,
                 enteredAmounts,
                 changePortionAmount,
                 addRecipeItem
