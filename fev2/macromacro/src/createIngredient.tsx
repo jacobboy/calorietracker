@@ -1,10 +1,20 @@
 import React, { ChangeEvent, useState } from "react";
-import { DetailedMacros, CustomIngredient, Unit } from "./classes";
+import { DetailedMacros, CustomIngredient, Unit, Quantity } from "./classes";
 import { TextField } from "@mui/material";
 import LoadingButton from '@mui/lab/LoadingButton';
 
 
-const startIngredient = {
+export interface CustomIngredientBuilder {
+    name: string,
+    id: string,
+    brandOwner?: string,
+    brandName?: string,
+    portions: Quantity[],
+    dateCreated: Date
+    macros: DetailedMacros,
+}
+
+const startIngredient: CustomIngredientBuilder = {
     name: 'One Slammin\' Ingredient',
     // TODO
     id: 'TODO will this come from firebase?',
@@ -21,12 +31,12 @@ const startIngredient = {
         unit: Unit.g,
         description: '100 g',
     },
-    portions: [{unit: Unit.g, amount: 100}],
+    portions: [{unit: Unit.g, amount: 100, description: '100 g'}],
     dateCreated: new Date()
 }
 
-export function CreateIngredient(createIngredient: (ingredient: CustomIngredient) => void) {
-    const [ingredient, setIngredient] = useState<CustomIngredient>(startIngredient)
+export function CreateIngredient(createIngredient: (ingredient: CustomIngredientBuilder) => void) {
+    const [ingredient, setIngredient] = useState<CustomIngredientBuilder>(startIngredient)
     const [saving, setSaving] = useState<boolean>(false)
 
     function updateMacroValue(

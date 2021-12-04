@@ -146,7 +146,7 @@ function Row(
 
 export function IngredientsTable(
     searchData: IngredientRowData[],
-    detailedMacros: Record<string, PortionMacros[]>,
+    detailedMacros: Record<IngredientId, PortionMacros[]>,
     rowsOpen: Record<string, boolean>,
     toggleOpen: (id: IngredientId) => void, enteredAmounts: Record<IngredientId, Record<number, MathInputState>>,
     changePortionAmount: (id: IngredientId) => (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void,

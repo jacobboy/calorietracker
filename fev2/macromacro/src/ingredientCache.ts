@@ -17,5 +17,4 @@ async function getFood(id: IngredientId): Promise<PortionMacros[]> {
     } else {
         throw new Error('woopsies')
     }
-
 }

@@ -4,7 +4,7 @@ import Input from '@mui/material/Input';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 import { SearchResultFood } from "./usda";
-import { IngredientId, IngredientRowData, PortionMacros } from "./classes";
+import { CustomIngredient, IngredientId, IngredientRowData, PortionMacros, Unit } from "./classes";
 import { IngredientsTable } from "./ingredientsTable";
 import { getApiClient, getMeasuresForOneFood } from "./calls";
 import { getMacros, MathInputState } from "./conversions";
@@ -13,7 +13,7 @@ const ariaLabel = {'aria-label': 'description'};
 
 export function IngredientSearch(
     addRecipeItem: (id: IngredientId, name: string) => (fromPortion: PortionMacros, amount: MathInputState) => () => void,
-    createdIngredients: IngredientRowData[]
+    createdIngredients: CustomIngredient[]
 ) {
     const [searchText, setSearchText] = useState('');
     const [searchData, setSearchData] = useState<IngredientRowData[]>([])
@@ -22,14 +22,13 @@ export function IngredientSearch(
     const [detailedMacros, setDetailedMacros] = useState<Record<IngredientId, PortionMacros[]>>({})
 
     function toggleOpen(id: IngredientId) {
-        getFood(id)
         setRowsOpen({
             ...rowsOpen,
             [id]: !rowsOpen[id]
         })
     }
 
-    function getFood(id: IngredientId) {
+    function fetchFdcPortions(id: IngredientId) {
         if (!(id in detailedMacros)) {
             getMeasuresForOneFood(id).then(
                 (detailedMacro) => {
@@ -39,6 +38,11 @@ export function IngredientSearch(
                 }
             )
         }
+    }
+
+    function fetchFdcPortionsAndToggleOpen(id: IngredientId) {
+        fetchFdcPortions(id)
+        toggleOpen(id);
     }
 
     function createSearchIngredientRowData(searchResult: SearchResultFood): IngredientRowData {
@@ -84,6 +88,23 @@ export function IngredientSearch(
         }
     }
 
+    function createCreatedIngredientRowData(ingredient: CustomIngredient): IngredientRowData {
+        return {
+            dataType: 'createdIngredient',
+            brandOwner: ingredient.brandOwner,
+            brandName: ingredient.brandName,
+            id: ingredient.id,
+            name: ingredient.name,
+            ...ingredient.macros100g,
+            // householdServingFullText: ingredient.householdServingFullText
+        }
+    }
+
+    function createDetailedMacrosFromCreatedIngredient(ingredients: CustomIngredient[]): Record<IngredientId, PortionMacros[]> {
+        // TODO this is what i'm working on
+        return {}
+    }
+
     return <>
         <TableContainer component={Paper}>
             <header>
@@ -94,8 +115,24 @@ export function IngredientSearch(
                        onChange={e => setSearchText(e.target.value)} inputProps={ariaLabel}/>
                 <input type="submit" value="Submit"/>
             </form>
-            {IngredientsTable(searchData, detailedMacros, rowsOpen, toggleOpen, enteredAmounts, changePortionAmount, addRecipeItem)}
-            {/*{IngredientsTable(searchData, detailedMacros, rowsOpen, toggleOpen, enteredAmounts, changePortionAmount, addRecipeItem)}*/}
+            {IngredientsTable(
+                searchData,
+                detailedMacros,
+                rowsOpen,
+                fetchFdcPortionsAndToggleOpen,
+                enteredAmounts,
+                changePortionAmount,
+                addRecipeItem
+            )}
+            {IngredientsTable(
+                createdIngredients.map(createCreatedIngredientRowData),
+                createDetailedMacrosFromCreatedIngredient(createdIngredients),
+                rowsOpen,
+                toggleOpen,
+                enteredAmounts,
+                changePortionAmount,
+                addRecipeItem
+            )}
         </TableContainer>
     </>;
 }

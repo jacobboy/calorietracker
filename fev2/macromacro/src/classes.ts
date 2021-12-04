@@ -18,7 +18,8 @@ export type Source = 'fdcApi' | 'createIngredient' | 'createRecipe'
 
 export interface Quantity {
     unit: Unit,
-    amount: number
+    amount: number,
+    description: string
 }
 
 export interface SimpleMacros extends Quantity {
@@ -26,7 +27,6 @@ export interface SimpleMacros extends Quantity {
     carbs?: number,
     fat?: number,
     protein?: number
-    description: string
 }
 
 export interface DetailedMacros extends SimpleMacros {
@@ -94,8 +94,8 @@ export interface CustomIngredient {
     id: string,
     brandOwner?: string,
     brandName?: string,
-    macros: DetailedMacros,
     portions: Quantity[],
     dateCreated: Date
+    macros100g: DetailedMacros,
 }
 
