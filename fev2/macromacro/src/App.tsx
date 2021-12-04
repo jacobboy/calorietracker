@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import './App.css';
-import { CustomIngredient, IngredientId, IngredientRowData, PortionMacros, RecipeItem } from "./classes";
+import {
+  CustomIngredient,
+  CustomIngredientUnsaved,
+  IngredientId,
+  PortionMacros,
+  RecipeItem
+} from "./classes";
 import { MathInputState } from "./conversions";
-import { getMeasuresForOneFood } from "./calls";
 import { Recipe } from "./recipe";
 import { IngredientSearch } from "./ingredientSearch";
-import { CreateIngredient, CustomIngredientBuilder } from "./createIngredient";
+import { CreateIngredient } from "./createIngredient";
 import { persistCustomIngredient } from "./firebaseApi/api";
+import { initFirebaseApp } from "./firebase-config";
 
-// import { firebaseApp } from './firebase-config'
-
-
+const firebaseApp = initFirebaseApp()
 
 function App() {
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([])
@@ -46,7 +50,7 @@ function App() {
   }
 
 
-  function createIngredient(ingredient: CustomIngredientBuilder) {
+  function createIngredient(ingredient: CustomIngredientUnsaved) {
     setCreatedIngredients((prevState) => [
         ...prevState, persistCustomIngredient(ingredient)
     ])

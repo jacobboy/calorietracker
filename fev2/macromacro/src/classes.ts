@@ -99,3 +99,4 @@ export interface CustomIngredient {
     macros100g: DetailedMacros,
 }
 
+export type CustomIngredientUnsaved = Omit<Omit<CustomIngredient, 'id'>, 'dateCreated'>

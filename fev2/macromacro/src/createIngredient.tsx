@@ -1,16 +1,15 @@
 import React, { ChangeEvent, useState } from "react";
-import { DetailedMacros, CustomIngredient, Unit, Quantity } from "./classes";
+import { DetailedMacros, Unit, Quantity, CustomIngredientUnsaved } from "./classes";
 import { TextField } from "@mui/material";
 import LoadingButton from '@mui/lab/LoadingButton';
 
 
-export interface CustomIngredientBuilder {
+interface CustomIngredientBuilder {
     name: string,
     id: string,
     brandOwner?: string,
     brandName?: string,
     portions: Quantity[],
-    dateCreated: Date
     macros: DetailedMacros,
 }
 
@@ -31,11 +30,10 @@ const startIngredient: CustomIngredientBuilder = {
         unit: Unit.g,
         description: '100 g',
     },
-    portions: [{unit: Unit.g, amount: 100, description: '100 g'}],
-    dateCreated: new Date()
+    portions: [{unit: Unit.g, amount: 100, description: '100 g'}]
 }
 
-export function CreateIngredient(createIngredient: (ingredient: CustomIngredientBuilder) => void) {
+export function CreateIngredient(createIngredient: (ingredient: CustomIngredientUnsaved) => void) {
     const [ingredient, setIngredient] = useState<CustomIngredientBuilder>(startIngredient)
     const [saving, setSaving] = useState<boolean>(false)
 
@@ -66,10 +64,20 @@ export function CreateIngredient(createIngredient: (ingredient: CustomIngredient
         })
     }
 
+    function convertToCustomIngredientUnsaved(ingredient: CustomIngredientBuilder): CustomIngredientUnsaved {
+        return {
+            name: ingredient.name,
+            brandOwner: ingredient.brandOwner,
+            brandName: ingredient.brandName,
+            portions: ingredient.portions,
+            macros100g: ingredient.macros
+        }
+    }
+
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         console.log('handling submit')
         setSaving(true)
-        createIngredient({...ingredient, dateCreated: new Date()})
+        createIngredient(convertToCustomIngredientUnsaved(ingredient))
         setIngredient(startIngredient)
         setSaving(false)
         e.preventDefault()
