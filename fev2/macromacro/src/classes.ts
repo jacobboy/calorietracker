@@ -16,13 +16,16 @@ export type PortionSource = { source: 'portion', id?: number } |
 
 export type Source = 'fdcApi' | 'createIngredient' | 'createRecipe'
 
-export interface SimpleMacros {
+export interface Quantity {
+    unit: Unit,
+    amount: number
+}
+
+export interface SimpleMacros extends Quantity {
     calories?: number,
     carbs?: number,
     fat?: number,
     protein?: number
-    amount: number,
-    unit: Unit,
     description: string
 }
 
@@ -86,18 +89,13 @@ export interface Recipe {
     unit: Unit
 }
 
-export interface IngredientPortion {
-    unit: Unit,
-    amount: number
-}
-
-export interface Ingredient {
+export interface CustomIngredient {
     name: string,
     id: string,
     brandOwner?: string,
     brandName?: string,
     macros: DetailedMacros,
-    portions: IngredientPortion[],
+    portions: Quantity[],
     dateCreated: Date
 }
 

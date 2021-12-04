@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useState } from "react";
-import { DetailedMacros, Ingredient, Unit } from "./classes";
+import { DetailedMacros, CustomIngredient, Unit } from "./classes";
 import { TextField } from "@mui/material";
 import LoadingButton from '@mui/lab/LoadingButton';
 
@@ -25,8 +25,8 @@ const startIngredient = {
     dateCreated: new Date()
 }
 
-export function CreateIngredient(createIngredient: (ingredient: Ingredient) => void) {
-    const [ingredient, setIngredient] = useState<Ingredient>(startIngredient)
+export function CreateIngredient(createIngredient: (ingredient: CustomIngredient) => void) {
+    const [ingredient, setIngredient] = useState<CustomIngredient>(startIngredient)
     const [saving, setSaving] = useState<boolean>(false)
 
     function updateMacroValue(

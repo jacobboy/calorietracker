@@ -57,7 +57,7 @@ function Row(
     toggleOpen: () => void,
     portionAmounts: Record<number, MathInputState>,
     changePortionAmount: (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void,
-    addRecipeItem: (portionIdx: number, amount: MathInputState) => () => void
+    addRecipeItem: (fromPortion: PortionMacros, amount: MathInputState) => () => void
 ) {
 
     const thinking = open && macros.length === 0
@@ -126,7 +126,7 @@ function Row(
                                                         evaluated: 0
                                                     },
                                                     changePortionAmount(idx),
-                                                    addRecipeItem(idx, portionAmounts[idx] || {
+                                                    addRecipeItem(macro, portionAmounts[idx] || {
                                                         input: '',
                                                         isValid: true,
                                                         evaluated: 0
@@ -150,7 +150,7 @@ export function IngredientsTable(
     rowsOpen: Record<string, boolean>,
     toggleOpen: (id: IngredientId) => void, enteredAmounts: Record<IngredientId, Record<number, MathInputState>>,
     changePortionAmount: (id: IngredientId) => (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void,
-    addRecipeItem: (id: IngredientId, name: string) => (portionIdx: number, amount: MathInputState) => () => void
+    addRecipeItem: (id: IngredientId, name: string) => (fromPortion: PortionMacros, amount: MathInputState) => () => void
 ) {
     return <Table sx={{minWidth: 650}} aria-label="simple table">
         <TableHead>

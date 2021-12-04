@@ -6,21 +6,20 @@ import Paper from '@mui/material/Paper';
 import { SearchResultFood } from "./usda";
 import { IngredientId, IngredientRowData, PortionMacros } from "./classes";
 import { IngredientsTable } from "./ingredientsTable";
-import { getApiClient } from "./calls";
+import { getApiClient, getMeasuresForOneFood } from "./calls";
 import { getMacros, MathInputState } from "./conversions";
 
 const ariaLabel = {'aria-label': 'description'};
 
 export function IngredientSearch(
-    detailedMacros: Record<IngredientId, PortionMacros[]>,
-    addRecipeItem: (id: IngredientId, name: string) => (portionIdx: number, amount: MathInputState) => () => void,
-    getFood: (id: IngredientId) => void,
+    addRecipeItem: (id: IngredientId, name: string) => (fromPortion: PortionMacros, amount: MathInputState) => () => void,
     createdIngredients: IngredientRowData[]
 ) {
     const [searchText, setSearchText] = useState('');
     const [searchData, setSearchData] = useState<IngredientRowData[]>([])
     const [rowsOpen, setRowsOpen] = useState<Record<IngredientId, boolean>>({})
     const [enteredAmounts, setEnteredAmounts] = useState<Record<IngredientId, Record<number, MathInputState>>>({})
+    const [detailedMacros, setDetailedMacros] = useState<Record<IngredientId, PortionMacros[]>>({})
 
     function toggleOpen(id: IngredientId) {
         getFood(id)
@@ -28,6 +27,18 @@ export function IngredientSearch(
             ...rowsOpen,
             [id]: !rowsOpen[id]
         })
+    }
+
+    function getFood(id: IngredientId) {
+        if (!(id in detailedMacros)) {
+            getMeasuresForOneFood(id).then(
+                (detailedMacro) => {
+                    setDetailedMacros((prevState) => {
+                        return {...prevState, [id]: detailedMacro}
+                    })
+                }
+            )
+        }
     }
 
     function createSearchIngredientRowData(searchResult: SearchResultFood): IngredientRowData {

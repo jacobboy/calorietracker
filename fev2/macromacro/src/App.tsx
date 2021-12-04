@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
-import { Ingredient, IngredientId, IngredientRowData, PortionMacros, RecipeItem } from "./classes";
+import { CustomIngredient, IngredientId, IngredientRowData, PortionMacros, RecipeItem } from "./classes";
 import { MathInputState } from "./conversions";
 import { getMeasuresForOneFood } from "./calls";
 import { Recipe } from "./recipe";
@@ -14,11 +14,10 @@ import { CreateIngredient } from "./createIngredient";
 function App() {
   // const [searchResults, setSearchResults] = useState<SearchResultFood[]>([]);
   // TODO move searchData into IngredientSearch?
-  const [detailedMacros, setDetailedMacros] = useState<Record<IngredientId, PortionMacros[]>>({})
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([])
-  const [createdIngredients, setCreatedIngredients] = useState<Ingredient[]>([])
+  const [createdIngredients, setCreatedIngredients] = useState<CustomIngredient[]>([])
 
-  function createCreatedIngredientRowData(ingredient: Ingredient): IngredientRowData {
+  function createCreatedIngredientRowData(ingredient: CustomIngredient): IngredientRowData {
     return {
       dataType: 'createdIngredient',
       brandOwner: ingredient.brandOwner,
@@ -30,22 +29,9 @@ function App() {
     }
   }
 
-  function getFood(id: IngredientId) {
-    if (!(id in detailedMacros)) {
-      getMeasuresForOneFood(id).then(
-          (detailedMacro) => {
-            setDetailedMacros((prevState) => {
-              return {...prevState, [id]: detailedMacro}
-            })
-          }
-      )
-    }
-  }
-
   function addFdcRecipeItem(id: IngredientId, name: string) {
-    return (portionIdx: number, enteredAmount: MathInputState) => {
+    return (fromPortion: PortionMacros, enteredAmount: MathInputState) => {
       return () => {
-        const fromPortion: PortionMacros = detailedMacros[id][portionIdx]
         const recipeItem: RecipeItem = {
           name: name,
           id: id,
@@ -73,7 +59,7 @@ function App() {
   }
 
 
-  function createIngredient(ingredient: Ingredient) {
+  function createIngredient(ingredient: CustomIngredient) {
     setCreatedIngredients((prevState) => [...prevState, ingredient])
     // TODO set detailed macros\
     // handle is open for created ingredients
@@ -84,10 +70,8 @@ function App() {
       {Recipe(recipeItems, changeRecipeItemAmount)}
       {CreateIngredient(createIngredient)}
       {IngredientSearch(
-          detailedMacros,
           addFdcRecipeItem,
-          getFood,
-          createdIngredients.map(createCreatedIngredientRowData)
+          createdIngredients.map(createCreatedIngredientRowData),
       )}
     </div>
   );
