@@ -1,23 +1,23 @@
 import { addDoc, collection, getFirestore, } from 'firebase/firestore';
 import { CustomIngredient, CustomIngredientUnsaved } from "../classes";
 
-let idx = 0
+// let idx = 0
+//
+// export function persistCustomIngredient(ingredient: CustomIngredientUnsaved): CustomIngredient {
+//     const id = idx.toString()
+//     idx += 1
+//     return {
+//         ...ingredient,
+//         id,
+//         dateCreated: new Date()
+//     }
+// }
 
-export function persistCustomIngredient(ingredient: CustomIngredientUnsaved): CustomIngredient {
-    const id = idx.toString()
-    idx += 1
-    return {
-        ...ingredient,
-        id,
-        dateCreated: new Date()
-    }
-}
 
-
-// Saves a new message on the Cloud Firestore.
-async function saveMessage(ingredient: CustomIngredientUnsaved): Promise<CustomIngredient> {
-    // Add a new message entry to the Firebase database.
-    const toSave = {...ingredient, dateCreated: new Date()}
+export async function persistCustomIngredient(ingredient: CustomIngredientUnsaved): Promise<CustomIngredient> {
+    console.log('persistCustomIngredient')
+    // remove undefined values
+    const toSave: CustomIngredientUnsaved = JSON.parse(JSON.stringify(ingredient))
     try {
         const messageRef = await addDoc(
             collection(getFirestore(), 'customIngredients-v1'),
@@ -33,6 +33,8 @@ async function saveMessage(ingredient: CustomIngredientUnsaved): Promise<CustomI
         throw error;
     }
 }
+
+// export async function getCustom
 
 // Loads chat messages history and listens for upcoming ones.
 // function loadMessages() {

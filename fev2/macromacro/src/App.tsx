@@ -50,9 +50,10 @@ function App() {
   }
 
 
-  function createIngredient(ingredient: CustomIngredientUnsaved) {
+  async function createIngredient(ingredient: CustomIngredientUnsaved) {
+    const createdIngredient: CustomIngredient = await persistCustomIngredient(ingredient)
     setCreatedIngredients((prevState) => [
-        ...prevState, persistCustomIngredient(ingredient)
+        ...prevState, createdIngredient
     ])
   }
 

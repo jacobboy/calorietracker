@@ -75,7 +75,6 @@ export function CreateIngredient(createIngredient: (ingredient: CustomIngredient
     }
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        console.log('handling submit')
         setSaving(true)
         createIngredient(convertToCustomIngredientUnsaved(ingredient))
         setIngredient(startIngredient)

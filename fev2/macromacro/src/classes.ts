@@ -95,8 +95,7 @@ export interface CustomIngredient {
     brandOwner?: string,
     brandName?: string,
     portions: Quantity[],
-    dateCreated: Date,
     macros100g: DetailedMacros,
 }
 
-export type CustomIngredientUnsaved = Omit<Omit<CustomIngredient, 'id'>, 'dateCreated'>
+export type CustomIngredientUnsaved = Omit<CustomIngredient, 'id'>
