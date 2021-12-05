@@ -1,4 +1,13 @@
-import { addDoc, collection, getFirestore, } from 'firebase/firestore';
+import {
+    addDoc,
+    collection,
+    getDocs,
+    getFirestore,
+    limit,
+    onSnapshot,
+    orderBy,
+    query
+} from 'firebase/firestore';
 import { CustomIngredient, CustomIngredientUnsaved } from "../classes";
 
 // let idx = 0
@@ -14,13 +23,15 @@ import { CustomIngredient, CustomIngredientUnsaved } from "../classes";
 // }
 
 
+const CUSTOM_INGREDIENTS_COLLECTION_NAME = 'customIngredients-v1';
+
 export async function persistCustomIngredient(ingredient: CustomIngredientUnsaved): Promise<CustomIngredient> {
     console.log('persistCustomIngredient')
     // remove undefined values
     const toSave: CustomIngredientUnsaved = JSON.parse(JSON.stringify(ingredient))
     try {
         const messageRef = await addDoc(
-            collection(getFirestore(), 'customIngredients-v1'),
+            collection(getFirestore(), CUSTOM_INGREDIENTS_COLLECTION_NAME),
             toSave
         );
         return {
@@ -34,23 +45,20 @@ export async function persistCustomIngredient(ingredient: CustomIngredientUnsave
     }
 }
 
-// export async function getCustom
+export async function loadRecentlyCreatedCustomIngredients(): Promise<CustomIngredient[]> {
+    // Create the query to load the last 12 messages and listen for new ones.
+    const recentMessagesQuery = query(
+        collection(getFirestore(), CUSTOM_INGREDIENTS_COLLECTION_NAME),
+        orderBy('timestamp', 'desc'),
+        limit(20)
+    );
 
-// Loads chat messages history and listens for upcoming ones.
-// function loadMessages() {
-//     // Create the query to load the last 12 messages and listen for new ones.
-//     const recentMessagesQuery = query(collection(getFirestore(), 'messages'), orderBy('timestamp', 'desc'), limit(12));
-//
-//     // Start listening to the query.
-//     onSnapshot(recentMessagesQuery, function(snapshot) {
-//         snapshot.docChanges().forEach(function(change) {
-//             if (change.type === 'removed') {
-//                 deleteMessage(change.doc.id);
-//             } else {
-//                 var message = change.doc.data();
-//                 displayMessage(change.doc.id, message.timestamp, message.name,
-//                     message.text, message.profilePicUrl, message.imageUrl);
-//             }
-//         });
-//     });
-// }
+    const querySnapshot = await getDocs(recentMessagesQuery);
+
+    const customIngredients: CustomIngredient[] = []
+    querySnapshot.forEach((doc) => {
+        console.log(doc.data())
+        // customIngredients.push(doc.data())
+    })
+    return []
+}

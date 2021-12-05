@@ -1,6 +1,6 @@
-// Import the functions you need from the SDKs you need
-import { FirebaseApp, initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+// import firebase from 'firebase/app';
+import { initializeApp } from "firebase/app";
+// import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -16,10 +16,14 @@ const firebaseConfig = {
   measurementId: "G-HCMQNGPE9P"
 };
 
-export function initFirebaseApp(): FirebaseApp {
-  const firebaseApp = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(firebaseApp);
-  return firebaseApp
+export function initFirebaseApp(): void {
+  initializeApp(firebaseConfig);
+  // const analytics = getAnalytics(firebaseApp);
+  // if (location.hostname === "localhost") {
+  //   firebase.firestore().useEmulator("localhost", 8080);
+  // }
+  // return firebaseApp
 }
+
 
 

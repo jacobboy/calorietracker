@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import {
   CustomIngredient,
@@ -11,14 +11,16 @@ import { MathInputState } from "./conversions";
 import { Recipe } from "./recipe";
 import { IngredientSearch } from "./ingredientSearch";
 import { CreateIngredient } from "./createIngredient";
-import { persistCustomIngredient } from "./firebaseApi/api";
+import { loadRecentlyCreatedCustomIngredients, persistCustomIngredient } from "./firebaseApi/api";
 import { initFirebaseApp } from "./firebase-config";
 
-const firebaseApp = initFirebaseApp()
+initFirebaseApp()
 
 function App() {
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([])
   const [createdIngredients, setCreatedIngredients] = useState<CustomIngredient[]>([])
+
+  // useEffect(getRecentCustomIngredients, [])
 
   function addFdcRecipeItem(id: IngredientId, name: string) {
     return (fromPortion: PortionMacros, enteredAmount: MathInputState) => {
@@ -49,12 +51,15 @@ function App() {
     }
   }
 
+  function getRecentCustomIngredients() {
+    loadRecentlyCreatedCustomIngredients().then((recentIngredients) => {
+      setCreatedIngredients(recentIngredients)
+    })
+  }
 
-  async function createIngredient(ingredient: CustomIngredientUnsaved) {
-    const createdIngredient: CustomIngredient = await persistCustomIngredient(ingredient)
-    setCreatedIngredients((prevState) => [
-        ...prevState, createdIngredient
-    ])
+
+  function createIngredient(ingredient: CustomIngredientUnsaved) {
+    persistCustomIngredient(ingredient).then(getRecentCustomIngredients)
   }
 
   return (

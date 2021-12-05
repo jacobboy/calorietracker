@@ -34,9 +34,8 @@ test('Can add an ingredient to the recipe', async () => {
     const searchInput = within(searchTable).getByRole('textbox');
     expect(searchInput).toBeInTheDocument();
 
+    // why does wrapping this in act make it do nothing??
     userEvent.type(searchInput, 'bread')
-    expect(searchInput).toHaveValue('bread')
-
     userEvent.type(searchInput, '{enter}')
 
     expect(await screen.findByText(searchResponse.foods![0].brandOwner!)).toBeInTheDocument();
