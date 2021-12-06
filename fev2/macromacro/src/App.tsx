@@ -53,6 +53,10 @@ function App() {
     }
   }
 
+  function removeRecipeItem(idx: number) {
+    setRecipeItems((prevState) => [...prevState.slice(0, idx), ...prevState.slice(idx +1)])
+  }
+
   function getRecentCustomIngredients() {
     loadRecentlyCreatedCustomIngredients().then((recentIngredients) => {
       setCreatedIngredients(recentIngredients)
@@ -68,7 +72,7 @@ function App() {
 
   return (
     <div className="App">
-      {Recipe(recipeItems, changeRecipeItemAmount)}
+      {Recipe(recipeItems, changeRecipeItemAmount, removeRecipeItem)}
       {CreateIngredient(createIngredient)}
       {IngredientSearch(
           addFdcRecipeItem,

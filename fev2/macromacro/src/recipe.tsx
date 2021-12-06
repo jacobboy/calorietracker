@@ -15,7 +15,8 @@ import {
     round,
     scaleUpOrUndefined
 } from "./conversions";
-import { TableFooter } from "@mui/material";
+import { Button, TableFooter, IconButton } from "@mui/material";
+import ClearIcon from '@mui/icons-material/Clear';
 
 function sum(xs: number[]): number {
     const rounded = round(xs.reduce((a, b) => a + b, 0))
@@ -27,7 +28,8 @@ export function RecipeRow(
     recipeItem: RecipeItem,
     macros: DetailedMacros,
     idx: number,
-    changeRecipeItemAmount: (input: string, evaluated: number, isValid: boolean) => void
+    changeRecipeItemAmount: (input: string, evaluated: number, isValid: boolean) => void,
+    removeRecipeItem: () => void
 ) {
 
     return (
@@ -38,7 +40,8 @@ export function RecipeRow(
                     <a target="_blank" rel="noreferrer"
                        href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${recipeItem.id}/nutrients`}>{recipeItem.name}</a>
                 </TableCell>
-                <TableCell align="right">{MathInput(recipeItem.amount.input, recipeItem.amount.isValid, changeRecipeItemAmount)}</TableCell>
+                <TableCell
+                    align="right">{MathInput(recipeItem.amount.input, recipeItem.amount.isValid, changeRecipeItemAmount)}</TableCell>
                 <TableCell align="right">{recipeItem.macros.description}</TableCell>
                 <TableCell align="right">{round(macros.calories)}</TableCell>
                 <TableCell align="right">{round(macros.fat)}</TableCell>
@@ -46,6 +49,11 @@ export function RecipeRow(
                 <TableCell align="right">{round(macros.protein)}</TableCell>
                 <TableCell align="right">{round(macros.totalFiber)}</TableCell>
                 <TableCell align="right">{round(macros.sugar)}</TableCell>
+                <TableCell align="right">
+                    <IconButton color="primary" aria-label="remove recipe item" component="span" onClick={removeRecipeItem}>
+                        <ClearIcon/>
+                    </IconButton>
+                </TableCell>
             </TableRow>
         </React.Fragment>
     );
@@ -53,7 +61,8 @@ export function RecipeRow(
 
 export function Recipe(
     recipeItems: RecipeItem[],
-    changeRecipeItemAmount: (idx: number) => (input: string, evaluated: number, isValid: boolean) => void
+    changeRecipeItemAmount: (idx: number) => (input: string, evaluated: number, isValid: boolean) => void,
+    removeRecipeItem: (idx: number) => void
 ) {
     const [amount, setAmount] = useState<MathInputState>({input: '', evaluated: 0, isValid: true})
     const [unit, setUnit] = useState<Unit>(Unit.g)
@@ -114,6 +123,7 @@ export function Recipe(
                         <TableCell align="right">Protein&nbsp;(g)</TableCell>
                         <TableCell align="right">Total Fiber</TableCell>
                         <TableCell align="right">Sugar</TableCell>
+                        <TableCell align="right">Remove</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -123,7 +133,8 @@ export function Recipe(
                                 recipeItem,
                                 macros[idx],
                                 idx,
-                                changeRecipeItemAmount(idx)
+                                changeRecipeItemAmount(idx),
+                                () => removeRecipeItem(idx)
                             )
                         )
                     }
@@ -131,29 +142,31 @@ export function Recipe(
 
                 {recipeItems.length > 0 &&
                 <TableFooter>
-                    <TableRow>
-                        <TableCell align="left">Total</TableCell>
-                        <TableCell
-                            align="right">{MathInput(amount.input, amount.isValid, handleRecipeAmountChange)}</TableCell>
-                        <TableCell align="right">{`${amount.evaluated} ${unit}`}</TableCell>
-                        <TableCell align="right">{totalMacros.calories}</TableCell>
-                        <TableCell align="right">{totalMacros.fat}</TableCell>
-                        <TableCell align="right">{totalMacros.carbs}</TableCell>
-                        <TableCell align="right">{totalMacros.protein}</TableCell>
-                        <TableCell align="right">{totalMacros.totalFiber}</TableCell>
-                        <TableCell align="right">{totalMacros.sugar}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                        <TableCell align="left">Per 100</TableCell>
-                        <TableCell align="right">100</TableCell>
-                        <TableCell align="right">{`100 ${unit}`}</TableCell>
-                        <TableCell align="right">{per100Macros.calories}</TableCell>
-                        <TableCell align="right">{per100Macros.fat}</TableCell>
-                        <TableCell align="right">{per100Macros.carbs}</TableCell>
-                        <TableCell align="right">{per100Macros.protein}</TableCell>
-                        <TableCell align="right">{per100Macros.totalFiber}</TableCell>
-                        <TableCell align="right">{per100Macros.sugar}</TableCell>
-                    </TableRow>
+                  <TableRow>
+                    <TableCell align="left">Total</TableCell>
+                    <TableCell
+                      align="right">{MathInput(amount.input, amount.isValid, handleRecipeAmountChange)}</TableCell>
+                    <TableCell align="right">{`${amount.evaluated} ${unit}`}</TableCell>
+                    <TableCell align="right">{totalMacros.calories}</TableCell>
+                    <TableCell align="right">{totalMacros.fat}</TableCell>
+                    <TableCell align="right">{totalMacros.carbs}</TableCell>
+                    <TableCell align="right">{totalMacros.protein}</TableCell>
+                    <TableCell align="right">{totalMacros.totalFiber}</TableCell>
+                    <TableCell align="right">{totalMacros.sugar}</TableCell>
+                    <TableCell />
+                  </TableRow>
+                  <TableRow>
+                    <TableCell align="left">Per 100</TableCell>
+                    <TableCell align="right">100</TableCell>
+                    <TableCell align="right">{`100 ${unit}`}</TableCell>
+                    <TableCell align="right">{per100Macros.calories}</TableCell>
+                    <TableCell align="right">{per100Macros.fat}</TableCell>
+                    <TableCell align="right">{per100Macros.carbs}</TableCell>
+                    <TableCell align="right">{per100Macros.protein}</TableCell>
+                    <TableCell align="right">{per100Macros.totalFiber}</TableCell>
+                    <TableCell align="right">{per100Macros.sugar}</TableCell>
+                    <TableCell />
+                  </TableRow>
                 </TableFooter>}
             </Table>
         </TableContainer>

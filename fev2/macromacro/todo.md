@@ -2,7 +2,7 @@
 - like, see what we have.  explore weights and measures.
 - check an egg, chickpeas, ham, etc
 # measures
-# store recipe 
+# store recipe
 ## with date created and total weight and accumulated nutrition
 # handle ingredient portions
 # handle ingredient different units
@@ -14,4 +14,4 @@
 
 
 # current
-# get recent ingredients on load
+# remove from recipe
