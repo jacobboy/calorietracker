@@ -8,10 +8,11 @@ import {
     Timestamp,
     query
 } from 'firebase/firestore';
-import { CustomIngredient, CustomIngredientUnsaved } from "../classes";
+import { CustomIngredient, CustomIngredientUnsaved, Recipe, RecipeUnsaved, Unit } from "../classes";
 
 
 const CUSTOM_INGREDIENTS_COLLECTION_NAME = 'customIngredients-v1';
+const RECIPES_COLLECTION_NAME = 'recipes-v1';
 
 export async function persistCustomIngredient(ingredient: CustomIngredientUnsaved): Promise<CustomIngredient> {
     // remove undefined values
@@ -32,7 +33,7 @@ export async function persistCustomIngredient(ingredient: CustomIngredientUnsave
         }
     }
     catch(error) {
-        console.error('Error writing new message to Firebase Database', error);
+        console.error('Error writing ingredient to Firebase Database', error);
         throw error;
     }
 }
@@ -65,4 +66,43 @@ export async function loadRecentlyCreatedCustomIngredients(): Promise<CustomIngr
         )
     })
     return customIngredients
+}
+
+function recipeUnsavedToRecipe(recipe: RecipeUnsaved): Omit<Omit<Recipe, 'id'>, 'timestamp'> {
+    return {
+        ...recipe,
+        ingredients: recipe.ingredients.map((i) => {
+            return {
+                ...i,
+                amount: i.amount.evaluated
+            }
+        }),
+        amount: recipe.amount.evaluated,
+        name: recipe.name.value
+    }
+}
+
+export async function persistRecipe(recipe: RecipeUnsaved): Promise<Recipe> {
+    // remove undefined values
+    const toSave = {
+        ...JSON.parse(JSON.stringify(recipeUnsavedToRecipe(recipe))),
+        timestamp: Timestamp.fromDate(new Date()),
+        version: 'v1'
+    }
+
+    try {
+        const messageRef = await addDoc(
+            collection(getFirestore(), RECIPES_COLLECTION_NAME),
+            toSave
+        );
+        return {
+            ...toSave,
+            id: messageRef.id
+        }
+    }
+    catch(error) {
+        console.error('Error writing recipe to Firebase Database', error);
+        throw error;
+    }
+
 }

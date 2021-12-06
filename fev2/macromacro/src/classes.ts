@@ -1,6 +1,11 @@
 import { MathInputState } from "./conversions";
 import { Timestamp } from "firebase/firestore";
 
+export interface TextInputState {
+    value: string,
+    isValid: boolean
+}
+
 export enum Unit {
     g = 'g',
     ml = 'ml',
@@ -38,20 +43,6 @@ export interface DetailedMacros extends SimpleMacros {
 }
 
 /*
-I think this is the minimum needed for sharing between ingredients
-and recipe
-*/
-export interface PortionAmountReference {
-    ingredientReference: {
-        dataProvenance: Source,
-        id: IngredientId
-    },
-    portionReference: PortionSource,
-    portion: PortionSource,
-    amount: number
-}
-
-/*
 the unit on the portion macro needs to be compatible with the unit
 on the detailed macros
 */
@@ -75,21 +66,6 @@ export interface IngredientRowData extends SimpleMacros {
     householdServingFullText?: string
 }
 
-export interface RecipeItem {
-    name: string,
-    id: IngredientId,
-    macros: PortionMacros,
-    amount: MathInputState
-}
-
-export interface Recipe {
-    date: Date,
-    uuid: string,
-    ingredients: RecipeItem[],
-    amount: MathInputState,
-    unit: Unit
-}
-
 export interface CustomIngredient {
     name: string,
     id: string,
@@ -101,3 +77,34 @@ export interface CustomIngredient {
 }
 
 export type CustomIngredientUnsaved = Omit<Omit<CustomIngredient, 'id'>, 'timestamp'>
+
+export interface RecipeItemUnsaved {
+    name: string,
+    id: IngredientId,
+    macros: PortionMacros,
+    amount: MathInputState
+}
+
+export interface RecipeUnsaved {
+    ingredients: RecipeItemUnsaved[],
+    amount: MathInputState,
+    unit: Unit,
+    name: TextInputState,
+    isValid: boolean
+}
+
+export interface RecipeItem {
+    name: string,
+    id: IngredientId,
+    macros: PortionMacros,
+    amount: number
+ }
+
+export interface Recipe {
+    timestamp: Timestamp,
+    id: string,
+    ingredients: RecipeItem[],
+    amount: number,
+    unit: Unit,
+    name: string
+}
