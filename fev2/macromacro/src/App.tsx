@@ -20,7 +20,9 @@ function App() {
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([])
   const [createdIngredients, setCreatedIngredients] = useState<CustomIngredient[]>([])
 
-  // useEffect(getRecentCustomIngredients, [])
+  useEffect(() => {
+    getRecentCustomIngredients()
+  }, [])
 
   function addFdcRecipeItem(id: IngredientId, name: string) {
     return (fromPortion: PortionMacros, enteredAmount: MathInputState) => {
@@ -59,7 +61,9 @@ function App() {
 
 
   function createIngredient(ingredient: CustomIngredientUnsaved) {
-    persistCustomIngredient(ingredient).then(getRecentCustomIngredients)
+    persistCustomIngredient(ingredient).then((ingredient) => {
+      setCreatedIngredients((prevState) => [ingredient, ...prevState])
+    })
   }
 
   return (

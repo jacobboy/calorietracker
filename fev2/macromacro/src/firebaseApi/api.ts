@@ -4,31 +4,23 @@ import {
     getDocs,
     getFirestore,
     limit,
-    onSnapshot,
     orderBy,
+    Timestamp,
     query
 } from 'firebase/firestore';
 import { CustomIngredient, CustomIngredientUnsaved } from "../classes";
-
-// let idx = 0
-//
-// export function persistCustomIngredient(ingredient: CustomIngredientUnsaved): CustomIngredient {
-//     const id = idx.toString()
-//     idx += 1
-//     return {
-//         ...ingredient,
-//         id,
-//         dateCreated: new Date()
-//     }
-// }
 
 
 const CUSTOM_INGREDIENTS_COLLECTION_NAME = 'customIngredients-v1';
 
 export async function persistCustomIngredient(ingredient: CustomIngredientUnsaved): Promise<CustomIngredient> {
-    console.log('persistCustomIngredient')
     // remove undefined values
-    const toSave: CustomIngredientUnsaved = JSON.parse(JSON.stringify(ingredient))
+    const toSave = {
+        ...JSON.parse(JSON.stringify(ingredient)),
+        timestamp: Timestamp.fromDate(new Date()),
+        // timestamp: serverTimeStamp(),
+        version: 'v1'
+    }
     try {
         const messageRef = await addDoc(
             collection(getFirestore(), CUSTOM_INGREDIENTS_COLLECTION_NAME),
@@ -46,10 +38,10 @@ export async function persistCustomIngredient(ingredient: CustomIngredientUnsave
 }
 
 export async function loadRecentlyCreatedCustomIngredients(): Promise<CustomIngredient[]> {
-    // Create the query to load the last 12 messages and listen for new ones.
+
     const recentMessagesQuery = query(
         collection(getFirestore(), CUSTOM_INGREDIENTS_COLLECTION_NAME),
-        orderBy('timestamp', 'desc'),
+        orderBy('timestamp', 'asc'),
         limit(20)
     );
 
@@ -57,8 +49,20 @@ export async function loadRecentlyCreatedCustomIngredients(): Promise<CustomIngr
 
     const customIngredients: CustomIngredient[] = []
     querySnapshot.forEach((doc) => {
-        console.log(doc.data())
-        // customIngredients.push(doc.data())
+        const data = doc.data()
+        customIngredients.push(
+            {
+                id: doc.id,
+                macros100g: data.macros100g,
+                name: data.name,
+                portions: data.portions,
+                brandOwner: data.brandOwner,
+                brandName: data.brandName,
+                timestamp: Timestamp.fromMillis(
+                    data.timestamp.seconds * 1000 + data.timestamp.nanoseconds * 1000000
+                )
+            }
+        )
     })
-    return []
+    return customIngredients
 }

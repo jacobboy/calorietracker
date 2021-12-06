@@ -1,4 +1,5 @@
 import { MathInputState } from "./conversions";
+import { Timestamp } from "firebase/firestore";
 
 export enum Unit {
     g = 'g',
@@ -96,6 +97,7 @@ export interface CustomIngredient {
     brandName?: string,
     portions: Quantity[],
     macros100g: DetailedMacros,
+    timestamp: Timestamp
 }
 
-export type CustomIngredientUnsaved = Omit<CustomIngredient, 'id'>
+export type CustomIngredientUnsaved = Omit<Omit<CustomIngredient, 'id'>, 'timestamp'>

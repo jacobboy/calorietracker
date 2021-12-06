@@ -1,5 +1,5 @@
-// import firebase from 'firebase/app';
 import { initializeApp } from "firebase/app";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 // import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -19,11 +19,9 @@ const firebaseConfig = {
 export function initFirebaseApp(): void {
   initializeApp(firebaseConfig);
   // const analytics = getAnalytics(firebaseApp);
-  // if (location.hostname === "localhost") {
-  //   firebase.firestore().useEmulator("localhost", 8080);
-  // }
-  // return firebaseApp
+
+  if (process.env.NODE_ENV === 'test') {
+    const db = getFirestore();
+    connectFirestoreEmulator(db, 'localhost', 8080);
+  }
 }
-
-
-

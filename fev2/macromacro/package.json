@@ -30,7 +30,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "firebase emulators:exec \"react-scripts test --env=./custom-jest-environment.js\"",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
