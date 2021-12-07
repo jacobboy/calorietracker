@@ -21,24 +21,24 @@ export function scaleUpOrUndefined(scale: number, x?: number): number | undefine
 TODO this should take the incoming unit and raise an error if it can't be converted
      also, base macros may not be grams
 */
-export function multiply100gMacro(
-    macros100g: DetailedMacros,
+export function multiplyBaseMacro(
+    baseMacros: DetailedMacros,
     description: string,
     amount: number,
     source: PortionSource
-): Omit<PortionMacros, 'dataProvenance'> {
-    const scalePerGram = amount / macros100g.amount
+): PortionMacros {
+    const scalePerGram = amount / baseMacros.amount
     return {
-        calories: scaleUpOrUndefined(scalePerGram, macros100g.calories),
-        carbs: scaleUpOrUndefined(scalePerGram, macros100g.carbs),
-        protein: scaleUpOrUndefined(scalePerGram, macros100g.protein),
-        fat: scaleUpOrUndefined(scalePerGram, macros100g.fat),
-        totalFiber: scaleUpOrUndefined(scalePerGram, macros100g.totalFiber),
-        sugar: scaleUpOrUndefined(scalePerGram, macros100g.sugar),
+        calories: scaleUpOrUndefined(scalePerGram, baseMacros.calories),
+        carbs: scaleUpOrUndefined(scalePerGram, baseMacros.carbs),
+        protein: scaleUpOrUndefined(scalePerGram, baseMacros.protein),
+        fat: scaleUpOrUndefined(scalePerGram, baseMacros.fat),
+        totalFiber: scaleUpOrUndefined(scalePerGram, baseMacros.totalFiber),
+        sugar: scaleUpOrUndefined(scalePerGram, baseMacros.sugar),
         amount: amount,
-        unit: macros100g.unit,
+        unit: baseMacros.unit,
         description: description,
-        baseMacros: macros100g,
+        baseMacros: baseMacros,
         portionSource: source
     }
 }
@@ -46,7 +46,7 @@ export function multiply100gMacro(
 export function getPortionMacrosForMeasures(
     foodItem: BrandedFoodItem | FoundationFoodItem | SRLegacyFoodItem | SurveyFoodItem
 ): PortionMacros[] {
-    const macros100g: DetailedMacros = {
+    const baseMacros: DetailedMacros = {
         amount: 100,
         unit: Unit.g,
         description: '100 g',
@@ -56,7 +56,7 @@ export function getPortionMacrosForMeasures(
         (Object.entries(macrosMap) as [keyof typeof macrosMap, string][]).forEach(
             ([field, nutrientNumber]) => {
                 if (nutrient.nutrient?.number === nutrientNumber) {
-                    macros100g[field] = nutrient.amount
+                    baseMacros[field] = nutrient.amount
                 }
             }
         )
@@ -77,7 +77,7 @@ export function getPortionMacrosForMeasures(
             const gramWeight = foodPortion.gramWeight || 0
 
             const portionMacro: PortionMacros = {
-                ...multiply100gMacro(macros100g, description, gramWeight, {source: 'portion', id: foodPortion.id})
+                ...multiplyBaseMacro(baseMacros, description, gramWeight, {source: 'portion', id: foodPortion.id})
             }
 
             portions.push(portionMacro)
@@ -97,12 +97,12 @@ export function getPortionMacrosForMeasures(
                 unit: Unit[((foodItem.servingSizeUnit || 'g') as keyof typeof Unit)],
                 description: foodItem.householdServingFullText || `${foodItem.servingSize || 'not set'} ${foodItem.servingSizeUnit || 'not set'}`,
                 portionSource: {source: 'labelNutrients'},
-                baseMacros: macros100g
+                baseMacros: baseMacros
             }
         )
     }
 
-    return [{...macros100g, baseMacros: macros100g, portionSource: {source: '100g'}}, ...portions];
+    return [{...baseMacros, baseMacros: baseMacros, portionSource: {source: '100g'}}, ...portions];
 }
 
 export function getMacros(foodNutrients: AbridgedFoodNutrient[]): SimpleMacros {

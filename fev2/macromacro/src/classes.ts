@@ -80,13 +80,13 @@ export interface IngredientRowData extends SimpleMacros {
 }
 
 export interface CustomIngredient {
-    name: string,
+    timestamp: Timestamp
     id: string,
+    name: string,
+    baseMacros: DetailedMacros,
+    portions: Quantity[],
     brandOwner?: string,
     brandName?: string,
-    portions: Quantity[],
-    macros100g: DetailedMacros,
-    timestamp: Timestamp
 }
 
 export type CustomIngredientUnsaved = Omit<Omit<CustomIngredient, 'id'>, 'timestamp'>
@@ -116,8 +116,10 @@ export interface RecipeItem {
 export interface Recipe {
     timestamp: Timestamp,
     id: string,
+    name: string
     ingredients: RecipeItem[],
     amount: number,
     unit: Unit,
-    name: string
+    // baseMacros: DetailedMacros,
+    // portions: Quantity[],
 }

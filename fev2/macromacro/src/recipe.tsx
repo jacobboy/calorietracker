@@ -11,7 +11,7 @@ import { DetailedMacros, RecipeItemUnsaved, RecipeUnsaved } from "./classes";
 import {
     MathInput,
     MathInputState,
-    multiply100gMacro,
+    multiplyBaseMacro,
     round,
     scaleUpOrUndefined
 } from "./conversions";
@@ -71,7 +71,7 @@ export function Recipe(
 ) {
     const [amount, setAmount] = useState<MathInputState>({input: '', evaluated: 0, isValid: true})
 
-    const macros: DetailedMacros[] = recipe.ingredients.map((recipeItem) => multiply100gMacro(
+    const macros: DetailedMacros[] = recipe.ingredients.map((recipeItem) => multiplyBaseMacro(
         recipeItem.macros.baseMacros,
         recipeItem.macros.description,
         recipeItem.amount.evaluated * recipeItem.macros.amount,

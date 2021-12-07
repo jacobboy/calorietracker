@@ -70,7 +70,7 @@ export function CreateIngredient(createIngredient: (ingredient: CustomIngredient
             brandOwner: ingredient.brandOwner,
             brandName: ingredient.brandName,
             portions: ingredient.portions,
-            macros100g: ingredient.macros
+            baseMacros: ingredient.macros
         }
     }
 

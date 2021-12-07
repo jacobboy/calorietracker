@@ -54,7 +54,7 @@ export async function loadRecentlyCreatedCustomIngredients(): Promise<CustomIngr
         customIngredients.push(
             {
                 id: doc.id,
-                macros100g: data.macros100g,
+                baseMacros: data.baseMacros,
                 name: data.name,
                 portions: data.portions,
                 brandOwner: data.brandOwner,

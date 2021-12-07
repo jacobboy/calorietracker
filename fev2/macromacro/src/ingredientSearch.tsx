@@ -13,7 +13,7 @@ import {
 } from "./classes";
 import { IngredientsTable } from "./ingredientsTable";
 import { getApiClient, getMeasuresForOneFood } from "./calls";
-import { getMacros, MathInputState, multiply100gMacro } from "./conversions";
+import { getMacros, MathInputState, multiplyBaseMacro } from "./conversions";
 
 const ariaLabel = {'aria-label': 'description'};
 
@@ -76,7 +76,7 @@ export function IngredientSearch(
                 name: ingredient.name,
                 dataSource: 'createIngredient'
             },
-            ...ingredient.macros100g,
+            ...ingredient.baseMacros,
             // householdServingFullText: ingredient.householdServingFullText
         }
     }
@@ -119,8 +119,8 @@ export function IngredientSearch(
                     (portion, idx) => {
                         return {
                             dataProvenance: 'createIngredient',
-                            ...multiply100gMacro(
-                                ingredient.macros100g,
+                            ...multiplyBaseMacro(
+                                ingredient.baseMacros,
                                 portion.description,
                                 portion.amount,
                                 {source: 'portion', id: idx}
