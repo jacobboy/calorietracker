@@ -77,7 +77,6 @@ export function getPortionMacrosForMeasures(
             const gramWeight = foodPortion.gramWeight || 0
 
             const portionMacro: PortionMacros = {
-                dataProvenance: 'fdcApi',
                 ...multiply100gMacro(macros100g, description, gramWeight, {source: 'portion', id: foodPortion.id})
             }
 
@@ -98,13 +97,12 @@ export function getPortionMacrosForMeasures(
                 unit: Unit[((foodItem.servingSizeUnit || 'g') as keyof typeof Unit)],
                 description: foodItem.householdServingFullText || `${foodItem.servingSize || 'not set'} ${foodItem.servingSizeUnit || 'not set'}`,
                 portionSource: {source: 'labelNutrients'},
-                baseMacros: macros100g,
-                dataProvenance: "fdcApi"
+                baseMacros: macros100g
             }
         )
     }
 
-    return [{...macros100g, baseMacros: macros100g, portionSource: {source: '100g'}, dataProvenance: "fdcApi"}, ...portions];
+    return [{...macros100g, baseMacros: macros100g, portionSource: {source: '100g'}}, ...portions];
 }
 
 export function getMacros(foodNutrients: AbridgedFoodNutrient[]): SimpleMacros {

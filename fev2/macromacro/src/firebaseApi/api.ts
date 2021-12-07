@@ -5,10 +5,10 @@ import {
     getFirestore,
     limit,
     orderBy,
-    Timestamp,
-    query
+    query,
+    Timestamp
 } from 'firebase/firestore';
-import { CustomIngredient, CustomIngredientUnsaved, Recipe, RecipeUnsaved, Unit } from "../classes";
+import { CustomIngredient, CustomIngredientUnsaved, Recipe, RecipeUnsaved } from "../classes";
 
 
 const CUSTOM_INGREDIENTS_COLLECTION_NAME = 'customIngredients-v1';

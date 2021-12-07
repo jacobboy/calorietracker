@@ -20,7 +20,19 @@ export type PortionSource = { source: 'portion', id?: number } |
     { source: 'labelNutrients' } |
     { source: 'g' } | { source: 'ml' }  // for created ingredients
 
-export type Source = 'fdcApi' | 'createIngredient' | 'createRecipe'
+export type IngredientSource = {
+    dataSource: 'fdcApi',
+    name: string,
+    id: number
+} | {
+    dataSource: 'createIngredient',
+    name: string,
+    id: string
+} | {
+    dataSource: 'createRecipe',
+    name: string,
+    id: string
+}
 
 export interface Quantity {
     unit: Unit,
@@ -43,11 +55,13 @@ export interface DetailedMacros extends SimpleMacros {
 }
 
 /*
+An amount of a given portion, its description and calculated macros, and a
+reference to the base macros
+
 the unit on the portion macro needs to be compatible with the unit
 on the detailed macros
 */
 export interface PortionMacros extends DetailedMacros {
-    dataProvenance: Source,
     portionSource: PortionSource,
     baseMacros: DetailedMacros
 }
@@ -61,8 +75,7 @@ export interface IngredientRowData extends SimpleMacros {
     dataType?: string,
     brandOwner?: string,
     brandName?: string,
-    id: IngredientId,
-    name: string,
+    source: IngredientSource,
     householdServingFullText?: string
 }
 
@@ -79,8 +92,7 @@ export interface CustomIngredient {
 export type CustomIngredientUnsaved = Omit<Omit<CustomIngredient, 'id'>, 'timestamp'>
 
 export interface RecipeItemUnsaved {
-    name: string,
-    id: IngredientId,
+    source: IngredientSource,
     macros: PortionMacros,
     amount: MathInputState
 }
@@ -94,12 +106,13 @@ export interface RecipeUnsaved {
 }
 
 export interface RecipeItem {
-    name: string,
-    id: IngredientId,
+    source: IngredientSource,
     macros: PortionMacros,
     amount: number
  }
 
+
+// TODO have calculated macros here?
 export interface Recipe {
     timestamp: Timestamp,
     id: string,

@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
-import { PortionMacros, IngredientRowData, IngredientId } from "./classes";
+import { PortionMacros, IngredientRowData, IngredientId, IngredientSource } from "./classes";
 import { MathInput, MathInputState, round } from "./conversions";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -30,7 +30,7 @@ function PortionTableRow(
     }
 
     return (
-        <TableRow key={`${row.id}-${idx}-details`}>
+        <TableRow key={`${row.source.id}-${idx}-details`}>
             {/*// TODO what is this component and scope*/}
             <TableCell component="th" scope="row">
                 <form onSubmit={e => handleSubmit(e)}>
@@ -62,8 +62,8 @@ function Row(
 
     const thinking = open && macros.length === 0
     return (
-        <React.Fragment key={`${row.id}-frag`}>
-            <TableRow sx={{'& > *': {borderBottom: 'unset'}}} key={`${row.id}-simple`}>
+        <React.Fragment key={`${row.source.id}-frag`}>
+            <TableRow sx={{'& > *': {borderBottom: 'unset'}}} key={`${row.source.id}-simple`}>
                 <TableCell>
                     <IconButton
                         aria-label="expand row"
@@ -75,7 +75,8 @@ function Row(
                 </TableCell>
                 <TableCell component="th" scope="row">
                     <a target="_blank" rel="noreferrer"
-                       href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${row.id}/nutrients`}>{row.name}</a>
+                       // TODO this is wrong for ingredients and recipes.  Add url to source?
+                       href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${row.source.id}/nutrients`}>{row.source.name}</a>
                 </TableCell>
                 <TableCell align="right">{row.dataType}</TableCell>
                 <TableCell align="right">{row.brandOwner}</TableCell>
@@ -86,7 +87,7 @@ function Row(
                 <TableCell align="right">{round(row.carbs)}</TableCell>
                 <TableCell align="right">{round(row.protein)}</TableCell>
             </TableRow>
-            <TableRow key={`${row.id}-something`}>
+            <TableRow key={`${row.source.id}-something`}>
                 <TableCell style={{paddingBottom: 0, paddingTop: 0}} colSpan={6}>
                     <Collapse in={open} timeout="auto" unmountOnExit={false}>
                         <Box sx={{margin: 1}}>
@@ -95,7 +96,7 @@ function Row(
                             {/*</Typography>*/}
                             <Table size="small" aria-label="food details">
                                 <TableHead>
-                                    <TableRow key={`${row.id}-details-header`}>
+                                    <TableRow key={`${row.source.id}-details-header`}>
                                         <TableCell align="left">Add amount to recipe</TableCell>
                                         <TableCell align="right">Description</TableCell>
                                         <TableCell align="right">Amount</TableCell>
@@ -151,7 +152,7 @@ export function IngredientsTable(
     rowsOpen: Record<string, boolean>,
     toggleOpen: (id: IngredientId) => void, enteredAmounts: Record<IngredientId, Record<number, MathInputState>>,
     changePortionAmount: (id: IngredientId) => (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void,
-    addRecipeItem: (id: IngredientId, name: string) => (fromPortion: PortionMacros, amount: MathInputState) => () => void
+    addRecipeItem: (source: IngredientSource) => (fromPortion: PortionMacros, amount: MathInputState) => () => void
 ) {
     return <div>
         <header>{name}</header>
@@ -175,12 +176,12 @@ export function IngredientsTable(
                     searchData.map(
                         (row) => Row(
                             row,
-                            detailedMacros[row.id] || [],
-                            rowsOpen[row.id],
-                            () => toggleOpen(row.id),
-                            enteredAmounts[row.id] || {},
-                            changePortionAmount(row.id),
-                            addRecipeItem(row.id, row.name)
+                            detailedMacros[row.source.id] || [],
+                            rowsOpen[row.source.id],
+                            () => toggleOpen(row.source.id),
+                            enteredAmounts[row.source.id] || {},
+                            changePortionAmount(row.source.id),
+                            addRecipeItem(row.source)
                         )
                     )
                 }

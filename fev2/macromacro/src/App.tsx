@@ -3,7 +3,7 @@ import './App.css';
 import {
   CustomIngredient,
   CustomIngredientUnsaved,
-  IngredientId,
+  IngredientSource,
   PortionMacros,
   RecipeItemUnsaved,
   RecipeUnsaved,
@@ -38,12 +38,11 @@ function App() {
     getRecentCustomIngredients()
   }, [])
 
-  function addFdcRecipeItem(id: IngredientId, name: string) {
+  function addRecipeItem(source: IngredientSource) {
     return (fromPortion: PortionMacros, enteredAmount: MathInputState) => {
       return () => {
         const recipeItem: RecipeItemUnsaved = {
-          name: name,
-          id: id,
+          source,
           macros: fromPortion,
           amount: enteredAmount,
         }
@@ -64,9 +63,7 @@ function App() {
         setRecipe((prevState) => {
           const oldItem = prevState.ingredients[idx]
           const newItem: RecipeItemUnsaved = {
-            name: oldItem.name,
-            id: oldItem.id,
-            macros: oldItem.macros,
+            ...oldItem,
             amount: {input, evaluated, isValid},
           }
           return {
@@ -159,7 +156,7 @@ function App() {
       )}
       {CreateIngredient(createIngredient)}
       {IngredientSearch(
-          addFdcRecipeItem,
+          addRecipeItem,
           createdIngredients
       )}
     </div>

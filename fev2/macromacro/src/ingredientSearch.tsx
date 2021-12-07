@@ -4,7 +4,13 @@ import Input from '@mui/material/Input';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 import { SearchResultFood } from "./usda";
-import { CustomIngredient, IngredientId, IngredientRowData, PortionMacros } from "./classes";
+import {
+    CustomIngredient,
+    IngredientId,
+    IngredientRowData,
+    IngredientSource,
+    PortionMacros
+} from "./classes";
 import { IngredientsTable } from "./ingredientsTable";
 import { getApiClient, getMeasuresForOneFood } from "./calls";
 import { getMacros, MathInputState, multiply100gMacro } from "./conversions";
@@ -12,7 +18,7 @@ import { getMacros, MathInputState, multiply100gMacro } from "./conversions";
 const ariaLabel = {'aria-label': 'description'};
 
 export function IngredientSearch(
-    addRecipeItem: (id: IngredientId, name: string) => (fromPortion: PortionMacros, amount: MathInputState) => () => void,
+    addRecipeItem: (source: IngredientSource) => (fromPortion: PortionMacros, amount: MathInputState) => () => void,
     createdIngredients: CustomIngredient[]
 ) {
     const [searchText, setSearchText] = useState('');
@@ -50,10 +56,28 @@ export function IngredientSearch(
             dataType: searchResult.dataType,
             brandOwner: searchResult.brandOwner,
             brandName: searchResult.brandName,
-            id: searchResult.fdcId,
-            name: searchResult.description,
+            source: {
+                id: searchResult.fdcId,
+                name: searchResult.description,
+                dataSource: 'fdcApi'
+            },
             ...getMacros(searchResult.foodNutrients || []),
             // householdServingFullText: searchResult.householdServingFullText
+        }
+    }
+
+    function createCreatedIngredientRowData(ingredient: CustomIngredient): IngredientRowData {
+        return {
+            dataType: 'createdIngredient',
+            brandOwner: ingredient.brandOwner,
+            brandName: ingredient.brandName,
+            source: {
+                id: ingredient.id,
+                name: ingredient.name,
+                dataSource: 'createIngredient'
+            },
+            ...ingredient.macros100g,
+            // householdServingFullText: ingredient.householdServingFullText
         }
     }
 
@@ -85,18 +109,6 @@ export function IngredientSearch(
                     }
                 )
             }
-        }
-    }
-
-    function createCreatedIngredientRowData(ingredient: CustomIngredient): IngredientRowData {
-        return {
-            dataType: 'createdIngredient',
-            brandOwner: ingredient.brandOwner,
-            brandName: ingredient.brandName,
-            id: ingredient.id,
-            name: ingredient.name,
-            ...ingredient.macros100g,
-            // householdServingFullText: ingredient.householdServingFullText
         }
     }
 

@@ -34,12 +34,12 @@ export function RecipeRow(
 ) {
 
     return (
-        <React.Fragment key={`${recipeItem.id}-${idx}-recipe-frag`}>
+        <React.Fragment key={`${recipeItem.source.id}-${idx}-recipe-frag`}>
             <TableRow sx={{'& > *': {borderBottom: 'unset'}}}
-                      key={`${recipeItem.id}-${idx}-recipeitem`}>
+                      key={`${recipeItem.source.id}-${idx}-recipeitem`}>
                 <TableCell component="th" scope="row">
                     <a target="_blank" rel="noreferrer"
-                       href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${recipeItem.id}/nutrients`}>{recipeItem.name}</a>
+                       href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${recipeItem.source.id}/nutrients`}>{recipeItem.source.name}</a>
                 </TableCell>
                 <TableCell
                     align="right">{MathInput(recipeItem.amount.input, recipeItem.amount.isValid, changeRecipeItemAmount)}</TableCell>
@@ -178,7 +178,7 @@ export function Recipe(
                     onChange={(e) => setName(e.target.value)}
                     type='text'
                     helperText='Recipe Name'
-                    value={recipe.name}
+                    value={recipe.name.value}
                 />
                 <LoadingButton type='submit' loading={saving} loadingIndicator="Saving..." variant="outlined">
                     Save
