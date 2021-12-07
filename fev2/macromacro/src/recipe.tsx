@@ -17,7 +17,7 @@ import {
 } from "./conversions";
 import { TableFooter, IconButton, TextField } from "@mui/material";
 import ClearIcon from '@mui/icons-material/Clear';
-import LoadingButton from '@mui/lab/LoadingButton/LoadingButton';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 function sum(xs: number[]): number {
     const rounded = round(xs.reduce((a, b) => a + b, 0))
