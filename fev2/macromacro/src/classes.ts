@@ -62,7 +62,7 @@ export interface DetailedMacros extends SimpleMacros {
 }
 
 /*
-An amount of a given portion, its description and calculated macros, and a
+A portion containing amount and unit, its description and calculated macros, and a
 reference to the base macros
 
 the unit on the portion macro needs to be compatible with the unit
@@ -115,8 +115,6 @@ export interface RecipeItem {
     amount: number
  }
 
-
-// TODO have calculated macros here?
 export interface Recipe extends Saved {
     ingredients: RecipeItem[],
     amount: number,
