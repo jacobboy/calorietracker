@@ -27,8 +27,8 @@ beforeAll(() => {
 );
 
 
-test('Can add an ingredient to the recipe', async () => {
-    render(<App/>);
+test('Can add an ingredient to the recipe and save it', async () => {
+    const { debug } = render(<App/>);
 
     const searchTable = screen.getByText('Search').closest('div')!
     const searchInput = within(searchTable).getByRole('textbox');
@@ -51,6 +51,7 @@ test('Can add an ingredient to the recipe', async () => {
 
     const firstPortionInput = (await within(entryTable).findAllByRole('textbox'))[0]
     userEvent.type(firstPortionInput, '0.5')
+
     userEvent.type(firstPortionInput, '{enter}')
 
     // const recipesTable = screen.getAllByLabelText('simple table')[0]
@@ -60,4 +61,19 @@ test('Can add an ingredient to the recipe', async () => {
 
     const breadRow = breadCell.closest('tr')!
     expect(within(breadRow).getByText('131.5')).toBeInTheDocument()
+
+    const recipeNameInput = within(screen.getByText('Recipe Name').parentElement!).getByRole('textbox')
+
+    userEvent.type(recipeNameInput, 'Test Ingredient')
+    act(() => {
+        userEvent.click(within(recipesTable).getByText('Save'))
+    })
+
+    const customIngredientsHeader = screen.getByText('Custom Ingredients');
+    expect(customIngredientsHeader).toBeInTheDocument()
+    const createdIngredientsTable = customIngredientsHeader.closest('table')!
+    expect(createdIngredientsTable).toBeInTheDocument()
+    const createdRecipeRow = (await within(createdIngredientsTable).findByText('Test Ingredient')).closest('tr')
+
+    expect(createdRecipeRow).toBeInTheDocument()
 });

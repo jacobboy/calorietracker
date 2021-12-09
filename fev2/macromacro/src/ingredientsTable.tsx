@@ -12,7 +12,7 @@ import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, TableContainer } from "@mui/material";
 
 function PortionTableRow(
     row: IngredientRowData,
@@ -155,38 +155,39 @@ export function IngredientsTable(
     addRecipeItem: (source: IngredientSource) => (fromPortion: PortionMacros, amount: MathInputState) => () => void
 ) {
     return <div>
-        <header>{name}</header>
-        <Table sx={{minWidth: 650}} aria-label="simple table">
-            <TableHead>
-                <TableRow key='header'>
-                    <TableCell/>
-                    <TableCell>Food</TableCell>
-                    <TableCell align="right">Data Type</TableCell>
-                    <TableCell align="right">Brand Owner</TableCell>
-                    <TableCell align="right">Brand Name</TableCell>
-                    <TableCell align="right">Amount</TableCell>
-                    <TableCell align="right">Calories</TableCell>
-                    <TableCell align="right">Fat&nbsp;(g)</TableCell>
-                    <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-                    <TableCell align="right">Protein&nbsp;(g)</TableCell>
-                </TableRow>
-            </TableHead>
-            <TableBody>
-                {
-                    searchData.map(
-                        (row) => Row(
-                            row,
-                            detailedMacros[row.source.id] || [],
-                            rowsOpen[row.source.id],
-                            () => toggleOpen(row.source.id),
-                            enteredAmounts[row.source.id] || {},
-                            changePortionAmount(row.source.id),
-                            addRecipeItem(row.source)
+        <TableContainer>
+            <Table sx={{minWidth: 650}} aria-label={`${name.toLocaleLowerCase()} table`}>
+                <caption>{name}</caption>
+                <TableHead>
+                    <TableRow key='header'>
+                        <TableCell/>
+                        <TableCell>Food</TableCell>
+                        <TableCell align="right">Data Type</TableCell>
+                        <TableCell align="right">Brand Owner</TableCell>
+                        <TableCell align="right">Brand Name</TableCell>
+                        <TableCell align="right">Amount</TableCell>
+                        <TableCell align="right">Calories</TableCell>
+                        <TableCell align="right">Fat&nbsp;(g)</TableCell>
+                        <TableCell align="right">Carbs&nbsp;(g)</TableCell>
+                        <TableCell align="right">Protein&nbsp;(g)</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {
+                        searchData.map(
+                            (row) => Row(
+                                row,
+                                detailedMacros[row.source.id] || [],
+                                rowsOpen[row.source.id],
+                                () => toggleOpen(row.source.id),
+                                enteredAmounts[row.source.id] || {},
+                                changePortionAmount(row.source.id),
+                                addRecipeItem(row.source)
+                            )
                         )
-                    )
-                }
-            </TableBody>
-        </Table>
-
+                    }
+                </TableBody>
+            </Table>
+        </TableContainer>
     </div>;
 }

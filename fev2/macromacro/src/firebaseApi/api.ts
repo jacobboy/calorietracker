@@ -8,18 +8,28 @@ import {
     query,
     Timestamp
 } from 'firebase/firestore';
-import { CustomIngredient, CustomIngredientUnsaved, Recipe, RecipeUnsaved } from "../classes";
+import {
+    CustomIngredient,
+    CustomIngredientUnsaved,
+    RecipeAndIngredient,
+    RecipeUnsaved
+} from "../classes";
+import { per100MacrosForRecipe, totalMacrosForRecipe } from "../conversions";
 
 
 const CUSTOM_INGREDIENTS_COLLECTION_NAME = 'customIngredients-v1';
 const RECIPES_COLLECTION_NAME = 'recipes-v1';
 
+type SavePrep<T> = Omit<T, 'id'>
+
+function stripUndefined<T>(t: T): T {
+    return JSON.parse(JSON.stringify(t)) as T
+}
+
 export async function persistCustomIngredient(ingredient: CustomIngredientUnsaved): Promise<CustomIngredient> {
-    // remove undefined values
-    const toSave = {
-        ...JSON.parse(JSON.stringify(ingredient)),
+    const toSave: SavePrep<CustomIngredient> = {
+        ...stripUndefined(ingredient),
         timestamp: Timestamp.fromDate(new Date()),
-        // timestamp: serverTimeStamp(),
         version: 'v1'
     }
     try {
@@ -60,34 +70,43 @@ export async function loadRecentlyCreatedCustomIngredients(): Promise<CustomIngr
                 brandOwner: data.brandOwner,
                 brandName: data.brandName,
                 timestamp: Timestamp.fromMillis(
-                    data.timestamp.seconds * 1000 + data.timestamp.nanoseconds * 1000000
-                )
+                    data.timestamp.seconds * 1000 + data.timestamp.nanoseconds / 1000000
+                ),
+                version: 'v1'
             }
         )
     })
     return customIngredients
 }
 
-function recipeUnsavedToRecipe(recipe: RecipeUnsaved): Omit<Omit<Recipe, 'id'>, 'timestamp'> {
+function recipeUnsavedToRecipe(recipe: RecipeUnsaved): SavePrep<RecipeAndIngredient> {
+    const totalMacros = totalMacrosForRecipe(recipe, recipe.amount.evaluated);
+    const baseMacros = per100MacrosForRecipe(recipe.amount.evaluated, recipe, totalMacros)
     return {
-        ...recipe,
+        amount: recipe.amount.evaluated,
+        unit: recipe.unit,
         ingredients: recipe.ingredients.map((i) => {
             return {
                 ...i,
                 amount: i.amount.evaluated
             }
         }),
-        amount: recipe.amount.evaluated,
-        name: recipe.name.value
+        name: recipe.name.value,
+        version: 'v1',
+        baseMacros,
+        portions: [{
+            amount: baseMacros.amount,
+            unit: baseMacros.unit,
+            description: baseMacros.description
+        }],
+        timestamp: Timestamp.fromDate(new Date())
     }
 }
 
-export async function persistRecipe(recipe: RecipeUnsaved): Promise<Recipe> {
+export async function persistRecipe(recipe: RecipeUnsaved): Promise<RecipeAndIngredient> {
     // remove undefined values
-    const toSave = {
-        ...JSON.parse(JSON.stringify(recipeUnsavedToRecipe(recipe))),
-        timestamp: Timestamp.fromDate(new Date()),
-        version: 'v1'
+    const toSave: SavePrep<RecipeAndIngredient> = {
+        ...stripUndefined(recipeUnsavedToRecipe(recipe)),
     }
 
     try {
@@ -104,5 +123,4 @@ export async function persistRecipe(recipe: RecipeUnsaved): Promise<Recipe> {
         console.error('Error writing recipe to Firebase Database', error);
         throw error;
     }
-
 }

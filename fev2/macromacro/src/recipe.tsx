@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { FormEvent } from 'react';
 import './App.css';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -12,18 +12,14 @@ import {
     MathInput,
     MathInputState,
     multiplyBaseMacro,
+    per100MacrosForRecipe,
     round,
-    scaleUpOrUndefined
+    sum,
+    totalMacrosForRecipe
 } from "./conversions";
-import { TableFooter, IconButton, TextField } from "@mui/material";
+import { IconButton, TableFooter, TextField } from "@mui/material";
 import ClearIcon from '@mui/icons-material/Clear';
 import LoadingButton from '@mui/lab/LoadingButton';
-
-function sum(xs: number[]): number {
-    const rounded = round(xs.reduce((a, b) => a + b, 0))
-    // it won't be undefined under current behavior of round, just make the compiler happy
-    return rounded !== undefined ? rounded : 0
-}
 
 export function RecipeRow(
     recipeItem: RecipeItemUnsaved,
@@ -60,6 +56,7 @@ export function RecipeRow(
     );
 }
 
+
 export function Recipe(
     recipe: RecipeUnsaved,
     changeRecipeItemAmount: (idx: number) => (input: string, evaluated: number, isValid: boolean) => void,
@@ -67,55 +64,27 @@ export function Recipe(
     setName: (name: string) => void,
     saving: boolean,
     saveRecipe: () => void,
-    clearRecipe: () => void
+    clearRecipe: () => void,
+    setRecipeAmount: (amount: MathInputState) => void
 ) {
-    const [amount, setAmount] = useState<MathInputState>({input: '', evaluated: 0, isValid: true})
 
-    const macros: DetailedMacros[] = recipe.ingredients.map((recipeItem) => multiplyBaseMacro(
-        recipeItem.macros.baseMacros,
-        recipeItem.macros.description,
-        recipeItem.amount.evaluated * recipeItem.macros.amount,
-        recipeItem.macros.portionSource
-    ))
-
-    const totalRecipeAmount = sum(recipe.ingredients.map((recipeItem) => recipeItem.amount.evaluated))
-    const amountForTotalMacros = amount !== null ? amount : totalRecipeAmount
-
-    const totalMacros = {
-        amount: amountForTotalMacros,
-        unit: recipe.unit,
-        calories: sum(recipe.ingredients.map((recipeItem, idx) => macros[idx].calories!)),
-        fat: sum(recipe.ingredients.map((recipeItem, idx) => macros[idx].fat!)),
-        carbs: sum(recipe.ingredients.map((recipeItem, idx) => macros[idx].carbs!)),
-        protein: sum(recipe.ingredients.map((recipeItem, idx) => macros[idx].protein!)),
-        totalFiber: sum(recipe.ingredients.map((recipeItem, idx) => macros[idx].totalFiber!)),
-        sugar: sum(recipe.ingredients.map((recipeItem, idx) => macros[idx].sugar!))
-    }
-
-    const amountForPer100: number = amount.evaluated || totalRecipeAmount
-    const scalePerGram: number = 100 / amountForPer100
-
-    const per100Macros = {
-        amount: 100,
-        unit: recipe.unit,
-        calories: round(scaleUpOrUndefined(scalePerGram, totalMacros.calories)),
-        fat: round(scaleUpOrUndefined(scalePerGram, totalMacros.fat)),
-        carbs: round(scaleUpOrUndefined(scalePerGram, totalMacros.carbs)),
-        protein: round(scaleUpOrUndefined(scalePerGram, totalMacros.protein)),
-        totalFiber: round(scaleUpOrUndefined(scalePerGram, totalMacros.totalFiber)),
-        sugar: round(scaleUpOrUndefined(scalePerGram, totalMacros.sugar)),
-    }
+    const amountForTotalMacros = recipe.amount.evaluated | sum(recipe.ingredients.map((recipeItem) => recipeItem.amount.evaluated))
+    const totalMacros = totalMacrosForRecipe(recipe, amountForTotalMacros);
+    const per100Macros = per100MacrosForRecipe(amountForTotalMacros, recipe, totalMacros);
 
     function handleRecipeAmountChange(input: string, evaluated: number, isValid: boolean) {
-        setAmount({input, isValid, evaluated})
+        setRecipeAmount({input, isValid, evaluated})
+    }
+
+    function handleSave(e: FormEvent<HTMLFormElement>) {
+        saveRecipe()
+        e.preventDefault()
     }
 
     return (
         <TableContainer component={Paper}>
-            <header className="App-header">
-                Recipe
-            </header>
-            <Table sx={{minWidth: 650}} aria-label="simple table">
+            <caption>Recipe</caption>
+            <Table sx={{minWidth: 650}} aria-label="recipe table">
                 <TableHead>
                     <TableRow key='header'>
                         <TableCell align="left">Food</TableCell>
@@ -135,7 +104,12 @@ export function Recipe(
                         recipe.ingredients.map(
                             (recipeItem, idx) => RecipeRow(
                                 recipeItem,
-                                macros[idx],
+                                multiplyBaseMacro(
+                                    recipeItem.macros.baseMacros,
+                                    recipeItem.macros.description,
+                                    recipeItem.amount.evaluated * recipeItem.macros.amount,
+                                    recipeItem.macros.portionSource
+                                ),
                                 idx,
                                 changeRecipeItemAmount(idx),
                                 () => removeRecipeItem(idx)
@@ -149,8 +123,8 @@ export function Recipe(
                   <TableRow>
                     <TableCell align="left">Total</TableCell>
                     <TableCell
-                      align="right">{MathInput(amount.input, amount.isValid, handleRecipeAmountChange)}</TableCell>
-                    <TableCell align="right">{`${amount.evaluated} ${recipe.unit}`}</TableCell>
+                      align="right">{MathInput(recipe.amount.input, recipe.amount.isValid, handleRecipeAmountChange)}</TableCell>
+                    <TableCell align="right">{`${recipe.amount.evaluated} ${recipe.unit}`}</TableCell>
                     <TableCell align="right">{totalMacros.calories}</TableCell>
                     <TableCell align="right">{totalMacros.fat}</TableCell>
                     <TableCell align="right">{totalMacros.carbs}</TableCell>
@@ -173,11 +147,12 @@ export function Recipe(
                   </TableRow>
                 </TableFooter>}
             </Table>
-            <form onSubmit={saveRecipe}>
+            <form onSubmit={handleSave}>
                 <TextField
                     onChange={(e) => setName(e.target.value)}
                     type='text'
                     helperText='Recipe Name'
+                    placeholder='Hell of recipe'
                     value={recipe.name.value}
                 />
                 <LoadingButton type='submit' loading={saving} loadingIndicator="Saving..." variant="outlined">

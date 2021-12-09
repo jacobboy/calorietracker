@@ -13,15 +13,19 @@ import { MathInputState } from "./conversions";
 import { Recipe } from "./recipe";
 import { IngredientSearch } from "./ingredientSearch";
 import { CreateIngredient } from "./createIngredient";
-import { loadRecentlyCreatedCustomIngredients, persistCustomIngredient } from "./firebaseApi/api";
+import {
+  loadRecentlyCreatedCustomIngredients,
+  persistCustomIngredient,
+  persistRecipe
+} from "./firebaseApi/api";
 import { initFirebaseApp } from "./firebase-config";
 
 initFirebaseApp()
 
 const initalRecipe: RecipeUnsaved = {
   name: {
-    value: 'Hell of recipe',
-    isValid: true
+    value: '',
+    isValid: false
   },
   amount: {input: '100', isValid: true, evaluated: 100},
   unit: Unit.g,
@@ -93,14 +97,12 @@ function App() {
         recipe.ingredients.map((i) => i.amount.isValid).every((b) => b) &&
             recipe.name.isValid
     )
-    if (recipe.isValid !== isValid) {
-      setRecipe((prevState) => {
-        return {
-          ...prevState,
-          isValid
-        }
-      })
-    }
+    setRecipe((prevState) => {
+      return {
+        ...prevState,
+        isValid
+      }
+    })
   }
 
   function setRecipeName(name: string) {
@@ -117,6 +119,16 @@ function App() {
     checkRecipeValidity()
   }
 
+  function setRecipeAmount(amount: MathInputState) {
+    setRecipe((prevState) => {
+          return {
+            ...prevState,
+            amount
+          }
+        }
+    )
+  }
+
   function clearRecipe() {
     setRecipe(initalRecipe)
   }
@@ -124,10 +136,12 @@ function App() {
   function saveRecipe() {
     if (recipe.isValid) {
       setRecipeSaving(true)
-
-      setRecipeSaving(false)
+      persistRecipe(recipe).then((createdRecipe) => {
+        setRecipeSaving(false)
+        clearRecipe()
+        setCreatedIngredients((prevState) => [createdRecipe, ...prevState])
+      })
     }
-    clearRecipe()
   }
 
   function getRecentCustomIngredients() {
@@ -152,7 +166,8 @@ function App() {
           setRecipeName,
           recipeSaving,
           saveRecipe,
-          clearRecipe
+          clearRecipe,
+          setRecipeAmount
       )}
       {CreateIngredient(createIngredient)}
       {IngredientSearch(

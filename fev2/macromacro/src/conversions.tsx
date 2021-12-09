@@ -9,7 +9,14 @@ import {
 } from "./usda";
 import { TextField } from "@mui/material";
 import { Parser } from "expr-eval";
-import { DetailedMacros, PortionMacros, SimpleMacros, PortionSource, Unit } from "./classes";
+import {
+    DetailedMacros,
+    PortionMacros,
+    SimpleMacros,
+    PortionSource,
+    Unit,
+    RecipeUnsaved
+} from "./classes";
 import { macrosMap, simpleMacrosMap } from "./mappings";
 
 
@@ -154,4 +161,53 @@ export function MathInput(
         placeholder="37 * 2 / 3"
         onChange={handleChange}
     />
+}
+
+export function sum(xs: number[]): number {
+    const rounded = round(xs.reduce((a, b) => a + b, 0))
+    // it won't be undefined under current behavior of round, just make the compiler happy
+    return rounded !== undefined ? rounded : 0
+}
+
+export function totalMacrosForRecipe(recipe: RecipeUnsaved, amount: number): DetailedMacros {
+    const macros: DetailedMacros[] = recipe.ingredients.map((recipeItem) => multiplyBaseMacro(
+        recipeItem.macros.baseMacros,
+        recipeItem.macros.description,
+        recipeItem.amount.evaluated * recipeItem.macros.amount,
+        recipeItem.macros.portionSource
+    ))
+    const totalMacros = {
+        description: 'total',
+        amount: amount,
+        unit: recipe.unit,
+        calories: sum(recipe.ingredients.map((recipeItem, idx) => macros[idx].calories!)),
+        fat: sum(recipe.ingredients.map((recipeItem, idx) => macros[idx].fat!)),
+        carbs: sum(recipe.ingredients.map((recipeItem, idx) => macros[idx].carbs!)),
+        protein: sum(recipe.ingredients.map((recipeItem, idx) => macros[idx].protein!)),
+        totalFiber: sum(recipe.ingredients.map((recipeItem, idx) => macros[idx].totalFiber!)),
+        sugar: sum(recipe.ingredients.map((recipeItem, idx) => macros[idx].sugar!))
+    }
+    return totalMacros;
+}
+
+export function per100MacrosForRecipe(
+    amount: number,
+    recipe: RecipeUnsaved,
+    totalMacros: DetailedMacros,
+) {
+    const amountForPer100: number = amount
+    const scalePerGram: number = 100 / amountForPer100
+
+    const per100Macros = {
+        description: `per 100 ${recipe.unit}`,
+        amount: 100,
+        unit: recipe.unit,
+        calories: round(scaleUpOrUndefined(scalePerGram, totalMacros.calories)),
+        fat: round(scaleUpOrUndefined(scalePerGram, totalMacros.fat)),
+        carbs: round(scaleUpOrUndefined(scalePerGram, totalMacros.carbs)),
+        protein: round(scaleUpOrUndefined(scalePerGram, totalMacros.protein)),
+        totalFiber: round(scaleUpOrUndefined(scalePerGram, totalMacros.totalFiber)),
+        sugar: round(scaleUpOrUndefined(scalePerGram, totalMacros.sugar)),
+    }
+    return per100Macros;
 }

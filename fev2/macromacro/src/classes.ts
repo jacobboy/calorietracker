@@ -15,6 +15,13 @@ export enum Unit {
     flOz = 'fl oz'
 }
 
+export interface Saved {
+    timestamp: Timestamp,
+    id: string,
+    name: string,
+    version: string
+}
+
 export type PortionSource = { source: 'portion', id?: number } |
     { source: '100g' } |
     { source: 'labelNutrients' } |
@@ -79,17 +86,14 @@ export interface IngredientRowData extends SimpleMacros {
     householdServingFullText?: string
 }
 
-export interface CustomIngredient {
-    timestamp: Timestamp
-    id: string,
-    name: string,
+export interface CustomIngredient extends Saved {
     baseMacros: DetailedMacros,
     portions: Quantity[],
     brandOwner?: string,
     brandName?: string,
 }
 
-export type CustomIngredientUnsaved = Omit<Omit<CustomIngredient, 'id'>, 'timestamp'>
+export type CustomIngredientUnsaved = Omit<Omit<Omit<CustomIngredient, 'id'>, 'timestamp'>, 'version'>
 
 export interface RecipeItemUnsaved {
     source: IngredientSource,
@@ -113,13 +117,10 @@ export interface RecipeItem {
 
 
 // TODO have calculated macros here?
-export interface Recipe {
-    timestamp: Timestamp,
-    id: string,
-    name: string
+export interface Recipe extends Saved {
     ingredients: RecipeItem[],
     amount: number,
     unit: Unit,
-    // baseMacros: DetailedMacros,
-    // portions: Quantity[],
 }
+
+export type RecipeAndIngredient = Recipe & CustomIngredient
