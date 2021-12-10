@@ -13,12 +13,15 @@
 # can't submit ingredient with unfilled out forms
 - formik?
 # Recipe notes
+# ingredient notes, starred, default portions, and portion aliases
 # make 1g portions
 # handle ingredient portions
 # handle ingredient different units
 ## https://fdc.nal.usda.gov/fdc-app.html#/food-details/748278/nutrients might have ml?
 # foods where default isn't 100g?
 # branded foods '"Calculated from value per serving size measure"'
+# https://mui.com/getting-started/usage/ Responsive meta tag
+<meta name="viewport" content="initial-scale=1, width=device-width" />
 
 # edit/delete recipe, ingredient
 - edit implies not storing macros with recipes
