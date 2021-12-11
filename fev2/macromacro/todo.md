@@ -21,7 +21,8 @@
 # foods where default isn't 100g?
 # branded foods '"Calculated from value per serving size measure"'
 # https://mui.com/getting-started/usage/ Responsive meta tag
-<meta name="viewport" content="initial-scale=1, width=device-width" />
+- <meta name="viewport" content="initial-scale=1, width=device-width" />
+# ingredient vs recipe in ingredient search
 
 # edit/delete recipe, ingredient
 - edit implies not storing macros with recipes

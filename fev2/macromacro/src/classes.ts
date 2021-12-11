@@ -93,6 +93,10 @@ export interface CustomIngredient extends Saved {
     brandName?: string,
 }
 
+export interface CustomIngredientFromDB extends CustomIngredient {
+    source: IngredientSource
+}
+
 export type CustomIngredientUnsaved = Omit<Omit<Omit<CustomIngredient, 'id'>, 'timestamp'>, 'version'>
 
 export interface RecipeItemUnsaved {
