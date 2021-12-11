@@ -55,18 +55,19 @@ test('Can add an ingredient to the recipe and save it', async () => {
     userEvent.type(firstPortionInput, '{enter}')
 
     // const recipesTable = screen.getAllByLabelText('simple table')[0]
-    const recipesTable = screen.getByText('Recipe').parentElement!
+    const recipesTable = screen.getByText('Recipe').closest('table')!
     const breadCell = within(recipesTable).getByText('BREAD')
     expect(breadCell).toBeInTheDocument()
 
     const breadRow = breadCell.closest('tr')!
     expect(within(breadRow).getByText('131.5')).toBeInTheDocument()
 
-    const recipeNameInput = within(screen.getByText('Recipe Name').parentElement!).getByRole('textbox')
+    const recipeNameForm = screen.getByText('Recipe Name').closest('form')!
+    const recipeNameInput = within(recipeNameForm).getByRole('textbox')
 
     userEvent.type(recipeNameInput, 'Test Ingredient')
     act(() => {
-        userEvent.click(within(recipesTable).getByText('Save'))
+        userEvent.click(within(recipeNameForm).getByText('Save'))
     })
 
     const customIngredientsHeader = screen.getByText('Custom Ingredients');
