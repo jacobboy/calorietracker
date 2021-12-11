@@ -83,8 +83,8 @@ export function Recipe(
 
     return (
         <TableContainer component={Paper}>
-            <caption>Recipe</caption>
             <Table sx={{minWidth: 650}} aria-label="recipe table">
+                <caption>Recipe</caption>
                 <TableHead>
                     <TableRow key='header'>
                         <TableCell align="left">Food</TableCell>

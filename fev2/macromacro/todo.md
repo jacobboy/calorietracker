@@ -1,9 +1,7 @@
 # current
-# make sure i'm not saving cruft when i add a recipe to a recipe
-
+# macro percents
 
 # make ingredient rows show macros for amount
-# macro percents
 # reset search form and cursor location after adding ingredient
 # improve search
 # algolia
@@ -23,6 +21,8 @@
 # https://mui.com/getting-started/usage/ Responsive meta tag
 - <meta name="viewport" content="initial-scale=1, width=device-width" />
 # ingredient vs recipe in ingredient search
+# make sure i'm not saving cruft when i add a recipe to a recipe
+## can slim down some of these objects too
 
 # edit/delete recipe, ingredient
 - edit implies not storing macros with recipes
