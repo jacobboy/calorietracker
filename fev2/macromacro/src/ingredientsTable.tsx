@@ -41,11 +41,12 @@ function PortionTableRow(
             <TableCell align="right">{macro.amount}</TableCell>
             <TableCell align="right">{macro.unit}</TableCell>
             <TableCell align="right">{round(macro.calories)}</TableCell>
-            <TableCell align="right">{round(macro.protein)}</TableCell>
             <TableCell align="right">{round(macro.fat)}</TableCell>
             <TableCell align="right">{round(macro.carbs)}</TableCell>
-            <TableCell align="right">{round(macro.totalFiber)}</TableCell>
+            <TableCell align="right">{round(macro.dietaryFiber)}</TableCell>
+            <TableCell align="right">{round(macro.solubleFiber)}</TableCell>
             <TableCell align="right">{round(macro.sugar)}</TableCell>
+            <TableCell align="right">{round(macro.protein)}</TableCell>
         </TableRow>
     );
 }
@@ -102,11 +103,12 @@ function Row(
                                         <TableCell align="right">Amount</TableCell>
                                         <TableCell align="right">Unit</TableCell>
                                         <TableCell align="right">Calories</TableCell>
-                                        <TableCell align="right">Protein</TableCell>
                                         <TableCell align="right">Fat</TableCell>
                                         <TableCell align="right">Carbs</TableCell>
-                                        <TableCell align="right">Total Fiber</TableCell>
-                                        <TableCell align="right">Sugar</TableCell>
+                                        <TableCell align="right">Dietary&nbsp;Fiber</TableCell>
+                                        <TableCell align="right">Soluble&nbsp;Fiber</TableCell>
+                                        <TableCell align="right">Sugars</TableCell>
+                                        <TableCell align="right">Protein&nbsp;</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -167,9 +169,9 @@ export function IngredientsTable(
                         <TableCell align="right">Brand Name</TableCell>
                         <TableCell align="right">Amount</TableCell>
                         <TableCell align="right">Calories</TableCell>
-                        <TableCell align="right">Fat&nbsp;(g)</TableCell>
-                        <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-                        <TableCell align="right">Protein&nbsp;(g)</TableCell>
+                        <TableCell align="right">Fat</TableCell>
+                        <TableCell align="right">Carbs</TableCell>
+                        <TableCell align="right">Protein</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

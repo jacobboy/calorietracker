@@ -21,9 +21,8 @@ const startIngredient: CustomIngredientBuilder = {
         carbs: 0,
         fat: 0,
         protein: 0,
-        totalFiber: 0,
         solubleFiber: 0,
-        insolubleFiber: 0,
+        dietaryFiber: 0,
         sugar: 0,
         amount: 100,
         unit: Unit.g,
@@ -101,22 +100,6 @@ export function CreateIngredient(createIngredient: (ingredient: CustomIngredient
                     onChange={updateMacroValue('calories')}
                 />
                 <TextField
-                    helperText='Carbs'
-                    type='number'
-                    // TODO this max doesn't prevent them from typing in 12345
-                    inputProps={{min: 0, max: 9999}}
-                    value={ingredient.macros.carbs}
-                    onChange={updateMacroValue('carbs')}
-                />
-                <TextField
-                    helperText='Protein'
-                    type='number'
-                    // TODO this max doesn't prevent them from typing in 12345
-                    inputProps={{min: 0, max: 9999}}
-                    value={ingredient.macros.protein}
-                    onChange={updateMacroValue('protein')}
-                />
-                <TextField
                     helperText='Fat'
                     type='number'
                     // TODO this max doesn't prevent them from typing in 12345
@@ -125,12 +108,20 @@ export function CreateIngredient(createIngredient: (ingredient: CustomIngredient
                     onChange={updateMacroValue('fat')}
                 />
                 <TextField
-                    helperText='Total Fiber'
+                    helperText='Carbs'
                     type='number'
                     // TODO this max doesn't prevent them from typing in 12345
                     inputProps={{min: 0, max: 9999}}
-                    value={ingredient.macros.totalFiber}
-                    onChange={updateMacroValue('totalFiber')}
+                    value={ingredient.macros.carbs}
+                    onChange={updateMacroValue('carbs')}
+                />
+                <TextField
+                    helperText='Dietary Fiber'
+                    type='number'
+                    // TODO this max doesn't prevent them from typing in 12345
+                    inputProps={{min: 0, max: 9999}}
+                    value={ingredient.macros.dietaryFiber}
+                    onChange={updateMacroValue('dietaryFiber')}
                 />
                 <TextField
                     helperText='Soluble Fiber'
@@ -141,20 +132,20 @@ export function CreateIngredient(createIngredient: (ingredient: CustomIngredient
                     onChange={updateMacroValue('solubleFiber')}
                 />
                 <TextField
-                    helperText='Insoluble Fiber'
-                    type='number'
-                    // TODO this max doesn't prevent them from typing in 12345
-                    inputProps={{min: 0, max: 9999}}
-                    value={ingredient.macros.insolubleFiber}
-                    onChange={updateMacroValue('insolubleFiber')}
-                />
-                <TextField
                     helperText='Sugar'
                     type='number'
                     // TODO this max doesn't prevent them from typing in 12345
                     inputProps={{min: 0, max: 9999}}
                     value={ingredient.macros.sugar}
                     onChange={updateMacroValue('sugar')}
+                />
+                <TextField
+                    helperText='Protein'
+                    type='number'
+                    // TODO this max doesn't prevent them from typing in 12345
+                    inputProps={{min: 0, max: 9999}}
+                    value={ingredient.macros.protein}
+                    onChange={updateMacroValue('protein')}
                 />
                 <LoadingButton type='submit' loading={saving} loadingIndicator="Saving..." variant="outlined">
                     Save

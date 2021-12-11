@@ -55,9 +55,8 @@ export interface SimpleMacros extends Quantity {
 }
 
 export interface DetailedMacros extends SimpleMacros {
-    totalFiber?: number,
     solubleFiber?: number,
-    insolubleFiber?: number,
+    dietaryFiber?: number,
     sugar?: number,
 }
 

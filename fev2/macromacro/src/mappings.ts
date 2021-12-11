@@ -7,6 +7,6 @@ export const simpleMacrosMap = {
 
 export const macrosMap = {
     ...simpleMacrosMap,
-    totalFiber: "291",
+    dietaryFiber: "291",
     sugar: "269"
 };

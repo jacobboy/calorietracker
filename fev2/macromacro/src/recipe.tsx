@@ -9,6 +9,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { DetailedMacros, RecipeItemUnsaved, RecipeUnsaved } from "./classes";
 import {
+    getCaloriePercents,
     MathInput,
     MathInputState,
     multiplyBaseMacro,
@@ -43,9 +44,10 @@ export function RecipeRow(
                 <TableCell align="right">{round(macros.calories)}</TableCell>
                 <TableCell align="right">{round(macros.fat)}</TableCell>
                 <TableCell align="right">{round(macros.carbs)}</TableCell>
-                <TableCell align="right">{round(macros.protein)}</TableCell>
-                <TableCell align="right">{round(macros.totalFiber)}</TableCell>
+                <TableCell align="right">{round(macros.dietaryFiber)}</TableCell>
+                <TableCell align="right">{round(macros.solubleFiber)}</TableCell>
                 <TableCell align="right">{round(macros.sugar)}</TableCell>
+                <TableCell align="right">{round(macros.protein)}</TableCell>
                 <TableCell align="right">
                     <IconButton color="primary" aria-label="remove recipe item" component="span" onClick={removeRecipeItem}>
                         <ClearIcon/>
@@ -68,9 +70,10 @@ export function Recipe(
     setRecipeAmount: (amount: MathInputState) => void
 ) {
 
-    const amountForTotalMacros = recipe.amount.evaluated | sum(recipe.ingredients.map((recipeItem) => recipeItem.amount.evaluated))
+    const amountForTotalMacros = recipe.amount.evaluated || sum(recipe.ingredients.map((recipeItem) => recipeItem.amount.evaluated)) || 100
     const totalMacros = totalMacrosForRecipe(recipe, amountForTotalMacros);
     const per100Macros = per100MacrosForRecipe(amountForTotalMacros, recipe, totalMacros);
+    const caloriePercents = getCaloriePercents(amountForTotalMacros, recipe, totalMacros);
 
     function handleRecipeAmountChange(input: string, evaluated: number, isValid: boolean) {
         setRecipeAmount({input, isValid, evaluated})
@@ -91,11 +94,12 @@ export function Recipe(
                         <TableCell align="right">Amount</TableCell>
                         <TableCell align="right">Description</TableCell>
                         <TableCell align="right">Calories</TableCell>
-                        <TableCell align="right">Fat&nbsp;(g)</TableCell>
-                        <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-                        <TableCell align="right">Protein&nbsp;(g)</TableCell>
-                        <TableCell align="right">Total Fiber</TableCell>
-                        <TableCell align="right">Sugar</TableCell>
+                        <TableCell align="right">Fat</TableCell>
+                        <TableCell align="right">Carbs</TableCell>
+                        <TableCell align="right">Dietary&nbsp;Fiber</TableCell>
+                        <TableCell align="right">Soluble&nbsp;Fiber</TableCell>
+                        <TableCell align="right">Sugars</TableCell>
+                        <TableCell align="right">Protein&nbsp;</TableCell>
                         <TableCell align="right">Remove</TableCell>
                     </TableRow>
                 </TableHead>
@@ -128,9 +132,10 @@ export function Recipe(
                     <TableCell align="right">{totalMacros.calories}</TableCell>
                     <TableCell align="right">{totalMacros.fat}</TableCell>
                     <TableCell align="right">{totalMacros.carbs}</TableCell>
-                    <TableCell align="right">{totalMacros.protein}</TableCell>
-                    <TableCell align="right">{totalMacros.totalFiber}</TableCell>
+                    <TableCell align="right">{totalMacros.dietaryFiber}</TableCell>
+                    <TableCell align="right">{totalMacros.solubleFiber}</TableCell>
                     <TableCell align="right">{totalMacros.sugar}</TableCell>
+                    <TableCell align="right">{totalMacros.protein}</TableCell>
                     <TableCell />
                   </TableRow>
                   <TableRow>
@@ -140,9 +145,10 @@ export function Recipe(
                     <TableCell align="right">{per100Macros.calories}</TableCell>
                     <TableCell align="right">{per100Macros.fat}</TableCell>
                     <TableCell align="right">{per100Macros.carbs}</TableCell>
-                    <TableCell align="right">{per100Macros.protein}</TableCell>
-                    <TableCell align="right">{per100Macros.totalFiber}</TableCell>
+                    <TableCell align="right">{per100Macros.dietaryFiber}</TableCell>
+                    <TableCell align="right">{per100Macros.solubleFiber}</TableCell>
                     <TableCell align="right">{per100Macros.sugar}</TableCell>
+                    <TableCell align="right">{per100Macros.protein}</TableCell>
                     <TableCell />
                   </TableRow>
                 </TableFooter>}
