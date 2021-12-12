@@ -1,11 +1,9 @@
 # current
-# macro percents
+# improve search
 
-## can we get soluble by differencing out sugars and total dietary?
-# handle undefined in recipe 
 # make ingredient rows show macros for amount
 # reset search form and cursor location after adding ingredient
-# improve search
+
 # algolia
 # hosting
 ## hook yarn deploy command up to firebase?
@@ -25,7 +23,7 @@
 # ingredient vs recipe in ingredient search
 # make sure i'm not saving cruft when i add a recipe to a recipe
 ## can slim down some of these objects too
-
+# handle undefined in recipe
 # edit/delete recipe, ingredient
 - edit implies not storing macros with recipes
 - delete implies searching for recipes that use it and deleting those?

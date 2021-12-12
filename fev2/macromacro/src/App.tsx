@@ -14,7 +14,7 @@ import { Recipe } from "./recipe";
 import { IngredientSearch } from "./ingredientSearch";
 import { CreateIngredient } from "./createIngredient";
 import {
-  loadRecentlyCreatedCustomIngredients,
+  loadRecentlyCreatedCustomIngredients, loadRecentlyCreatedRecipes,
   persistCustomIngredient,
   persistRecipe
 } from "./firebaseApi/api";
@@ -40,6 +40,10 @@ function App() {
 
   useEffect(() => {
     getRecentCustomIngredients()
+  }, [])
+
+  useEffect(() => {
+    getRecentRecipes()
   }, [])
 
   function addRecipeItem(source: IngredientSource) {
@@ -146,7 +150,13 @@ function App() {
 
   function getRecentCustomIngredients() {
     loadRecentlyCreatedCustomIngredients().then((recentIngredients) => {
-      setCreatedIngredients(recentIngredients)
+      setCreatedIngredients((prevState) => [...recentIngredients, ...prevState])
+    })
+  }
+
+  function getRecentRecipes() {
+    loadRecentlyCreatedRecipes().then((recentRecipes) => {
+      setCreatedIngredients((prevState) => [...recentRecipes, ...prevState])
     })
   }
 
