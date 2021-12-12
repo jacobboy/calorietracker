@@ -31,7 +31,7 @@ test('Can add an ingredient to the recipe and save it', async () => {
     const { debug } = render(<App/>);
 
     const searchTable = screen.getByText('Search').closest('div')!
-    const searchInput = within(searchTable).getByRole('textbox');
+    const searchInput = within(searchTable).getByLabelText('search text');
     expect(searchInput).toBeInTheDocument();
 
     // why does wrapping this in act make it do nothing??

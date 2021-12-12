@@ -21,6 +21,9 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
+// TODO added this
+export type DataTypes = 'Branded' | 'Foundation' | 'Survey (FNDDS)' | 'SR Legacy'
+
 /**
  * 
  * @export
@@ -2585,7 +2588,7 @@ export class FDCApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof FDCApi
      */
-    public getFoodsSearch(query: string, dataType?: Array<'Branded' | 'Foundation' | 'Survey (FNDDS)' | 'SR Legacy'>, pageSize?: number, pageNumber?: number, sortBy?: 'dataType.keyword' | 'lowercaseDescription.keyword' | 'fdcId' | 'publishedDate', sortOrder?: 'asc' | 'desc', brandOwner?: string, options?: AxiosRequestConfig) {
+    public getFoodsSearch(query: string, dataType?: Array<DataTypes>, pageSize?: number, pageNumber?: number, sortBy?: 'dataType.keyword' | 'lowercaseDescription.keyword' | 'fdcId' | 'publishedDate', sortOrder?: 'asc' | 'desc', brandOwner?: string, options?: AxiosRequestConfig) {
         return FDCApiFp(this.configuration).getFoodsSearch(query, dataType, pageSize, pageNumber, sortBy, sortOrder, brandOwner, options).then((request) => request(this.axios, this.basePath));
     }
 

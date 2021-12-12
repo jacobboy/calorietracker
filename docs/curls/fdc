@@ -3,16 +3,12 @@
 :FDC_API_KEY := (getenv "FDC_API_KEY")
 
 # Search
-
+#   "dataType": ["Branded", "Foundation", "Survey (FNDDS)", "SR Legacy"]
 POST https://api.nal.usda.gov/fdc/v1/search?api_key=:FDC_API_KEY
 Content-Type: application/json
 {
-  "generalSearchInput": "Cheddar cheese",
-  "includeDataTypes": {
-    "Branded": true,
-    "Survey (FNDDS)": false,
-    "Foundation": true
-  }
+  "query": "white chocolate brandName:ghiradelli",
+  "dataType": ["Branded"]
 }
 
 # Get branded food

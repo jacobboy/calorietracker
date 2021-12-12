@@ -3,7 +3,7 @@ import './App.css';
 import Input from '@mui/material/Input';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
-import { SearchResultFood } from "./usda";
+import { DataTypes, SearchResultFood } from "./usda";
 import {
     CustomIngredient,
     IngredientId,
@@ -14,15 +14,16 @@ import {
 import { IngredientsTable } from "./ingredientsTable";
 import { getApiClient, getMeasuresForOneFood } from "./calls";
 import { getMacros, MathInputState, multiplyBaseMacro } from "./conversions";
-
-const ariaLabel = {'aria-label': 'description'};
+import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 
 export function IngredientSearch(
     addRecipeItem: (source: IngredientSource) => (fromPortion: PortionMacros, amount: MathInputState) => () => void,
     createdIngredients: CustomIngredient[]
 ) {
     const [searchText, setSearchText] = useState('');
+    const [searchDataTypes, setSearchDataTypes] = useState<Record<DataTypes, boolean>>({'Branded': true, 'Foundation': true, 'Survey (FNDDS)': true, 'SR Legacy': true})
     const [searchData, setSearchData] = useState<IngredientRowData[]>([])
+    const [brandName, setBrandName] = useState<string>('')
     const [rowsOpen, setRowsOpen] = useState<Record<IngredientId, boolean>>({})
     const [enteredAmounts, setEnteredAmounts] = useState<Record<IngredientId, Record<number, MathInputState>>>({})
     const [portionMacros, setPortionMacros] = useState<Record<IngredientId, PortionMacros[]>>({})
@@ -82,9 +83,19 @@ export function IngredientSearch(
     }
 
     async function search(event: React.FormEvent<HTMLFormElement>) {
+        const dataType = Object.entries(searchDataTypes)
+            .filter(([_, shouldUse]) => shouldUse)
+            .map(([dataType, _]) => dataType) as DataTypes[]
         if (searchText) {
+            let modifiedSearchText = searchText
+            if (brandName !== '' && !searchText.includes('brandName:')) {
+                modifiedSearchText = `${modifiedSearchText} brandName:${brandName}`
+            }
             const api = getApiClient();
-            api.getFoodsSearch(searchText).then(
+            api.getFoodsSearch(
+                modifiedSearchText,
+                dataType
+            ).then(
                 (response) => {
                     if (response.data && response.data.foods) {
                         // setSearchResults(response.data.foods)
@@ -133,14 +144,43 @@ export function IngredientSearch(
         return allPortionMacros
     }
 
+    function handleCheckboxChange(dataType: DataTypes) {
+        return () => {
+            setSearchDataTypes((prevState) => {
+                return {
+                    ...prevState,
+                    [dataType]: !prevState[dataType]
+                }
+            })
+        }
+    }
+
     return <>
         <TableContainer component={Paper}>
             <header>
                 Search
             </header>
             <form onSubmit={search}>
-                <Input placeholder="Placeholder" value={searchText}
-                       onChange={e => setSearchText(e.target.value)} inputProps={ariaLabel}/>
+                <Input placeholder="Search text" value={searchText}
+                       onChange={e => setSearchText(e.target.value)} inputProps={{'aria-label': 'search text'}}/>
+                <Input placeholder="Brand name" value={brandName}
+                       onChange={e => setBrandName(e.target.value)} inputProps={{'aria-label': 'brand name'}}/>
+
+                <FormGroup>
+                    {
+                        Object.entries(searchDataTypes).map(([dataType, shouldUse]) => {
+                            return <FormControlLabel
+                                key={`${dataType}-form-control`}
+                                control={
+                                    <Checkbox checked={shouldUse}
+                                              onChange={handleCheckboxChange(dataType as DataTypes)}
+                                              name={dataType}/>
+                                }
+                                label={dataType}
+                            />
+                        })
+                    }
+                </FormGroup>
                 <input type="submit" value="Submit"/>
             </form>
             {IngredientsTable(

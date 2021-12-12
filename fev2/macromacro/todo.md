@@ -1,13 +1,12 @@
 # current
-# improve search
 
-# make ingredient rows show macros for amount
-# reset search form and cursor location after adding ingredient
 
 # algolia
 # hosting
-## hook yarn deploy command up to firebase?
 # copy recipe
+# make ingredient rows show macros for amount
+# reset search form and cursor location after adding ingredient
+## hook yarn deploy command up to firebase?
 # can't submit ingredient with unfilled out forms
 - formik?
 # Recipe notes
@@ -28,3 +27,5 @@
 - edit implies not storing macros with recipes
 - delete implies searching for recipes that use it and deleting those?
 - maybe just "deprecate" ingredients to exclude them from search?
+# improve search
+## search pagination
