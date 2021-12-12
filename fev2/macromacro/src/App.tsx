@@ -27,7 +27,7 @@ const initalRecipe: RecipeUnsaved = {
     value: '',
     isValid: false
   },
-  amount: {input: '100', isValid: true, evaluated: 100},
+  amount: {input: '', isValid: false, evaluated: NaN},
   unit: Unit.g,
   ingredients: [],
   isValid: false

@@ -17,8 +17,8 @@ import {
 import { per100MacrosForRecipe, totalMacrosForRecipe } from "../conversions";
 
 
-const CUSTOM_INGREDIENTS_COLLECTION_NAME = 'customIngredients-v1';
-const RECIPES_COLLECTION_NAME = 'recipes-v1';
+const CUSTOM_INGREDIENTS_COLLECTION_NAME = 'customIngredients-v2';
+const RECIPES_COLLECTION_NAME = 'recipes-v2';
 
 type SavePrep<T> = Omit<T, 'id'>
 
@@ -79,8 +79,37 @@ export async function loadRecentlyCreatedCustomIngredients(): Promise<CustomIngr
     return customIngredients
 }
 
+export async function loadRecentlyCreatedRecipes(): Promise<CustomIngredient[]> {
+
+    const recentMessagesQuery = query(
+        collection(getFirestore(), RECIPES_COLLECTION_NAME),
+        orderBy('timestamp', 'asc'),
+        limit(20)
+    );
+
+    const querySnapshot = await getDocs(recentMessagesQuery);
+
+    const recipes: CustomIngredient[] = []
+    querySnapshot.forEach((doc) => {
+        const data = doc.data()
+        recipes.push(
+            {
+                id: doc.id,
+                baseMacros: data.baseMacros,
+                name: data.name,
+                portions: data.portions,
+                timestamp: Timestamp.fromMillis(
+                    data.timestamp.seconds * 1000 + data.timestamp.nanoseconds / 1000000
+                ),
+                version: 'v1'
+            }
+        )
+    })
+    return recipes
+}
+
 function recipeUnsavedToRecipe(recipe: RecipeUnsaved): SavePrep<RecipeAndIngredient> {
-    const totalMacros = totalMacrosForRecipe(recipe, recipe.amount.evaluated);
+    const totalMacros = {...totalMacrosForRecipe(recipe), amount: recipe.amount.evaluated};
     const baseMacros = per100MacrosForRecipe(recipe.amount.evaluated, recipe, totalMacros)
     return {
         amount: recipe.amount.evaluated,

@@ -1,8 +1,6 @@
 # current
 # macro percents
 
-# get soluble and insoluble fiber off fdc foods
-## is total actually total insoluble?  
 ## can we get soluble by differencing out sugars and total dietary?
 # handle undefined in recipe 
 # make ingredient rows show macros for amount

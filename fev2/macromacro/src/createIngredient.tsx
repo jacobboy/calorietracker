@@ -18,12 +18,12 @@ const startIngredient: CustomIngredientBuilder = {
     id: 'TODO will this come from firebase?',
     macros: {
         calories: 0,
-        carbs: 0,
         fat: 0,
-        protein: 0,
-        solubleFiber: 0,
+        carbs: 0,
         dietaryFiber: 0,
+        solubleFiber: 0,
         sugar: 0,
+        protein: 0,
         amount: 100,
         unit: Unit.g,
         description: '100 g',
@@ -62,6 +62,12 @@ export function CreateIngredient(createIngredient: (ingredient: CustomIngredient
         })
     }
 
+    function handleBrandName(brandName: string) {
+        setIngredient((prevState) => {
+            return {...prevState, brandName}
+        })
+    }
+
     function convertToCustomIngredientUnsaved(ingredient: CustomIngredientBuilder): CustomIngredientUnsaved {
         return {
             name: ingredient.name,
@@ -90,6 +96,12 @@ export function CreateIngredient(createIngredient: (ingredient: CustomIngredient
                     type='text'
                     value={ingredient.name}
                     onChange={e => handleName(e.target.value)}
+                />
+                <TextField
+                    helperText={'Brand Name'}
+                    type='text'
+                    value={ingredient.brandName}
+                    onChange={e => handleBrandName(e.target.value)}
                 />
                 <TextField
                     helperText='Calories'

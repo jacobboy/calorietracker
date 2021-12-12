@@ -39,8 +39,8 @@ export function multiplyBaseMacro(
         calories: scaleUpOrUndefined(scalePerGram, baseMacros.calories),
         fat: scaleUpOrUndefined(scalePerGram, baseMacros.fat),
         carbs: scaleUpOrUndefined(scalePerGram, baseMacros.carbs),
-        dietaryFiber: scaleUpOrUndefined(scalePerGram, baseMacros.solubleFiber),
-        solubleFiber: scaleUpOrUndefined(scalePerGram, baseMacros.dietaryFiber),
+        dietaryFiber: scaleUpOrUndefined(scalePerGram, baseMacros.dietaryFiber),
+        solubleFiber: scaleUpOrUndefined(scalePerGram, baseMacros.solubleFiber),
         sugar: scaleUpOrUndefined(scalePerGram, baseMacros.sugar),
         protein: scaleUpOrUndefined(scalePerGram, baseMacros.protein),
         amount: amount,
@@ -173,7 +173,7 @@ export function sum(xs: number[]): number | undefined {
     return rounded !== undefined ? rounded : 0
 }
 
-export function totalMacrosForRecipe(recipe: RecipeUnsaved, amount: number) {
+export function totalMacrosForRecipe(recipe: RecipeUnsaved): Omit<DetailedMacros, 'amount'> {
     const macros: DetailedMacros[] = recipe.ingredients.map((recipeItem) => multiplyBaseMacro(
         recipeItem.macros.baseMacros,
         recipeItem.macros.description,
@@ -182,7 +182,6 @@ export function totalMacrosForRecipe(recipe: RecipeUnsaved, amount: number) {
     ))
     const totalMacros = {
         description: 'total',
-        amount: amount,
         unit: recipe.unit,
         calories: sum(recipe.ingredients.map((recipeItem, idx) => macros[idx].calories!)),
         fat: sum(recipe.ingredients.map((recipeItem, idx) => macros[idx].fat!)),
@@ -196,47 +195,53 @@ export function totalMacrosForRecipe(recipe: RecipeUnsaved, amount: number) {
 }
 
 export function per100MacrosForRecipe(
-    amount: number,
+    amount: number | undefined,
     recipe: RecipeUnsaved,
-    totalMacros: DetailedMacros,
-) {
-    const amountForPer100: number = amount
-    const scalePerGram: number = 100 / amountForPer100
+    totalMacros: Omit<DetailedMacros, 'amount'>,
+): DetailedMacros {
+    const per100Quantity = {description: `per 100 ${recipe.unit}`, amount: 100, unit: recipe.unit}
+    if (amount === undefined) {
+        return per100Quantity
+    } else {
+        const amountForPer100: number = amount
+        const scalePerGram: number = 100 / amountForPer100
 
-    const per100Macros = {
-        description: `per 100 ${recipe.unit}`,
-        amount: 100,
-        unit: recipe.unit,
-        calories: round(scaleUpOrUndefined(scalePerGram, totalMacros.calories)),
-        fat: round(scaleUpOrUndefined(scalePerGram, totalMacros.fat)),
-        carbs: round(scaleUpOrUndefined(scalePerGram, totalMacros.carbs)),
-        dietaryFiber: round(scaleUpOrUndefined(scalePerGram, totalMacros.dietaryFiber)),
-        solubleFiber: round(scaleUpOrUndefined(scalePerGram, totalMacros.solubleFiber)),
-        sugar: round(scaleUpOrUndefined(scalePerGram, totalMacros.sugar)),
-        protein: round(scaleUpOrUndefined(scalePerGram, totalMacros.protein)),
+        const per100Macros = {
+            ...per100Quantity,
+            calories: round(scaleUpOrUndefined(scalePerGram, totalMacros.calories)),
+            fat: round(scaleUpOrUndefined(scalePerGram, totalMacros.fat)),
+            carbs: round(scaleUpOrUndefined(scalePerGram, totalMacros.carbs)),
+            dietaryFiber: round(scaleUpOrUndefined(scalePerGram, totalMacros.dietaryFiber)),
+            solubleFiber: round(scaleUpOrUndefined(scalePerGram, totalMacros.solubleFiber)),
+            sugar: round(scaleUpOrUndefined(scalePerGram, totalMacros.sugar)),
+            protein: round(scaleUpOrUndefined(scalePerGram, totalMacros.protein)),
+        }
+        return per100Macros;
     }
-    return per100Macros;
 }
 
 export function getCaloriePercents(
-    amount: number,
-    recipe: RecipeUnsaved,
-    totalMacros: DetailedMacros,
-) {
-    const amountForPer100: number = amount
-    const scalePerGram: number = 100 / amountForPer100
+    macroAmounts: {fat?: number, carbs?: number, dietaryFiber?: number, protein?: number}
+): {fat: number, carbs: number, protein: number} | {fat: undefined, carbs: undefined, protein: undefined} {
+    if (
+        [
+            macroAmounts.fat,
+            macroAmounts.carbs,
+            macroAmounts.dietaryFiber,
+            macroAmounts.protein
+        ].every((x) => x !== undefined)
+    ) {
+        const fatCalories = macroAmounts.fat! * 9
+        const carbCalories = (macroAmounts.carbs! - macroAmounts.dietaryFiber!) * 4
+        const proteinCalories = macroAmounts.protein! * 4
+        const totalCalories = fatCalories + carbCalories + proteinCalories
 
-    const per100Macros = {
-        description: `per 100 ${recipe.unit}`,
-        amount: 100,
-        unit: recipe.unit,
-        calories: round(scaleUpOrUndefined(scalePerGram, totalMacros.calories)),
-        fat: round(scaleUpOrUndefined(scalePerGram, totalMacros.fat)),
-        carbs: round(scaleUpOrUndefined(scalePerGram, totalMacros.carbs)),
-        dietaryFiber: round(scaleUpOrUndefined(scalePerGram, totalMacros.dietaryFiber)),
-        solubleFiber: round(scaleUpOrUndefined(scalePerGram, totalMacros.solubleFiber)),
-        sugar: round(scaleUpOrUndefined(scalePerGram, totalMacros.sugar)),
-        protein: round(scaleUpOrUndefined(scalePerGram, totalMacros.protein)),
+        return {
+            fat: 100 * (fatCalories / totalCalories),
+            carbs: 100 * (carbCalories / totalCalories),
+            protein: 100 * (proteinCalories / totalCalories)
+        }
+    } else {
+        return {fat: undefined, carbs: undefined, protein: undefined}
     }
-    return per100Macros;
 }

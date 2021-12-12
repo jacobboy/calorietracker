@@ -70,10 +70,10 @@ export function Recipe(
     setRecipeAmount: (amount: MathInputState) => void
 ) {
 
-    const amountForTotalMacros = recipe.amount.evaluated || sum(recipe.ingredients.map((recipeItem) => recipeItem.amount.evaluated)) || 100
-    const totalMacros = totalMacrosForRecipe(recipe, amountForTotalMacros);
+    const amountForTotalMacros = recipe.amount.evaluated || sum(recipe.ingredients.map((recipeItem) => recipeItem.amount.evaluated))
+    const totalMacros = {...totalMacrosForRecipe(recipe), amount: amountForTotalMacros};
     const per100Macros = per100MacrosForRecipe(amountForTotalMacros, recipe, totalMacros);
-    const caloriePercents = getCaloriePercents(amountForTotalMacros, recipe, totalMacros);
+    const caloriePercents = getCaloriePercents(totalMacros);
 
     function handleRecipeAmountChange(input: string, evaluated: number, isValid: boolean) {
         setRecipeAmount({input, isValid, evaluated})
@@ -139,9 +139,9 @@ export function Recipe(
                     <TableCell />
                   </TableRow>
                   <TableRow>
-                    <TableCell align="left">Per 100</TableCell>
-                    <TableCell align="right">100</TableCell>
-                    <TableCell align="right">{`100 ${recipe.unit}`}</TableCell>
+                    <TableCell align="left">{per100Macros.description}</TableCell>
+                    <TableCell align="right">{per100Macros.amount}</TableCell>
+                    <TableCell align="right">{per100Macros.unit}</TableCell>
                     <TableCell align="right">{per100Macros.calories}</TableCell>
                     <TableCell align="right">{per100Macros.fat}</TableCell>
                     <TableCell align="right">{per100Macros.carbs}</TableCell>
@@ -149,6 +149,19 @@ export function Recipe(
                     <TableCell align="right">{per100Macros.solubleFiber}</TableCell>
                     <TableCell align="right">{per100Macros.sugar}</TableCell>
                     <TableCell align="right">{per100Macros.protein}</TableCell>
+                    <TableCell/>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell align="left">Percents</TableCell>
+                    <TableCell align="right"/>
+                    <TableCell align="right"/>
+                    <TableCell align="right"/>
+                    <TableCell align="right">{round(caloriePercents.fat)}</TableCell>
+                    <TableCell align="right">{round(caloriePercents.carbs)}</TableCell>
+                    <TableCell align="right"/>
+                    <TableCell align="right"/>
+                    <TableCell align="right"/>
+                    <TableCell align="right">{round(caloriePercents.protein)}</TableCell>
                     <TableCell />
                   </TableRow>
                 </TableFooter>}
