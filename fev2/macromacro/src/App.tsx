@@ -13,11 +13,7 @@ import { MathInputState } from "./conversions";
 import { Recipe } from "./recipe";
 import { IngredientSearch } from "./ingredientSearch";
 import { CreateIngredient } from "./createIngredient";
-import {
-  loadRecentlyCreatedCustomIngredients, loadRecentlyCreatedRecipes,
-  persistCustomIngredient,
-  persistRecipe
-} from "./firebaseApi/api";
+import { FirebaseAPI } from "./firebaseApi/api";
 import { initFirebaseApp } from "./firebase-config";
 
 initFirebaseApp()
@@ -33,7 +29,7 @@ const initalRecipe: RecipeUnsaved = {
   isValid: false
 }
 
-function App() {
+function App({firebaseApi= new FirebaseAPI()}) {
   const [recipe, setRecipe] = useState<RecipeUnsaved>(initalRecipe)
   const [createdIngredients, setCreatedIngredients] = useState<CustomIngredient[]>([])
   const [recipeSaving, setRecipeSaving] = useState<boolean>(false)
@@ -140,7 +136,7 @@ function App() {
   function saveRecipe() {
     if (recipe.isValid) {
       setRecipeSaving(true)
-      persistRecipe(recipe).then((createdRecipe) => {
+      firebaseApi.persistRecipe(recipe).then((createdRecipe) => {
         setRecipeSaving(false)
         clearRecipe()
         setCreatedIngredients((prevState) => [createdRecipe, ...prevState])
@@ -149,20 +145,20 @@ function App() {
   }
 
   function getRecentCustomIngredients() {
-    loadRecentlyCreatedCustomIngredients().then((recentIngredients) => {
+    firebaseApi.loadRecentlyCreatedCustomIngredients().then((recentIngredients) => {
       setCreatedIngredients((prevState) => [...recentIngredients, ...prevState])
     })
   }
 
   function getRecentRecipes() {
-    loadRecentlyCreatedRecipes().then((recentRecipes) => {
+    firebaseApi.loadRecentlyCreatedRecipes().then((recentRecipes) => {
       setCreatedIngredients((prevState) => [...recentRecipes, ...prevState])
     })
   }
 
 
   function createIngredient(ingredient: CustomIngredientUnsaved) {
-    persistCustomIngredient(ingredient).then((ingredient) => {
+    firebaseApi.persistCustomIngredient(ingredient).then((ingredient) => {
       setCreatedIngredients((prevState) => [ingredient, ...prevState])
     })
   }

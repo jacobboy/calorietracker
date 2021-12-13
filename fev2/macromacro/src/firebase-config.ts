@@ -17,7 +17,7 @@ const firebaseConfig = {
 };
 
 export function initFirebaseApp(): void {
-  initializeApp(firebaseConfig);
+  const app = initializeApp(firebaseConfig);
   // const analytics = getAnalytics(firebaseApp);
 
   if (process.env.NODE_ENV === 'test') {

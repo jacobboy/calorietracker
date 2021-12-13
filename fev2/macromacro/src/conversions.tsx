@@ -76,7 +76,13 @@ export function getPortionMacrosForMeasures(
             let description;
             // foundation foods have measure units?
             if (foodPortion.measureUnit?.name && foodPortion.measureUnit.name !== 'undetermined') {
-                description = `${foodPortion.measureUnit?.name} ${foodPortion.portionDescription || 'not set'}`
+                // this all works for https://fdc.nal.usda.gov/fdc-app.html#/food-details/748967/nutrients
+                description = [
+                    foodPortion.amount,
+                    foodPortion.measureUnit?.name,
+                    foodPortion.portionDescription
+                ].filter((x) => (x !== undefined) && (x !== 'undetermined') )
+                    .join(' ') + (foodPortion.modifier ? `, ${foodPortion.modifier}` : '')
             } else {
                 description = foodPortion.portionDescription || 'not set'
             }

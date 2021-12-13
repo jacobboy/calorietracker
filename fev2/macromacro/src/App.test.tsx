@@ -1,18 +1,14 @@
 import React from 'react';
-import {
-    findByRole,
-    findByText, getByLabelText,
-    getByRole,
-    getByText,
-    render,
-    screen,
-    within
-} from '@testing-library/react';
+import { getByLabelText, render, screen, within } from '@testing-library/react';
 import App from './App';
 import { server } from "./test/mockServer";
 import userEvent from '@testing-library/user-event'
 import { searchResponse } from "./test/responseFixtures";
 import { act } from "react-dom/test-utils";
+import { FirebaseAPI } from "./firebaseApi/api";
+
+
+let firebaseApi: FirebaseAPI;
 
 beforeAll(() => {
         server.listen(
@@ -26,9 +22,20 @@ beforeAll(() => {
     }
 );
 
+beforeEach(() => {
+    firebaseApi = new FirebaseAPI(
+        'test-ingredient-collection',
+        'test-recipe-collection'
+    )
+})
+
+afterEach(async () => {
+    await firebaseApi.deleteCollections()
+})
+
 
 test('Can add an ingredient to the recipe and save it', async () => {
-    const { debug } = render(<App/>);
+    const { debug } = render(<App firebaseApi={firebaseApi} />);
 
     const searchTable = screen.getByText('Search').closest('div')!
     const searchInput = within(searchTable).getByLabelText('search text');

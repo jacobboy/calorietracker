@@ -14,7 +14,7 @@ import {
 import { IngredientsTable } from "./ingredientsTable";
 import { getApiClient, getMeasuresForOneFood } from "./calls";
 import { getMacros, MathInputState, multiplyBaseMacro } from "./conversions";
-import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+import { Button, Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 
 export function IngredientSearch(
     addRecipeItem: (source: IngredientSource) => (fromPortion: PortionMacros, amount: MathInputState) => () => void,
@@ -181,7 +181,7 @@ export function IngredientSearch(
                         })
                     }
                 </FormGroup>
-                <input type="submit" value="Submit"/>
+                <Button variant="contained" color="primary" type="submit">Submit</Button>
             </form>
             {IngredientsTable(
                 'Custom Ingredients',

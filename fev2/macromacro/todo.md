@@ -4,6 +4,9 @@
 # algolia
 # hosting
 # copy recipe
+# fix links for ingredients and recipes
+# tests use random collection name and clean up
+## https://cloud.google.com/firestore/docs/samples/firestore-data-delete-collection#firestore_data_delete_collection-nodejs
 # make ingredient rows show macros for amount
 # reset search form and cursor location after adding ingredient
 ## hook yarn deploy command up to firebase?
