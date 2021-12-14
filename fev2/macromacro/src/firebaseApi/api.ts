@@ -176,6 +176,14 @@ export class FirebaseAPI {
         await deleteIngredientCollection
         await deleteRecipesCollection
     }
+
+    isUserSignedIn() {
+        return true
+    }
+
+    signIn() {
+
+    }
 }
 
 // from https://cloud.google.com/firestore/docs/samples/firestore-data-delete-collection#firestore_data_delete_collection-nodejs

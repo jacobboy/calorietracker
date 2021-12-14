@@ -16,6 +16,8 @@ import { CreateIngredient } from "./createIngredient";
 import { FirebaseAPI } from "./firebaseApi/api";
 import { initFirebaseApp } from "./firebase-config";
 
+import { Button } from '@mui/material';
+
 initFirebaseApp()
 
 const initalRecipe: RecipeUnsaved = {
@@ -165,21 +167,27 @@ function App({firebaseApi= new FirebaseAPI()}) {
 
   return (
     <div className="App">
-      {Recipe(
-          recipe,
-          changeRecipeItemAmount,
-          removeRecipeItem,
-          setRecipeName,
-          recipeSaving,
-          saveRecipe,
-          clearRecipe,
-          setRecipeAmount
-      )}
-      {CreateIngredient(createIngredient)}
-      {IngredientSearch(
-          addRecipeItem,
-          createdIngredients
-      )}
+      {
+        !firebaseApi.isUserSignedIn() ?
+            <Button onClick={firebaseApi.signIn}>Sign In</Button>
+            :
+            <>
+              {
+                Recipe(
+                    recipe,
+                    changeRecipeItemAmount,
+                    removeRecipeItem,
+                    setRecipeName,
+                    recipeSaving,
+                    saveRecipe,
+                    clearRecipe,
+                    setRecipeAmount
+                )
+              }
+              {CreateIngredient(createIngredient)}
+              {IngredientSearch(addRecipeItem, createdIngredients)}
+            </>
+      }
     </div>
   );
 }
