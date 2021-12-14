@@ -31,7 +31,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "firebase emulators:exec \"react-scripts test --env=./custom-jest-environment.js\"",
-    "eject": "react-scripts eject"
+    "test:ci": "firebase emulators:exec \"react-scripts test --watchAll=false --env=./custom-jest-environment.js\"",
+    "eject": "react-scripts eject",
+    "deploy": "CI=true yarn test && yarn build && firebase deploy"
   },
   "eslintConfig": {
     "extends": [

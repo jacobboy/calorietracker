@@ -1,20 +1,20 @@
 # current
+# auth
 
-
+# close up DB
 # algolia
-# hosting
+# deploy script
+# what's going on with the tests
 # copy recipe
 # fix links for ingredients and recipes
-# tests use random collection name and clean up
-## https://cloud.google.com/firestore/docs/samples/firestore-data-delete-collection#firestore_data_delete_collection-nodejs
 # make ingredient rows show macros for amount
 # reset search form and cursor location after adding ingredient
-## hook yarn deploy command up to firebase?
 # can't submit ingredient with unfilled out forms
 - formik?
 # Recipe notes
 # ingredient notes, starred, default portions, and portion aliases
 # make 1g portions
+# link households
 # handle ingredient portions
 # handle ingredient different units
 ## https://fdc.nal.usda.gov/fdc-app.html#/food-details/748278/nutrients might have ml?
