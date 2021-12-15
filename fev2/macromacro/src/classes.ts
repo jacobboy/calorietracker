@@ -18,8 +18,8 @@ export enum Unit {
 export interface Saved {
     timestamp: Timestamp,
     id: string,
-    name: string,
-    version: string
+    version: string,
+    creator: string
 }
 
 export type PortionSource = { source: 'portion', id?: number } |
@@ -85,18 +85,15 @@ export interface IngredientRowData extends SimpleMacros {
     householdServingFullText?: string
 }
 
-export interface CustomIngredient extends Saved {
+export interface CustomIngredientUnsaved {
+    name: string,
     baseMacros: DetailedMacros,
     portions: Quantity[],
     brandOwner?: string,
-    brandName?: string,
+    brandName?: string
 }
 
-export interface CustomIngredientFromDB extends CustomIngredient {
-    source: IngredientSource
-}
-
-export type CustomIngredientUnsaved = Omit<Omit<Omit<CustomIngredient, 'id'>, 'timestamp'>, 'version'>
+export interface CustomIngredient extends CustomIngredientUnsaved, Saved { }
 
 export interface RecipeItemUnsaved {
     source: IngredientSource,
@@ -119,6 +116,7 @@ export interface RecipeItem {
  }
 
 export interface Recipe extends Saved {
+    name: string,
     ingredients: RecipeItem[],
     amount: number,
     unit: Unit,

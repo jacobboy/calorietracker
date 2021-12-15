@@ -147,15 +147,19 @@ function App({firebaseApi= new FirebaseAPI()}) {
   }
 
   function getRecentCustomIngredients() {
-    firebaseApi.loadRecentlyCreatedCustomIngredients().then((recentIngredients) => {
-      setCreatedIngredients((prevState) => [...recentIngredients, ...prevState])
-    })
+    if (firebaseApi.isUserSignedIn()) {
+      firebaseApi.loadRecentlyCreatedCustomIngredients().then((recentIngredients) => {
+        setCreatedIngredients((prevState) => [...recentIngredients, ...prevState])
+      })
+    }
   }
 
   function getRecentRecipes() {
-    firebaseApi.loadRecentlyCreatedRecipes().then((recentRecipes) => {
-      setCreatedIngredients((prevState) => [...recentRecipes, ...prevState])
-    })
+    if (firebaseApi.isUserSignedIn()) {
+      firebaseApi.loadRecentlyCreatedRecipes().then((recentRecipes) => {
+        setCreatedIngredients((prevState) => [...recentRecipes, ...prevState])
+      })
+    }
   }
 
 
@@ -172,6 +176,7 @@ function App({firebaseApi= new FirebaseAPI()}) {
             <Button onClick={firebaseApi.signIn}>Sign In</Button>
             :
             <>
+              <Button onClick={firebaseApi.signOut}>Sign Out</Button>
               {
                 Recipe(
                     recipe,

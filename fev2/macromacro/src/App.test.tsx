@@ -8,6 +8,20 @@ import { act } from "react-dom/test-utils";
 import { FirebaseAPI } from "./firebaseApi/api";
 
 
+class TestFirebaseAPIWithNoAuth extends FirebaseAPI {
+
+    async signIn() {
+        throw new Error('really need to learn to test this better')
+    }
+
+    isUserSignedIn() {
+        return true
+    }
+
+    signOut() {}
+
+}
+
 let firebaseApi: FirebaseAPI;
 
 beforeAll(() => {
@@ -23,7 +37,7 @@ beforeAll(() => {
 );
 
 beforeEach(() => {
-    firebaseApi = new FirebaseAPI(
+    firebaseApi = new TestFirebaseAPIWithNoAuth(
         'test-ingredient-collection',
         'test-recipe-collection'
     )

@@ -7,7 +7,8 @@ import {
     limit,
     orderBy,
     query,
-    Timestamp
+    Timestamp,
+    where
 } from 'firebase/firestore';
 import {
     CustomIngredient,
@@ -16,7 +17,7 @@ import {
     RecipeUnsaved
 } from "../classes";
 import { per100MacrosForRecipe, totalMacrosForRecipe } from "../conversions";
-
+import { getAuth, GoogleAuthProvider, signInWithRedirect, signOut } from 'firebase/auth';
 
 const CUSTOM_INGREDIENTS_COLLECTION_NAME = 'customIngredients-v2';
 const RECIPES_COLLECTION_NAME = 'recipes-v2';
@@ -41,88 +42,106 @@ export class FirebaseAPI {
     }
 
     async persistCustomIngredient(ingredient: CustomIngredientUnsaved): Promise<CustomIngredient> {
-        const toSave: SavePrep<CustomIngredient> = {
-            ...stripUndefined(ingredient),
-            timestamp: Timestamp.fromDate(new Date()),
-            version: 'v1'
-        }
-        try {
-            const messageRef = await addDoc(
-                collection(getFirestore(), this.customIngredientCollectionName),
-                toSave
-            );
-            return {
-                ...toSave,
-                id: messageRef.id
+        const uid = this.getUserUid()
+        if (uid) {
+            const toSave: SavePrep<CustomIngredient> = {
+                ...stripUndefined(ingredient),
+                timestamp: Timestamp.fromDate(new Date()),
+                version: 'v1',
+                creator: uid
             }
-        } catch (error) {
-            console.error('Error writing ingredient to Firebase Database', error);
-            throw error;
+            try {
+                const messageRef = await addDoc(
+                    collection(getFirestore(), this.customIngredientCollectionName),
+                    toSave
+                );
+                return {
+                    ...toSave,
+                    id: messageRef.id
+                }
+            } catch (error) {
+                console.error('Error writing ingredient to Firebase Database', error);
+                throw error;
+            }
+        } else {
+            throw new Error('not authorized')
         }
     }
 
     async loadRecentlyCreatedCustomIngredients(): Promise<CustomIngredient[]> {
+        const uid = this.getUserUid()
+        if (uid) {
+            const recentMessagesQuery = query(
+                collection(getFirestore(), this.customIngredientCollectionName),
+                where("creator", "==", uid),
+                orderBy('timestamp', 'asc'),
+                limit(20)
+            );
 
-        const recentMessagesQuery = query(
-            collection(getFirestore(), this.customIngredientCollectionName),
-            orderBy('timestamp', 'asc'),
-            limit(20)
-        );
+            const querySnapshot = await getDocs(recentMessagesQuery);
 
-        const querySnapshot = await getDocs(recentMessagesQuery);
-
-        const customIngredients: CustomIngredient[] = []
-        querySnapshot.forEach((doc) => {
-            const data = doc.data()
-            customIngredients.push(
-                {
-                    id: doc.id,
-                    baseMacros: data.baseMacros,
-                    name: data.name,
-                    portions: data.portions,
-                    brandOwner: data.brandOwner,
-                    brandName: data.brandName,
-                    timestamp: Timestamp.fromMillis(
-                        data.timestamp.seconds * 1000 + data.timestamp.nanoseconds / 1000000
-                    ),
-                    version: 'v1'
-                }
-            )
-        })
-        return customIngredients
+            const customIngredients: CustomIngredient[] = []
+            querySnapshot.forEach((doc) => {
+                const data = doc.data()
+                customIngredients.push(
+                    {
+                        id: doc.id,
+                        baseMacros: data.baseMacros,
+                        name: data.name,
+                        portions: data.portions,
+                        brandOwner: data.brandOwner,
+                        brandName: data.brandName,
+                        timestamp: Timestamp.fromMillis(
+                            data.timestamp.seconds * 1000 + data.timestamp.nanoseconds / 1000000
+                        ),
+                        version: 'v1',
+                        creator: data.creator.uid
+                    }
+                )
+            })
+            return customIngredients
+        } else {
+            throw new Error('not authorized')
+        }
     }
 
     async loadRecentlyCreatedRecipes(): Promise<CustomIngredient[]> {
+        const uid = this.getUserUid()
+        if (uid) {
+            const recentMessagesQuery = query(
+                collection(getFirestore(), this.recipesCollectionName),
+                where("creator", "==", uid),
+                orderBy('timestamp', 'asc'),
+                limit(20)
+            );
 
-        const recentMessagesQuery = query(
-            collection(getFirestore(), this.recipesCollectionName),
-            orderBy('timestamp', 'asc'),
-            limit(20)
-        );
+            const querySnapshot = await getDocs(recentMessagesQuery);
 
-        const querySnapshot = await getDocs(recentMessagesQuery);
-
-        const recipes: CustomIngredient[] = []
-        querySnapshot.forEach((doc) => {
-            const data = doc.data()
-            recipes.push(
-                {
-                    id: doc.id,
-                    baseMacros: data.baseMacros,
-                    name: data.name,
-                    portions: data.portions,
-                    timestamp: Timestamp.fromMillis(
-                        data.timestamp.seconds * 1000 + data.timestamp.nanoseconds / 1000000
-                    ),
-                    version: 'v1'
-                }
-            )
-        })
-        return recipes
+            const recipes: CustomIngredient[] = []
+            querySnapshot.forEach((doc) => {
+                const data = doc.data()
+                recipes.push(
+                    {
+                        id: doc.id,
+                        baseMacros: data.baseMacros,
+                        name: data.name,
+                        portions: data.portions,
+                        timestamp: Timestamp.fromMillis(
+                            data.timestamp.seconds * 1000 + data.timestamp.nanoseconds / 1000000
+                        ),
+                        version: 'v1',
+                        creator: uid
+                    }
+                )
+            })
+            return recipes
+        } else {
+            throw new Error('not authorized')
+        }
     }
 
-    recipeUnsavedToRecipe(recipe: RecipeUnsaved): SavePrep<RecipeAndIngredient> {
-        const totalMacros = {...totalMacrosForRecipe(recipe), amount: recipe.amount.evaluated};
+    recipeUnsavedToRecipe(recipe: RecipeUnsaved, uid: string): SavePrep<RecipeAndIngredient> {
+        const totalMacros = { ...totalMacrosForRecipe(recipe), amount: recipe.amount.evaluated };
         const baseMacros = per100MacrosForRecipe(recipe.amount.evaluated, recipe, totalMacros)
         return {
             amount: recipe.amount.evaluated,
@@ -141,28 +160,34 @@ export class FirebaseAPI {
                 unit: baseMacros.unit,
                 description: baseMacros.description
             }],
-            timestamp: Timestamp.fromDate(new Date())
+            timestamp: Timestamp.fromDate(new Date()),
+            creator: uid
         }
     }
 
     async persistRecipe(recipe: RecipeUnsaved): Promise<RecipeAndIngredient> {
-        // remove undefined values
-        const toSave: SavePrep<RecipeAndIngredient> = {
-            ...stripUndefined(this.recipeUnsavedToRecipe(recipe)),
-        }
-
-        try {
-            const messageRef = await addDoc(
-                collection(getFirestore(), this.recipesCollectionName),
-                toSave
-            );
-            return {
-                ...toSave,
-                id: messageRef.id
+        const uid = this.getUserUid()
+        if (uid) {
+            // remove undefined values
+            const toSave: SavePrep<RecipeAndIngredient> = {
+                ...stripUndefined(this.recipeUnsavedToRecipe(recipe, uid)),
             }
-        } catch (error) {
-            console.error('Error writing recipe to Firebase Database', error);
-            throw error;
+
+            try {
+                const messageRef = await addDoc(
+                    collection(getFirestore(), this.recipesCollectionName),
+                    toSave
+                );
+                return {
+                    ...toSave,
+                    id: messageRef.id
+                }
+            } catch (error) {
+                console.error('Error writing recipe to Firebase Database', error);
+                throw error;
+            }
+        } else {
+            throw new Error('not authorized')
         }
     }
 
@@ -177,12 +202,23 @@ export class FirebaseAPI {
         await deleteRecipesCollection
     }
 
-    isUserSignedIn() {
-        return true
+    async signIn() {
+        const provider = new GoogleAuthProvider();
+        const auth = getAuth();
+        await signInWithRedirect(auth, provider);
     }
 
-    signIn() {
+    isUserSignedIn() {
+        const user = getAuth().currentUser
+        return !!user;
+    }
 
+    getUserUid(): string | undefined {
+        return getAuth().currentUser?.uid
+    }
+
+    signOut() {
+        signOut(getAuth());
     }
 }
 

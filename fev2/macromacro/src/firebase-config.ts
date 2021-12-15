@@ -1,5 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
+import { connectAuthEmulator, getAuth } from "firebase/auth";
+
 // import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -16,12 +18,15 @@ const firebaseConfig = {
   measurementId: "G-HCMQNGPE9P"
 };
 
-export function initFirebaseApp(): void {
+export function initFirebaseApp(): void  {
   const app = initializeApp(firebaseConfig);
   // const analytics = getAnalytics(firebaseApp);
 
   if (process.env.NODE_ENV === 'test') {
     const db = getFirestore();
     connectFirestoreEmulator(db, 'localhost', 8080);
+
+    const auth = getAuth();
+    connectAuthEmulator(auth, "http://localhost:9099");
   }
 }
