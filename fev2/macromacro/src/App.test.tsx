@@ -10,6 +10,10 @@ import { FirebaseAPI } from "./firebaseApi/api";
 
 class TestFirebaseAPIWithNoAuth extends FirebaseAPI {
 
+    getUserUid() {
+        return 'testuser'
+    }
+
     async signIn() {
         throw new Error('really need to learn to test this better')
     }
