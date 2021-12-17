@@ -1,4 +1,21 @@
 {
-  "indexes": [],
+  "indexes": [
+    {
+      "collectionGroup": "recipes-v3",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "creator", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "customIngredients-v3",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "creator", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }

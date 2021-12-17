@@ -17,8 +17,9 @@ import { FirebaseAPI } from "./firebaseApi/api";
 import { initFirebaseApp } from "./firebase-config";
 
 import { Button } from '@mui/material';
+import { User } from "firebase/auth";
 
-initFirebaseApp()
+// initFirebaseApp()
 
 const initalRecipe: RecipeUnsaved = {
   name: {
@@ -35,13 +36,18 @@ function App({firebaseApi= new FirebaseAPI()}) {
   const [recipe, setRecipe] = useState<RecipeUnsaved>(initalRecipe)
   const [createdIngredients, setCreatedIngredients] = useState<CustomIngredient[]>([])
   const [recipeSaving, setRecipeSaving] = useState<boolean>(false)
+  const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
     getRecentCustomIngredients()
-  }, [])
+  }, [user])
 
   useEffect(() => {
     getRecentRecipes()
+  }, [user])
+
+  useEffect(() => {
+    firebaseApi.registerAuthCallback(setUser)
   }, [])
 
   function addRecipeItem(source: IngredientSource) {
@@ -147,7 +153,7 @@ function App({firebaseApi= new FirebaseAPI()}) {
   }
 
   function getRecentCustomIngredients() {
-    if (firebaseApi.isUserSignedIn()) {
+    if (user) {
       firebaseApi.loadRecentlyCreatedCustomIngredients().then((recentIngredients) => {
         setCreatedIngredients((prevState) => [...recentIngredients, ...prevState])
       })
@@ -155,7 +161,7 @@ function App({firebaseApi= new FirebaseAPI()}) {
   }
 
   function getRecentRecipes() {
-    if (firebaseApi.isUserSignedIn()) {
+    if (user) {
       firebaseApi.loadRecentlyCreatedRecipes().then((recentRecipes) => {
         setCreatedIngredients((prevState) => [...recentRecipes, ...prevState])
       })
@@ -170,30 +176,23 @@ function App({firebaseApi= new FirebaseAPI()}) {
   }
 
   return (
-    <div className="App">
-      {
-        !firebaseApi.isUserSignedIn() ?
-            <Button onClick={firebaseApi.signIn}>Sign In</Button>
-            :
-            <>
-              <Button onClick={firebaseApi.signOut}>Sign Out</Button>
-              {
-                Recipe(
-                    recipe,
-                    changeRecipeItemAmount,
-                    removeRecipeItem,
-                    setRecipeName,
-                    recipeSaving,
-                    saveRecipe,
-                    clearRecipe,
-                    setRecipeAmount
-                )
-              }
-              {CreateIngredient(createIngredient)}
-              {IngredientSearch(addRecipeItem, createdIngredients)}
-            </>
-      }
-    </div>
+      <>
+        <Button onClick={firebaseApi.signOut}>Sign Out</Button>
+        {
+          Recipe(
+              recipe,
+              changeRecipeItemAmount,
+              removeRecipeItem,
+              setRecipeName,
+              recipeSaving,
+              saveRecipe,
+              clearRecipe,
+              setRecipeAmount
+          )
+        }
+        {CreateIngredient(createIngredient)}
+        {IngredientSearch(addRecipeItem, createdIngredients)}
+      </>
   );
 }
 
