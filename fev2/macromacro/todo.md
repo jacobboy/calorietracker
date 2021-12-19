@@ -1,8 +1,11 @@
 # current
+# algolia
+
+
+# total description has NaN g in it when making ice cream base 
 
 # make ingredient rows show macros for amount
 # reset search form and cursor location after adding ingredient
-# algolia
 # deploy script
 # what's going on with the tests
 # copy recipe

@@ -98,8 +98,10 @@ export function IngredientSearch(
             ).then(
                 (response) => {
                     if (response.data && response.data.foods) {
-                        // setSearchResults(response.data.foods)
+                        setRowsOpen({})
                         setSearchData(response.data.foods.map(createSearchIngredientRowData))
+                        setPortionMacros({})
+                        setEnteredAmounts({})
                     }
                 }
             )
