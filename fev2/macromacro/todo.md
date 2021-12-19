@@ -3,7 +3,6 @@
 
 
 # total description has NaN g in it when making ice cream base 
-
 # make ingredient rows show macros for amount
 # reset search form and cursor location after adding ingredient
 # deploy script
@@ -34,3 +33,18 @@
 - maybe just "deprecate" ingredients to exclude them from search?
 # improve search
 ## search pagination
+# firestore permissions issues
+why doesn't this work anymore?
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.creator;
+    }
+  }
+}
+```
+## clues
+- started just after adding algolia.  what does algolia do?
+- trying it in rules playground tells me that resource is null, but this is taked from the docs
