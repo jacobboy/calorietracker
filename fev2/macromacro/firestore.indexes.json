@@ -1,18 +1,11 @@
 {
   "indexes": [
     {
-      "collectionGroup": "recipes-v3",
+      "collectionGroup": "ingredients-and-recipes",
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "creator", "order": "ASCENDING" },
-        { "fieldPath": "timestamp", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "customIngredients-v3",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "creator", "order": "ASCENDING" },
+        { "fieldPath": "type", "order": "ASCENDING" },
         { "fieldPath": "timestamp", "order": "DESCENDING" }
       ]
     }

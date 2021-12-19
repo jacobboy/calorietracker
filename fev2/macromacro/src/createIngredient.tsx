@@ -6,7 +6,6 @@ import LoadingButton from '@mui/lab/LoadingButton';
 
 interface CustomIngredientBuilder {
     name: string,
-    id: string,
     brandOwner?: string,
     brandName?: string,
     portions: Quantity[],
@@ -15,7 +14,8 @@ interface CustomIngredientBuilder {
 
 const startIngredient: CustomIngredientBuilder = {
     name: 'One Slammin\' Ingredient',
-    id: 'TODO will this come from firebase?',
+    brandName: '',
+    brandOwner: '',
     macros: {
         calories: 0,
         fat: 0,
@@ -71,8 +71,8 @@ export function CreateIngredient(createIngredient: (ingredient: CustomIngredient
     function convertToCustomIngredientUnsaved(ingredient: CustomIngredientBuilder): CustomIngredientUnsaved {
         return {
             name: ingredient.name,
-            brandOwner: ingredient.brandOwner,
-            brandName: ingredient.brandName,
+            brandOwner: ingredient.brandOwner !== '' ? ingredient.brandOwner : undefined,
+            brandName: ingredient.brandName !== '' ? ingredient.brandName : undefined,
             portions: ingredient.portions,
             baseMacros: ingredient.macros
         }

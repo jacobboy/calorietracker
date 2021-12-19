@@ -18,10 +18,6 @@ class TestFirebaseAPIWithNoAuth extends FirebaseAPI {
         throw new Error('really need to learn to test this better')
     }
 
-    isUserSignedIn() {
-        return true
-    }
-
     signOut() {}
 
 }
@@ -42,8 +38,7 @@ beforeAll(() => {
 
 beforeEach(() => {
     firebaseApi = new TestFirebaseAPIWithNoAuth(
-        'test-ingredient-collection',
-        'test-recipe-collection'
+        'test-ingredient-collection'
     )
 })
 
@@ -53,7 +48,7 @@ afterEach(async () => {
 
 
 test('Can add an ingredient to the recipe and save it', async () => {
-    const { debug } = render(<App firebaseApi={firebaseApi} />);
+    render(<App firebaseApi={firebaseApi} />);
 
     const searchTable = screen.getByText('Search').closest('div')!
     const searchInput = within(searchTable).getByLabelText('search text');

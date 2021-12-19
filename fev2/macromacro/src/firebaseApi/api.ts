@@ -19,8 +19,7 @@ import {
 import { per100MacrosForRecipe, totalMacrosForRecipe } from "../conversions";
 import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithRedirect, signOut, User } from 'firebase/auth';
 
-const CUSTOM_INGREDIENTS_COLLECTION_NAME = 'customIngredients-v3';
-const RECIPES_COLLECTION_NAME = 'recipes-v3';
+const INGREDIENTS_INGREDIENTS_RECIPES_COLLECTION_NAME = 'ingredients-and-recipes';
 
 type SavePrep<T> = Omit<T, 'id'>
 
@@ -29,16 +28,11 @@ function stripUndefined<T>(t: T): T {
 }
 
 export class FirebaseAPI {
-
-    customIngredientCollectionName: string
-    recipesCollectionName: string
-
+    ingredientsAndRecipesCollectionName: string
     constructor(
-        customIngredientCollectionName: string = CUSTOM_INGREDIENTS_COLLECTION_NAME,
-        recipesCollectionName: string = RECIPES_COLLECTION_NAME
+        ingredientsAndRecipesCollectionName: string = INGREDIENTS_INGREDIENTS_RECIPES_COLLECTION_NAME,
     ) {
-        this.customIngredientCollectionName = customIngredientCollectionName
-        this.recipesCollectionName = recipesCollectionName
+        this.ingredientsAndRecipesCollectionName = ingredientsAndRecipesCollectionName
     }
 
     registerAuthCallback(authCallback: (user: User | null) => void) {
@@ -56,8 +50,8 @@ export class FirebaseAPI {
             }
             try {
                 const messageRef = await addDoc(
-                    collection(getFirestore(), this.customIngredientCollectionName),
-                    toSave
+                    collection(getFirestore(), this.ingredientsAndRecipesCollectionName),
+                    {...toSave, type: 'ingredient'}
                 );
                 return {
                     ...toSave,
@@ -76,8 +70,9 @@ export class FirebaseAPI {
         const uid = this.getUserUid()
         if (uid) {
             const recentMessagesQuery = query(
-                collection(getFirestore(), this.customIngredientCollectionName),
+                collection(getFirestore(), this.ingredientsAndRecipesCollectionName),
                 where("creator", "==", uid),
+                where("type", "==", 'ingredient'),
                 orderBy('timestamp', 'desc'),
                 limit(20)
             );
@@ -113,8 +108,9 @@ export class FirebaseAPI {
         const uid = this.getUserUid()
         if (uid) {
             const recentMessagesQuery = query(
-                collection(getFirestore(), this.recipesCollectionName),
+                collection(getFirestore(), this.ingredientsAndRecipesCollectionName),
                 where("creator", "==", uid),
+                where("type", "==", 'recipe'),
                 orderBy('timestamp', 'desc'),
                 limit(20)
             );
@@ -174,13 +170,13 @@ export class FirebaseAPI {
         if (uid) {
             // remove undefined values
             const toSave: SavePrep<RecipeAndIngredient> = {
-                ...stripUndefined(this.recipeUnsavedToRecipe(recipe, uid)),
+                ...stripUndefined(this.recipeUnsavedToRecipe(recipe, uid))
             }
 
             try {
                 const messageRef = await addDoc(
-                    collection(getFirestore(), this.recipesCollectionName),
-                    toSave
+                    collection(getFirestore(), this.ingredientsAndRecipesCollectionName),
+                    {...toSave, type: 'recipe'}
                 );
                 return {
                     ...toSave,
@@ -197,39 +193,15 @@ export class FirebaseAPI {
 
     async deleteCollections() {
         const deleteIngredientCollection = deleteCollection(
-            getFirestore(), this.customIngredientCollectionName
-        )
-        const deleteRecipesCollection = deleteCollection(
-            getFirestore(), this.recipesCollectionName
+            getFirestore(), this.ingredientsAndRecipesCollectionName
         )
         await deleteIngredientCollection
-        await deleteRecipesCollection
     }
 
     async signIn() {
         const provider = new GoogleAuthProvider();
         const auth = getAuth();
         await signInWithRedirect(auth, provider);
-    }
-
-    private onUser(callBack: (user: User | null) => void): void {
-        onAuthStateChanged(getAuth(), callBack);
-        // (user) => {
-        //     if (user) {
-        //         // User is signed in, see docs for a list of available properties
-        //         // https://firebase.google.com/docs/reference/js/firebase.User
-        //         return user.uid;
-        //         // ...
-        //     } else {
-        //         return undefined
-        //     }
-        // }
-    }
-
-    isUserSignedIn() {
-        const user = getAuth().currentUser
-        console.log(user)
-        return !!user;
     }
 
     getUserUid(): string | undefined {

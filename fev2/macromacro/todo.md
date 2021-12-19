@@ -1,13 +1,13 @@
 # current
 
+# make ingredient rows show macros for amount
+# reset search form and cursor location after adding ingredient
 # algolia
 # deploy script
 # what's going on with the tests
 # copy recipe
 # add date to ingredient and recipe tables
 # fix links for ingredients and recipes
-# make ingredient rows show macros for amount
-# reset search form and cursor location after adding ingredient
 # can't submit ingredient with unfilled out forms
 - formik?
 # Recipe notes
