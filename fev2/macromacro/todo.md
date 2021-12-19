@@ -48,3 +48,4 @@ service cloud.firestore {
 ## clues
 - started just after adding algolia.  what does algolia do?
 - trying it in rules playground tells me that resource is null, but this is taked from the docs
+- errors, but not denies, in firestore > rules > monitor rules. what are they?
