@@ -1,13 +1,12 @@
 # current
 # algolia
 
-
+# copy recipe
 # total description has NaN g in it when making ice cream base 
 # make ingredient rows show macros for amount
 # reset search form and cursor location after adding ingredient
 # deploy script
 # what's going on with the tests
-# copy recipe
 # add date to ingredient and recipe tables
 # fix links for ingredients and recipes
 # can't submit ingredient with unfilled out forms
@@ -18,6 +17,7 @@
 # link households
 # handle ingredient portions
 # handle ingredient different units
+## https://fdc.nal.usda.gov/fdc-app.html#/food-details/2086725/nutrients has ml
 ## https://fdc.nal.usda.gov/fdc-app.html#/food-details/748278/nutrients might have ml?
 # foods where default isn't 100g?
 # branded foods '"Calculated from value per serving size measure"'

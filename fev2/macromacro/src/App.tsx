@@ -103,7 +103,8 @@ function App({firebaseApi= new FirebaseAPI()}) {
     const isValid: boolean = (
         recipe.ingredients.length > 0 &&
         recipe.ingredients.map((i) => i.amount.isValid).every((b) => b) &&
-            recipe.name.isValid
+            recipe.name.isValid &&
+            recipe.amount.isValid
     )
     setRecipe((prevState) => {
       return {
