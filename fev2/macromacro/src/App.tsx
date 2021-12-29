@@ -14,12 +14,9 @@ import { Recipe } from "./recipe";
 import { IngredientSearch } from "./ingredientSearch";
 import { CreateIngredient } from "./createIngredient";
 import { FirebaseAPI } from "./firebaseApi/api";
-import { initFirebaseApp } from "./firebase-config";
 
 import { Button } from '@mui/material';
 import { User } from "firebase/auth";
-
-// initFirebaseApp()
 
 const initalRecipe: RecipeUnsaved = {
   name: {
@@ -34,17 +31,8 @@ const initalRecipe: RecipeUnsaved = {
 
 function App({firebaseApi= new FirebaseAPI()}) {
   const [recipe, setRecipe] = useState<RecipeUnsaved>(initalRecipe)
-  // const [createdIngredients, setCreatedIngredients] = useState<CustomIngredient[]>([])
   const [recipeSaving, setRecipeSaving] = useState<boolean>(false)
   const [user, setUser] = useState<User | null>(null)
-
-  // useEffect(() => {
-  //   getRecentCustomIngredients()
-  // }, [user])
-  //
-  // useEffect(() => {
-  //   getRecentRecipes()
-  // }, [user])
 
   useEffect(() => {
     firebaseApi.registerAuthCallback(setUser)
@@ -148,32 +136,13 @@ function App({firebaseApi= new FirebaseAPI()}) {
       firebaseApi.persistRecipe(recipe).then((createdRecipe) => {
         setRecipeSaving(false)
         clearRecipe()
-        // setCreatedIngredients((prevState) => [createdRecipe, ...prevState])
       })
     }
   }
 
-  // function getRecentCustomIngredients() {
-  //   if (user) {
-  //     firebaseApi.loadRecentlyCreatedCustomIngredients().then((recentIngredients) => {
-  //       setCreatedIngredients((prevState) => [...recentIngredients, ...prevState])
-  //     })
-  //   }
-  // }
-  //
-  // function getRecentRecipes() {
-  //   if (user) {
-  //     firebaseApi.loadRecentlyCreatedRecipes().then((recentRecipes) => {
-  //       setCreatedIngredients((prevState) => [...recentRecipes, ...prevState])
-  //     })
-  //   }
-  // }
-
 
   function createIngredient(ingredient: CustomIngredientUnsaved) {
-    firebaseApi.persistCustomIngredient(ingredient).then((ingredient) => {
-      // setCreatedIngredients((prevState) => [ingredient, ...prevState])
-    })
+    firebaseApi.persistCustomIngredient(ingredient)
   }
 
   return (

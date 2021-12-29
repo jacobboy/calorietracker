@@ -1,18 +1,17 @@
 # current
-## make ingredient rows show macros for amount
 ## copy recipe
 
 # TODO
+## reset search form and cursor location after adding ingredient
+## Recipe notes and links
+## fix links for ingredients and recipes
 ## household sharing
 ## total description has NaN g in it when making ice cream base 
-## reset search form and cursor location after adding ingredient
 ## deploy script
 ## what's going on with the tests
 ## add date to ingredient and recipe tables
-## fix links for ingredients and recipes
 ## can't submit ingredient with unfilled out forms
 - formik?
-## Recipe notes
 ## clear search button
 ## ingredient notes, starred, default portions, and portion aliases
 ## make 1g portions
@@ -55,3 +54,4 @@ service cloud.firestore {
 
 # done
 ## algolia
+## make ingredient rows show macros for amount
