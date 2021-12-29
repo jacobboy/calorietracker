@@ -34,17 +34,17 @@ const initalRecipe: RecipeUnsaved = {
 
 function App({firebaseApi= new FirebaseAPI()}) {
   const [recipe, setRecipe] = useState<RecipeUnsaved>(initalRecipe)
-  const [createdIngredients, setCreatedIngredients] = useState<CustomIngredient[]>([])
+  // const [createdIngredients, setCreatedIngredients] = useState<CustomIngredient[]>([])
   const [recipeSaving, setRecipeSaving] = useState<boolean>(false)
   const [user, setUser] = useState<User | null>(null)
 
-  useEffect(() => {
-    getRecentCustomIngredients()
-  }, [user])
-
-  useEffect(() => {
-    getRecentRecipes()
-  }, [user])
+  // useEffect(() => {
+  //   getRecentCustomIngredients()
+  // }, [user])
+  //
+  // useEffect(() => {
+  //   getRecentRecipes()
+  // }, [user])
 
   useEffect(() => {
     firebaseApi.registerAuthCallback(setUser)
@@ -148,31 +148,31 @@ function App({firebaseApi= new FirebaseAPI()}) {
       firebaseApi.persistRecipe(recipe).then((createdRecipe) => {
         setRecipeSaving(false)
         clearRecipe()
-        setCreatedIngredients((prevState) => [createdRecipe, ...prevState])
+        // setCreatedIngredients((prevState) => [createdRecipe, ...prevState])
       })
     }
   }
 
-  function getRecentCustomIngredients() {
-    if (user) {
-      firebaseApi.loadRecentlyCreatedCustomIngredients().then((recentIngredients) => {
-        setCreatedIngredients((prevState) => [...recentIngredients, ...prevState])
-      })
-    }
-  }
-
-  function getRecentRecipes() {
-    if (user) {
-      firebaseApi.loadRecentlyCreatedRecipes().then((recentRecipes) => {
-        setCreatedIngredients((prevState) => [...recentRecipes, ...prevState])
-      })
-    }
-  }
+  // function getRecentCustomIngredients() {
+  //   if (user) {
+  //     firebaseApi.loadRecentlyCreatedCustomIngredients().then((recentIngredients) => {
+  //       setCreatedIngredients((prevState) => [...recentIngredients, ...prevState])
+  //     })
+  //   }
+  // }
+  //
+  // function getRecentRecipes() {
+  //   if (user) {
+  //     firebaseApi.loadRecentlyCreatedRecipes().then((recentRecipes) => {
+  //       setCreatedIngredients((prevState) => [...recentRecipes, ...prevState])
+  //     })
+  //   }
+  // }
 
 
   function createIngredient(ingredient: CustomIngredientUnsaved) {
     firebaseApi.persistCustomIngredient(ingredient).then((ingredient) => {
-      setCreatedIngredients((prevState) => [ingredient, ...prevState])
+      // setCreatedIngredients((prevState) => [ingredient, ...prevState])
     })
   }
 
@@ -192,7 +192,7 @@ function App({firebaseApi= new FirebaseAPI()}) {
           )
         }
         {CreateIngredient(createIngredient)}
-        {IngredientSearch(addRecipeItem, createdIngredients)}
+        {IngredientSearch(addRecipeItem)}
       </>
   );
 }

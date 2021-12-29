@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import Input from '@mui/material/Input';
 import TableContainer from '@mui/material/TableContainer';
@@ -15,10 +15,14 @@ import { IngredientsTable } from "./ingredientsTable";
 import { getApiClient, getMeasuresForOneFood } from "./calls";
 import { getMacros, MathInputState, multiplyBaseMacro } from "./conversions";
 import { Button, Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+import { AlgoliaClient } from "./algolia/algolia";
+
+
+const algolia = new AlgoliaClient()
+
 
 export function IngredientSearch(
-    addRecipeItem: (source: IngredientSource) => (fromPortion: PortionMacros, amount: MathInputState) => () => void,
-    createdIngredients: CustomIngredient[]
+    addRecipeItem: (source: IngredientSource) => (fromPortion: PortionMacros, amount: MathInputState) => () => void
 ) {
     const [searchText, setSearchText] = useState('');
     const [searchDataTypes, setSearchDataTypes] = useState<Record<DataTypes, boolean>>({'Branded': true, 'Foundation': true, 'Survey (FNDDS)': true, 'SR Legacy': true})
@@ -27,11 +31,18 @@ export function IngredientSearch(
     const [rowsOpen, setRowsOpen] = useState<Record<IngredientId, boolean>>({})
     const [enteredAmounts, setEnteredAmounts] = useState<Record<IngredientId, Record<number, MathInputState>>>({})
     const [portionMacros, setPortionMacros] = useState<Record<IngredientId, PortionMacros[]>>({})
+    const [createdIngredients, setCreatedIngredients] = useState<CustomIngredient[]>([])
+
+    useEffect(() => {
+        searchCustomIngredientsAndRecipes()
+    }, [])
 
     function toggleOpen(id: IngredientId) {
-        setRowsOpen({
-            ...rowsOpen,
-            [id]: !rowsOpen[id]
+        setRowsOpen((prevState ) => {
+            return {
+                ...prevState,
+                [id]: !rowsOpen[id]
+            }
         })
     }
 
@@ -106,7 +117,15 @@ export function IngredientSearch(
                 }
             )
         }
+        searchCustomIngredientsAndRecipes()
         event.preventDefault();
+    }
+
+    function searchCustomIngredientsAndRecipes() {
+        algolia.searchStuff(searchText).then((ingredients) => {
+            // TODO function for converting these, these Hit objects have extra stuff
+            setCreatedIngredients(ingredients)
+        });
     }
 
     function changePortionAmount(id: IngredientId) {

@@ -93,7 +93,7 @@ export class FirebaseAPI {
                         timestamp: Timestamp.fromMillis(
                             data.timestamp.seconds * 1000 + data.timestamp.nanoseconds / 1000000
                         ),
-                        version: 'v1',
+                        version: data.version,
                         creator: data.creator
                     }
                 )
