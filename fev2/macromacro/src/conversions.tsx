@@ -28,7 +28,7 @@ export function scaleUpOrUndefined(scale: number, x?: number): number | undefine
 TODO this should take the incoming unit and raise an error if it can't be converted
      also, base macros may not be grams
 */
-export function multiplyBaseMacro(
+export function scaleBaseMacro(
     baseMacros: DetailedMacros,
     description: string,
     amount: number,
@@ -91,7 +91,7 @@ export function getPortionMacrosForMeasures(
             const gramWeight = foodPortion.gramWeight || 0
 
             const portionMacro: PortionMacros = {
-                ...multiplyBaseMacro(baseMacros, description, gramWeight, {source: 'portion', id: foodPortion.id})
+                ...scaleBaseMacro(baseMacros, description, gramWeight, {source: 'portion', id: foodPortion.id})
             }
 
             portions.push(portionMacro)
@@ -180,7 +180,7 @@ export function sum(xs: number[]): number | undefined {
 }
 
 export function totalMacrosForRecipe(recipe: RecipeUnsaved): Omit<DetailedMacros, 'amount'> {
-    const macros: DetailedMacros[] = recipe.ingredients.map((recipeItem) => multiplyBaseMacro(
+    const macros: DetailedMacros[] = recipe.ingredients.map((recipeItem) => scaleBaseMacro(
         recipeItem.macros.baseMacros,
         recipeItem.macros.description,
         recipeItem.amount.evaluated * recipeItem.macros.amount,

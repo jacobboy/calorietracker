@@ -13,7 +13,7 @@ import {
 } from "./classes";
 import { IngredientsTable } from "./ingredientsTable";
 import { getApiClient, getMeasuresForOneFood } from "./calls";
-import { getMacros, MathInputState, multiplyBaseMacro } from "./conversions";
+import { getMacros, MathInputState, scaleBaseMacro } from "./conversions";
 import { Button, Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 import { AlgoliaClient } from "./algolia/algolia";
 
@@ -151,7 +151,7 @@ export function IngredientSearch(
                     (portion, idx) => {
                         return {
                             dataProvenance: 'createIngredient',
-                            ...multiplyBaseMacro(
+                            ...scaleBaseMacro(
                                 ingredient.baseMacros,
                                 portion.description,
                                 portion.amount,

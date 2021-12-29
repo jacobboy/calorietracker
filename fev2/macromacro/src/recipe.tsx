@@ -12,7 +12,7 @@ import {
     getCaloriePercents,
     MathInput,
     MathInputState,
-    multiplyBaseMacro,
+    scaleBaseMacro,
     per100MacrosForRecipe,
     round,
     sum,
@@ -108,7 +108,7 @@ export function Recipe(
                         recipe.ingredients.map(
                             (recipeItem, idx) => RecipeRow(
                                 recipeItem,
-                                multiplyBaseMacro(
+                                scaleBaseMacro(
                                     recipeItem.macros.baseMacros,
                                     recipeItem.macros.description,
                                     recipeItem.amount.evaluated * recipeItem.macros.amount,

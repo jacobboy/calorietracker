@@ -3,7 +3,7 @@ import './App.css';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import { PortionMacros, IngredientRowData, IngredientId, IngredientSource } from "./classes";
-import { MathInput, MathInputState, round } from "./conversions";
+import { MathInput, MathInputState, scaleBaseMacro, round } from "./conversions";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableHead from '@mui/material/TableHead';
@@ -29,6 +29,14 @@ function PortionTableRow(
         e.preventDefault()
     }
 
+    const scaleToAmount = (portionAmount.evaluated || 1) * macro.amount
+    const scaledMacros = scaleBaseMacro(
+        macro,
+        macro.description,
+        scaleToAmount,
+        macro.portionSource
+    )
+
     return (
         <TableRow key={`${row.source.id}-${idx}-details`}>
             {/*// TODO what is this component and scope*/}
@@ -37,16 +45,16 @@ function PortionTableRow(
                     {MathInput(portionAmount.input, portionAmount.isValid, changePortionAmount)}
                 </form>
             </TableCell>
-            <TableCell align="right">{macro.description}</TableCell>
-            <TableCell align="right">{macro.amount}</TableCell>
-            <TableCell align="right">{macro.unit}</TableCell>
-            <TableCell align="right">{round(macro.calories)}</TableCell>
-            <TableCell align="right">{round(macro.fat)}</TableCell>
-            <TableCell align="right">{round(macro.carbs)}</TableCell>
-            <TableCell align="right">{round(macro.dietaryFiber)}</TableCell>
-            <TableCell align="right">{round(macro.solubleFiber)}</TableCell>
-            <TableCell align="right">{round(macro.sugar)}</TableCell>
-            <TableCell align="right">{round(macro.protein)}</TableCell>
+            <TableCell align="right">{scaledMacros.description}</TableCell>
+            <TableCell align="right">{scaledMacros.amount}</TableCell>
+            <TableCell align="right">{scaledMacros.unit}</TableCell>
+            <TableCell align="right">{round(scaledMacros.calories)}</TableCell>
+            <TableCell align="right">{round(scaledMacros.fat)}</TableCell>
+            <TableCell align="right">{round(scaledMacros.carbs)}</TableCell>
+            <TableCell align="right">{round(scaledMacros.dietaryFiber)}</TableCell>
+            <TableCell align="right">{round(scaledMacros.solubleFiber)}</TableCell>
+            <TableCell align="right">{round(scaledMacros.sugar)}</TableCell>
+            <TableCell align="right">{round(scaledMacros.protein)}</TableCell>
         </TableRow>
     );
 }
