@@ -2,29 +2,95 @@ import {
     addDoc,
     collection,
     deleteDoc,
+    DocumentData,
     getDocs,
     getFirestore,
     limit,
     orderBy,
     query,
+    QueryDocumentSnapshot,
     Timestamp,
     where
 } from 'firebase/firestore';
 import {
     CustomIngredient,
+    CustomIngredientDocV1,
     CustomIngredientUnsaved,
     RecipeAndIngredient,
-    RecipeUnsaved
+    RecipeAndIngredientDocV1,
+    RecipeUnsaved,
+    SavePrep,
+    SearchResults
 } from "../classes";
 import { per100MacrosForRecipe, totalMacrosForRecipe } from "../conversions";
-import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithRedirect, signOut, User } from 'firebase/auth';
+import {
+    getAuth,
+    GoogleAuthProvider,
+    onAuthStateChanged,
+    signInWithRedirect,
+    signOut,
+    User
+} from 'firebase/auth';
 
 const INGREDIENTS_INGREDIENTS_RECIPES_COLLECTION_NAME = 'ingredients-and-recipes';
 
-type SavePrep<T> = Omit<T, 'id'>
 
 function stripUndefined<T>(t: T): T {
     return JSON.parse(JSON.stringify(t)) as T
+}
+
+function isRecipe(doc: DocumentData): doc is RecipeAndIngredientDocV1 {
+    // @ts-ignore
+    return doc.ingredients !== undefined && doc.amount !== undefined
+}
+
+function makeRecipeOrIngredient(doc: QueryDocumentSnapshot<DocumentData>): [CustomIngredient, undefined] | [undefined, RecipeAndIngredient] {
+    const id = doc.id
+    const data = doc.data()
+    if (isRecipe(doc)) {
+        const recipe: RecipeAndIngredient = {
+            id: id,
+            baseMacros: data.baseMacros,
+            name: data.name,
+            portions: data.portions,
+            brandOwner: data.brandOwner,
+            brandName: data.brandName,
+            timestamp: Timestamp.fromMillis(
+                data.timestamp.seconds * 1000 + data.timestamp.nanoseconds / 1000000
+            ),
+            version: data.version,
+            creator: data.creator,
+            amount: data.amount,
+            ingredients: data.ingredients,
+            unit: data.unit,
+            source: {
+                dataSource: 'createRecipe',
+                name: data.name,
+                id: id
+            }
+        }
+        return [undefined, recipe]
+    } else {
+        const ingredient: CustomIngredient = {
+            id: id,
+            baseMacros: data.baseMacros,
+            name: data.name,
+            portions: data.portions,
+            brandOwner: data.brandOwner,
+            brandName: data.brandName,
+            timestamp: Timestamp.fromMillis(
+                data.timestamp.seconds * 1000 + data.timestamp.nanoseconds / 1000000
+            ),
+            version: data.version,
+            creator: data.creator,
+            source: {
+                dataSource: 'createIngredient',
+                name: data.name,
+                id: id
+            }
+        }
+        return [ingredient, undefined]
+    }
 }
 
 export class FirebaseAPI {
@@ -46,16 +112,22 @@ export class FirebaseAPI {
                 ...stripUndefined(ingredient),
                 timestamp: Timestamp.fromDate(new Date()),
                 version: 'v1',
-                creator: uid
+                creator: uid,
             }
             try {
+                const doc: CustomIngredientDocV1 = {...toSave, type: 'ingredient'}
                 const messageRef = await addDoc(
                     collection(getFirestore(), this.ingredientsAndRecipesCollectionName),
-                    {...toSave, type: 'ingredient'}
+                    doc
                 );
                 return {
                     ...toSave,
-                    id: messageRef.id
+                    id: messageRef.id,
+                    source: {
+                        dataSource: 'createIngredient',
+                        name: toSave.name,
+                        id: messageRef.id
+                    }
                 }
             } catch (error) {
                 console.error('Error writing ingredient to Firebase Database', error);
@@ -66,7 +138,7 @@ export class FirebaseAPI {
         }
     }
 
-    async loadRecentlyCreatedCustomIngredients(): Promise<CustomIngredient[]> {
+    async loadRecentlyCreatedCustomIngredients(): Promise<SearchResults> {
         const uid = this.getUserUid()
         if (uid) {
             const recentMessagesQuery = query(
@@ -79,62 +151,22 @@ export class FirebaseAPI {
 
             const querySnapshot = await getDocs(recentMessagesQuery);
 
-            const customIngredients: CustomIngredient[] = []
+            const searchResults: SearchResults = {
+                ingredients: [],
+                recipes: []
+            }
             querySnapshot.forEach((doc) => {
-                const data = doc.data()
-                customIngredients.push(
-                    {
-                        id: doc.id,
-                        baseMacros: data.baseMacros,
-                        name: data.name,
-                        portions: data.portions,
-                        brandOwner: data.brandOwner,
-                        brandName: data.brandName,
-                        timestamp: Timestamp.fromMillis(
-                            data.timestamp.seconds * 1000 + data.timestamp.nanoseconds / 1000000
-                        ),
-                        version: data.version,
-                        creator: data.creator
-                    }
-                )
+                const [ingredient, recipe] = makeRecipeOrIngredient(doc)
+                if (ingredient) {
+                    searchResults.ingredients.push(
+                        ingredient
+                    )
+                }
+                if (recipe) {
+                    searchResults.recipes.push(recipe)
+                }
             })
-            return customIngredients
-        } else {
-            throw new Error('not authorized')
-        }
-    }
-
-    async loadRecentlyCreatedRecipes(): Promise<CustomIngredient[]> {
-        const uid = this.getUserUid()
-        if (uid) {
-            const recentMessagesQuery = query(
-                collection(getFirestore(), this.ingredientsAndRecipesCollectionName),
-                where("creator", "==", uid),
-                where("type", "==", 'recipe'),
-                orderBy('timestamp', 'desc'),
-                limit(20)
-            );
-
-            const querySnapshot = await getDocs(recentMessagesQuery);
-
-            const recipes: CustomIngredient[] = []
-            querySnapshot.forEach((doc) => {
-                const data = doc.data()
-                recipes.push(
-                    {
-                        id: doc.id,
-                        baseMacros: data.baseMacros,
-                        name: data.name,
-                        portions: data.portions,
-                        timestamp: Timestamp.fromMillis(
-                            data.timestamp.seconds * 1000 + data.timestamp.nanoseconds / 1000000
-                        ),
-                        version: 'v1',
-                        creator: uid
-                    }
-                )
-            })
-            return recipes
+            return searchResults
         } else {
             throw new Error('not authorized')
         }
@@ -174,13 +206,19 @@ export class FirebaseAPI {
             }
 
             try {
+                const doc: RecipeAndIngredientDocV1 = {...toSave, type: 'recipe'}
                 const messageRef = await addDoc(
                     collection(getFirestore(), this.ingredientsAndRecipesCollectionName),
-                    {...toSave, type: 'recipe'}
+                    doc
                 );
                 return {
                     ...toSave,
-                    id: messageRef.id
+                    id: messageRef.id,
+                    source: {
+                        dataSource: 'createRecipe',
+                        name: toSave.name,
+                        id: messageRef.id
+                    }
                 }
             } catch (error) {
                 console.error('Error writing recipe to Firebase Database', error);

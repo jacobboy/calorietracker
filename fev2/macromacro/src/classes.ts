@@ -19,7 +19,9 @@ export interface Saved {
     timestamp: Timestamp,
     id: string,
     version: string,
-    creator: string
+    creator: string,
+    // TODO id and name in IngredientSource are redundant now
+    source: IngredientSource
 }
 
 export type PortionSource = { source: 'portion', id?: number } |
@@ -27,19 +29,25 @@ export type PortionSource = { source: 'portion', id?: number } |
     { source: 'labelNutrients' } |
     { source: 'g' } | { source: 'ml' }  // for created ingredients
 
-export type IngredientSource = {
+type FDCSource = {
     dataSource: 'fdcApi',
     name: string,
     id: number
-} | {
+}
+
+type CreateIngredientSource = {
     dataSource: 'createIngredient',
     name: string,
     id: string
-} | {
+}
+
+type CreateRecipeSource = {
     dataSource: 'createRecipe',
     name: string,
     id: string
 }
+
+export type IngredientSource = FDCSource | CreateIngredientSource | CreateRecipeSource
 
 export interface Quantity {
     unit: Unit,
@@ -90,10 +98,12 @@ export interface CustomIngredientUnsaved {
     baseMacros: DetailedMacros,
     portions: Quantity[],
     brandOwner?: string,
-    brandName?: string
+    brandName?: string,
 }
 
-export interface CustomIngredient extends CustomIngredientUnsaved, Saved { }
+export interface CustomIngredient extends CustomIngredientUnsaved, Saved {
+    source: CreateIngredientSource
+}
 
 export interface RecipeItemUnsaved {
     source: IngredientSource,
@@ -120,6 +130,26 @@ export interface Recipe extends Saved {
     ingredients: RecipeItem[],
     amount: number,
     unit: Unit,
+    source: CreateRecipeSource
 }
 
-export type RecipeAndIngredient = Recipe & CustomIngredient
+export interface RecipeAndIngredient extends Omit<Recipe & CustomIngredient, 'source'> {
+    source: CreateRecipeSource
+}
+
+export interface SearchResults {
+    ingredients: CustomIngredient[]
+    recipes: RecipeAndIngredient[]
+}
+
+export type SavePrep<T> = Omit<Omit<T, 'id'>, 'source'>
+
+export interface CustomIngredientDocV1 extends SavePrep<CustomIngredient> {
+    type: 'ingredient'
+}
+
+export interface RecipeAndIngredientDocV1 extends SavePrep<RecipeAndIngredient> {
+    type: 'recipe'
+}
+
+export type DBContentsV1 = CustomIngredientDocV1 | RecipeAndIngredientDocV1

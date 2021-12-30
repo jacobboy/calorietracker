@@ -9,7 +9,7 @@ import {
     IngredientId,
     IngredientRowData,
     IngredientSource,
-    PortionMacros
+    PortionMacros, RecipeUnsaved
 } from "./classes";
 import { IngredientsTable } from "./ingredientsTable";
 import { getApiClient, getMeasuresForOneFood } from "./calls";
@@ -22,7 +22,8 @@ const algolia = new AlgoliaClient()
 
 
 export function IngredientSearch(
-    addRecipeItem: (source: IngredientSource) => (fromPortion: PortionMacros, amount: MathInputState) => () => void
+    addRecipeItem: (source: IngredientSource) => (fromPortion: PortionMacros, amount: MathInputState) => () => void,
+    copyRecipe: (recipe: RecipeUnsaved) => void
 ) {
     const [searchText, setSearchText] = useState('');
     const [searchDataTypes, setSearchDataTypes] = useState<Record<DataTypes, boolean>>({'Branded': true, 'Foundation': true, 'Survey (FNDDS)': true, 'SR Legacy': true})

@@ -38,6 +38,12 @@ function App({firebaseApi= new FirebaseAPI()}) {
     firebaseApi.registerAuthCallback(setUser)
   }, [])
 
+  function copyRecipe(recipe: RecipeUnsaved) {
+    setRecipe((prevState) => {
+      return recipe
+    })
+  }
+
   function addRecipeItem(source: IngredientSource) {
     return (fromPortion: PortionMacros, enteredAmount: MathInputState) => {
       return () => {
@@ -140,7 +146,6 @@ function App({firebaseApi= new FirebaseAPI()}) {
     }
   }
 
-
   function createIngredient(ingredient: CustomIngredientUnsaved) {
     firebaseApi.persistCustomIngredient(ingredient)
   }
@@ -161,7 +166,7 @@ function App({firebaseApi= new FirebaseAPI()}) {
           )
         }
         {CreateIngredient(createIngredient)}
-        {IngredientSearch(addRecipeItem)}
+        {IngredientSearch(addRecipeItem, copyRecipe)}
       </>
   );
 }
