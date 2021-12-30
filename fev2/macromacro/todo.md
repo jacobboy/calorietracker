@@ -1,8 +1,7 @@
 # current
-## copy recipe
+## reset search form and cursor location after adding ingredient
 
 # TODO
-## reset search form and cursor location after adding ingredient
 ## Recipe notes and links
 ## fix links for ingredients and recipes
 ## household sharing
@@ -55,3 +54,4 @@ service cloud.firestore {
 # done
 ## algolia
 ## make ingredient rows show macros for amount
+## copy recipe

@@ -18,7 +18,7 @@ import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { CircularProgress, TableContainer } from "@mui/material";
+import { Button, CircularProgress, TableContainer } from "@mui/material";
 
 function PortionTableRow(
     row: IngredientRowData,
@@ -92,7 +92,10 @@ function Row(
                 <TableCell component="th" scope="row">
                     <a target="_blank" rel="noreferrer"
                        // TODO this is wrong for ingredients and recipes.  Add url to source?
-                       href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${row.source.id}/nutrients`}>{row.source.name}</a>
+                       href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${row.source.id}/nutrients`}>
+                        {row.source.name}
+                    </a>
+                    {copyRecipe && <Button onClick={copyRecipe}>Copy</Button>}
                 </TableCell>
                 <TableCell align="right">{row.dataType}</TableCell>
                 <TableCell align="right">{row.brandOwner}</TableCell>
@@ -201,7 +204,7 @@ export function IngredientsTable(
                                 enteredAmounts[row.source.id] || {},
                                 changePortionAmount(row.source.id),
                                 addRecipeItem(row.source),
-                                copyRecipe[row.source.id]
+                                copyRecipe && copyRecipe[row.source.id]
                             )
                         )
                     }
