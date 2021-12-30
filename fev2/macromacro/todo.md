@@ -1,5 +1,4 @@
 # current
-## reset cursor location after adding ingredient
 ## reset search form after adding ingredient
 
 # TODO
@@ -55,3 +54,4 @@ service cloud.firestore {
 ## make ingredient rows show macros for amount
 ## copy recipe
 ## ingredient vs recipe in ingredient search
+## reset cursor location after adding ingredient

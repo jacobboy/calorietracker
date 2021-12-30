@@ -93,6 +93,7 @@ function App({firebaseApi= new FirebaseAPI()}) {
   useEffect(() => {
     if (searchRef.current) {
       searchRef.current.focus()
+      window.scrollTo(0, 0)
     }
   }, [recipe])
 
