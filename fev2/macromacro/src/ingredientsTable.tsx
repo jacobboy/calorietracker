@@ -166,7 +166,7 @@ export function IngredientsTable(
 ) {
     return <div>
         <TableContainer>
-            <Table sx={{minWidth: 650}} aria-label={`${name.toLocaleLowerCase()} table`}>
+            <Table className='MacrosTable' sx={{minWidth: 650}} aria-label={`${name.toLocaleLowerCase()} table`}>
                 <caption>{name}</caption>
                 <TableHead>
                     <TableRow key='header'>

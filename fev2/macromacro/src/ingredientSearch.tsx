@@ -9,7 +9,7 @@ import {
     IngredientId,
     IngredientRowData,
     IngredientSource,
-    PortionMacros, RecipeUnsaved
+    PortionMacros, RecipeAndIngredient, RecipeUnsaved, SearchResults
 } from "./classes";
 import { IngredientsTable } from "./ingredientsTable";
 import { getApiClient, getMeasuresForOneFood } from "./calls";
@@ -32,7 +32,10 @@ export function IngredientSearch(
     const [rowsOpen, setRowsOpen] = useState<Record<IngredientId, boolean>>({})
     const [enteredAmounts, setEnteredAmounts] = useState<Record<IngredientId, Record<number, MathInputState>>>({})
     const [portionMacros, setPortionMacros] = useState<Record<IngredientId, PortionMacros[]>>({})
-    const [createdIngredients, setCreatedIngredients] = useState<CustomIngredient[]>([])
+    const [createdIngredients, setCreatedIngredients] = useState<SearchResults>({
+        ingredients: [],
+        recipes: []
+    })
 
     useEffect(() => {
         searchCustomIngredientsAndRecipes()
@@ -79,7 +82,7 @@ export function IngredientSearch(
         }
     }
 
-    function createCreatedIngredientRowData(ingredient: CustomIngredient): IngredientRowData {
+    function createCreatedIngredientRowData(ingredient: CustomIngredient | RecipeAndIngredient): IngredientRowData {
         return {
             dataType: 'createdIngredient',
             brandOwner: ingredient.brandOwner,
@@ -123,9 +126,8 @@ export function IngredientSearch(
     }
 
     function searchCustomIngredientsAndRecipes() {
-        algolia.searchStuff(searchText).then((ingredients) => {
-            // TODO function for converting these, these Hit objects have extra stuff
-            setCreatedIngredients(ingredients)
+        algolia.searchStuff(searchText).then((searchResults) => {
+            setCreatedIngredients(searchResults)
         });
     }
 
@@ -145,7 +147,7 @@ export function IngredientSearch(
         }
     }
 
-    function createPortionMacrosFromCreatedIngredient(ingredients: CustomIngredient[]): Record<IngredientId, PortionMacros[]> {
+    function createPortionMacrosFromCreatedIngredient(ingredients: (CustomIngredient | RecipeAndIngredient)[]): Record<IngredientId, PortionMacros[]> {
         const allPortionMacros: Record<IngredientId, PortionMacros[]> = {}
         ingredients.forEach((ingredient) => {
             allPortionMacros[ingredient.id] = ingredient.portions.map(
@@ -207,8 +209,18 @@ export function IngredientSearch(
             </form>
             {IngredientsTable(
                 'Custom Ingredients',
-                createdIngredients.map(createCreatedIngredientRowData),
-                createPortionMacrosFromCreatedIngredient(createdIngredients),
+                createdIngredients.ingredients.map(createCreatedIngredientRowData),
+                createPortionMacrosFromCreatedIngredient(createdIngredients.ingredients),
+                rowsOpen,
+                toggleOpen,
+                enteredAmounts,
+                changePortionAmount,
+                addRecipeItem
+            )}
+            {IngredientsTable(
+                'Custom Recipes',
+                createdIngredients.recipes.map(createCreatedIngredientRowData),
+                createPortionMacrosFromCreatedIngredient(createdIngredients.recipes),
                 rowsOpen,
                 toggleOpen,
                 enteredAmounts,
