@@ -95,10 +95,8 @@ function makeRecipeOrIngredient(data: Hit<DBContentsV1>): [CustomIngredient, und
 }
 
 function isRecipe(doc: DBContentsV1): doc is RecipeAndIngredientDocV1 {
-    console.log(doc)
     // @ts-ignore
     const itIs = doc.ingredients !== undefined && doc.amount !== undefined
-    console.log(itIs)
     return itIs
 }
 

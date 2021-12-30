@@ -2,14 +2,8 @@ import React from 'react';
 import './App.css';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
-import {
-    PortionMacros,
-    IngredientRowData,
-    IngredientId,
-    IngredientSource,
-    RecipeUnsaved
-} from "./classes";
-import { MathInput, MathInputState, scaleBaseMacro, round } from "./conversions";
+import { IngredientId, IngredientRowData, IngredientSource, PortionMacros } from "./classes";
+import { MathInput, MathInputState, round, scaleBaseMacro } from "./conversions";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableHead from '@mui/material/TableHead';
