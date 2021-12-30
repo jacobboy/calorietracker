@@ -9,7 +9,9 @@ import {
     IngredientId,
     IngredientRowData,
     IngredientSource,
-    PortionMacros, RecipeAndIngredient, RecipeUnsaved, SearchResults
+    PortionMacros,
+    RecipeAndIngredient,
+    SearchResults
 } from "./classes";
 import { IngredientsTable } from "./ingredientsTable";
 import { getApiClient, getMeasuresForOneFood } from "./calls";
@@ -23,7 +25,7 @@ const algolia = new AlgoliaClient()
 
 export function IngredientSearch(
     addRecipeItem: (source: IngredientSource) => (fromPortion: PortionMacros, amount: MathInputState) => () => void,
-    copyRecipe: (recipe: RecipeUnsaved) => void
+    copyRecipe: (recipe: RecipeAndIngredient) => void
 ) {
     const [searchText, setSearchText] = useState('');
     const [searchDataTypes, setSearchDataTypes] = useState<Record<DataTypes, boolean>>({'Branded': true, 'Foundation': true, 'Survey (FNDDS)': true, 'SR Legacy': true})
@@ -225,7 +227,13 @@ export function IngredientSearch(
                 toggleOpen,
                 enteredAmounts,
                 changePortionAmount,
-                addRecipeItem
+                addRecipeItem,
+                createdIngredients.recipes.reduce<Record<IngredientId, () => void>>(
+                    (map, recipe) => {
+                        map[recipe.id] = () => copyRecipe(recipe)
+                        return map
+                    },
+                    {}),
             )}
             {IngredientsTable(
                 'FDC Search Results',

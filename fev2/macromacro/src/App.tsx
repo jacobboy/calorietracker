@@ -3,7 +3,7 @@ import './App.css';
 import {
   CustomIngredientUnsaved,
   IngredientSource,
-  PortionMacros,
+  PortionMacros, RecipeAndIngredient,
   RecipeItemUnsaved,
   RecipeUnsaved,
   Unit
@@ -37,9 +37,33 @@ function App({firebaseApi= new FirebaseAPI()}) {
     firebaseApi.registerAuthCallback(setUser)
   }, [])
 
-  function copyRecipe(recipe: RecipeUnsaved) {
+  function copyRecipe(recipe: RecipeAndIngredient) {
     setRecipe((prevState) => {
-      return recipe
+      let recipeUnsaved: RecipeUnsaved = {
+        ingredients: recipe.ingredients.map((ingredient) => {
+          return {
+            source: ingredient.source,
+            macros: ingredient.macros,
+            amount:{
+              input: ingredient.amount.toString(),
+              isValid: true,
+              evaluated: ingredient.amount
+            }
+          }
+        }),
+        amount: {
+          input: recipe.amount.toString(),
+          isValid: true,
+          evaluated: recipe.amount
+        },
+        unit: recipe.unit,
+        name: {
+          value: recipe.name,
+          isValid: true
+        },
+        isValid: true
+      };
+      return recipeUnsaved
     })
   }
 

@@ -2,7 +2,13 @@ import React from 'react';
 import './App.css';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
-import { PortionMacros, IngredientRowData, IngredientId, IngredientSource } from "./classes";
+import {
+    PortionMacros,
+    IngredientRowData,
+    IngredientId,
+    IngredientSource,
+    RecipeUnsaved
+} from "./classes";
 import { MathInput, MathInputState, scaleBaseMacro, round } from "./conversions";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -66,7 +72,8 @@ function Row(
     toggleOpen: () => void,
     portionAmounts: Record<number, MathInputState>,
     changePortionAmount: (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void,
-    addRecipeItem: (fromPortion: PortionMacros, amount: MathInputState) => () => void
+    addRecipeItem: (fromPortion: PortionMacros, amount: MathInputState) => () => void,
+    copyRecipe?: () => void
 ) {
 
     const thinking = open && macros.length === 0
@@ -162,7 +169,8 @@ export function IngredientsTable(
     rowsOpen: Record<string, boolean>,
     toggleOpen: (id: IngredientId) => void, enteredAmounts: Record<IngredientId, Record<number, MathInputState>>,
     changePortionAmount: (id: IngredientId) => (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void,
-    addRecipeItem: (source: IngredientSource) => (fromPortion: PortionMacros, amount: MathInputState) => () => void
+    addRecipeItem: (source: IngredientSource) => (fromPortion: PortionMacros, amount: MathInputState) => () => void,
+    copyRecipe?: Record<IngredientId, () => void>
 ) {
     return <div>
         <TableContainer>
@@ -192,7 +200,8 @@ export function IngredientsTable(
                                 () => toggleOpen(row.source.id),
                                 enteredAmounts[row.source.id] || {},
                                 changePortionAmount(row.source.id),
-                                addRecipeItem(row.source)
+                                addRecipeItem(row.source),
+                                copyRecipe[row.source.id]
                             )
                         )
                     }
