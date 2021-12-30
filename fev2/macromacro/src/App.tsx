@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import {
   CustomIngredientUnsaved,
   IngredientSource,
-  PortionMacros, RecipeAndIngredient,
+  PortionMacros,
+  RecipeAndIngredient,
   RecipeItemUnsaved,
   RecipeUnsaved,
   Unit
@@ -32,6 +33,8 @@ function App({firebaseApi= new FirebaseAPI()}) {
   const [recipe, setRecipe] = useState<RecipeUnsaved>(initalRecipe)
   const [recipeSaving, setRecipeSaving] = useState<boolean>(false)
   const [user, setUser] = useState<User | null>(null)
+  const searchRef = useRef<HTMLInputElement>(null)
+
 
   useEffect(() => {
     firebaseApi.registerAuthCallback(setUser)
@@ -86,6 +89,12 @@ function App({firebaseApi= new FirebaseAPI()}) {
       }
     }
   }
+
+  useEffect(() => {
+    if (searchRef.current) {
+      searchRef.current.focus()
+    }
+  }, [recipe])
 
   function changeRecipeItemAmount(idx: number) {
     return (input: string, evaluated: number, isValid: boolean) => {
@@ -189,7 +198,7 @@ function App({firebaseApi= new FirebaseAPI()}) {
           )
         }
         {CreateIngredient(createIngredient)}
-        {IngredientSearch(addRecipeItem, copyRecipe)}
+        {IngredientSearch(addRecipeItem, copyRecipe, searchRef)}
       </>
   );
 }

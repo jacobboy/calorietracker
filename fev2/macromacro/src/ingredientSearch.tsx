@@ -25,7 +25,8 @@ const algolia = new AlgoliaClient()
 
 export function IngredientSearch(
     addRecipeItem: (source: IngredientSource) => (fromPortion: PortionMacros, amount: MathInputState) => () => void,
-    copyRecipe: (recipe: RecipeAndIngredient) => void
+    copyRecipe: (recipe: RecipeAndIngredient) => void,
+    searchRef: React.RefObject<HTMLInputElement>
 ) {
     const [searchText, setSearchText] = useState('');
     const [searchDataTypes, setSearchDataTypes] = useState<Record<DataTypes, boolean>>({'Branded': true, 'Foundation': true, 'Survey (FNDDS)': true, 'SR Legacy': true})
@@ -86,45 +87,13 @@ export function IngredientSearch(
 
     function createCreatedIngredientRowData(ingredient: CustomIngredient | RecipeAndIngredient): IngredientRowData {
         return {
-            dataType: 'createdIngredient',
+            dataType: ingredient.source.dataSource,
             brandOwner: ingredient.brandOwner,
             brandName: ingredient.brandName,
-            source: {
-                id: ingredient.id,
-                name: ingredient.name,
-                dataSource: 'createIngredient'
-            },
+            source: ingredient.source,
             ...ingredient.baseMacros,
             // householdServingFullText: ingredient.householdServingFullText
         }
-    }
-
-    async function search(event: React.FormEvent<HTMLFormElement>) {
-        const dataType = Object.entries(searchDataTypes)
-            .filter(([_, shouldUse]) => shouldUse)
-            .map(([dataType, _]) => dataType) as DataTypes[]
-        if (searchText) {
-            let modifiedSearchText = searchText
-            if (brandName !== '' && !searchText.includes('brandName:')) {
-                modifiedSearchText = `${modifiedSearchText} brandName:${brandName}`
-            }
-            const api = getApiClient();
-            api.getFoodsSearch(
-                modifiedSearchText,
-                dataType
-            ).then(
-                (response) => {
-                    if (response.data && response.data.foods) {
-                        setRowsOpen({})
-                        setSearchData(response.data.foods.map(createSearchIngredientRowData))
-                        setPortionMacros({})
-                        setEnteredAmounts({})
-                    }
-                }
-            )
-        }
-        searchCustomIngredientsAndRecipes()
-        event.preventDefault();
     }
 
     function searchCustomIngredientsAndRecipes() {
@@ -181,16 +150,66 @@ export function IngredientSearch(
         }
     }
 
+    // function closeRows() {
+    //     setRowsOpen({})
+    //     setPortionMacros({})
+    //     setEnteredAmounts({})
+    // }
+
+    function addRecipeItemAndReset(source: IngredientSource): (fromPortion: PortionMacros, amount: MathInputState) => () => void {
+        // closeRows()
+        return addRecipeItem(source)
+    }
+
+    async function search(event: React.FormEvent<HTMLFormElement>) {
+        const dataType = Object.entries(searchDataTypes)
+            .filter(([_, shouldUse]) => shouldUse)
+            .map(([dataType, _]) => dataType) as DataTypes[]
+        if (searchText) {
+            let modifiedSearchText = searchText
+            if (brandName !== '' && !searchText.includes('brandName:')) {
+                modifiedSearchText = `${modifiedSearchText} brandName:${brandName}`
+            }
+            const api = getApiClient();
+            api.getFoodsSearch(
+                modifiedSearchText,
+                dataType
+            ).then(
+                (response) => {
+                    if (response.data && response.data.foods) {
+                        setSearchData(response.data.foods.map(createSearchIngredientRowData))
+                        setRowsOpen({})
+                        setPortionMacros({})
+                        setEnteredAmounts({})
+                        // closeRows();
+                    }
+                }
+            )
+        }
+        searchCustomIngredientsAndRecipes()
+        event.preventDefault();
+    }
+
     return <>
         <TableContainer component={Paper}>
             <header>
                 Search
             </header>
             <form onSubmit={search}>
-                <Input placeholder="Search text" value={searchText}
-                       onChange={e => setSearchText(e.target.value)} inputProps={{'aria-label': 'search text'}}/>
-                <Input placeholder="Brand name" value={brandName}
-                       onChange={e => setBrandName(e.target.value)} inputProps={{'aria-label': 'brand name'}}/>
+                <Input
+                    inputRef={searchRef}
+                    autoFocus={true}
+                    placeholder="Search text"
+                    value={searchText}
+                    onChange={e => setSearchText(e.target.value)}
+                    inputProps={{'aria-label': 'search text'}}
+                />
+                <Input
+                    placeholder="Brand name"
+                    value={brandName}
+                    onChange={e => setBrandName(e.target.value)}
+                    inputProps={{'aria-label': 'brand name'}}
+                />
 
                 <FormGroup>
                     {
@@ -217,7 +236,7 @@ export function IngredientSearch(
                 toggleOpen,
                 enteredAmounts,
                 changePortionAmount,
-                addRecipeItem
+                addRecipeItemAndReset
             )}
             {IngredientsTable(
                 'Custom Recipes',
@@ -227,7 +246,7 @@ export function IngredientSearch(
                 toggleOpen,
                 enteredAmounts,
                 changePortionAmount,
-                addRecipeItem,
+                addRecipeItemAndReset,
                 createdIngredients.recipes.reduce<Record<IngredientId, () => void>>(
                     (map, recipe) => {
                         map[recipe.id] = () => copyRecipe(recipe)
@@ -243,7 +262,7 @@ export function IngredientSearch(
                 fetchFdcPortionsAndToggleOpen,
                 enteredAmounts,
                 changePortionAmount,
-                addRecipeItem
+                addRecipeItemAndReset
             )}
         </TableContainer>
     </>;
