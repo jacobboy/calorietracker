@@ -1,5 +1,5 @@
 # current
-## reset search form after adding ingredient
+## recipe non-gram inputs
 
 # TODO
 ## handle ingredient portions
@@ -55,3 +55,4 @@ service cloud.firestore {
 ## copy recipe
 ## ingredient vs recipe in ingredient search
 ## reset cursor location after adding ingredient
+## reset rows open and portions etc after adding ingredient

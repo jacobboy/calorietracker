@@ -150,15 +150,19 @@ export function IngredientSearch(
         }
     }
 
-    // function closeRows() {
-    //     setRowsOpen({})
-    //     setPortionMacros({})
-    //     setEnteredAmounts({})
-    // }
+    function closeRows() {
+        setRowsOpen({})
+        setPortionMacros({})
+        setEnteredAmounts({})
+    }
 
     function addRecipeItemAndReset(source: IngredientSource): (fromPortion: PortionMacros, amount: MathInputState) => () => void {
-        // closeRows()
-        return addRecipeItem(source)
+        return (fromPortion: PortionMacros, amount: MathInputState) => {
+            return () => {
+                closeRows()
+                addRecipeItem(source)(fromPortion, amount)()
+            }
+        }
     }
 
     async function search(event: React.FormEvent<HTMLFormElement>) {
@@ -178,10 +182,7 @@ export function IngredientSearch(
                 (response) => {
                     if (response.data && response.data.foods) {
                         setSearchData(response.data.foods.map(createSearchIngredientRowData))
-                        setRowsOpen({})
-                        setPortionMacros({})
-                        setEnteredAmounts({})
-                        // closeRows();
+                        closeRows();
                     }
                 }
             )
@@ -199,6 +200,7 @@ export function IngredientSearch(
                 <Input
                     inputRef={searchRef}
                     autoFocus={true}
+                    onFocus={(event) => event.target.select()}
                     placeholder="Search text"
                     value={searchText}
                     onChange={e => setSearchText(e.target.value)}
