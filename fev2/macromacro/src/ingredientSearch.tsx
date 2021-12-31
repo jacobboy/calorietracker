@@ -80,7 +80,7 @@ export function IngredientSearch(
                 name: searchResult.description,
                 dataSource: 'fdcApi'
             },
-            ...getMacros(searchResult.foodNutrients || []),
+            ...getMacros(searchResult),
             // householdServingFullText: searchResult.householdServingFullText
         }
     }

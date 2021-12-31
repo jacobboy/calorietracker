@@ -86,16 +86,13 @@ function App({firebaseApi= new FirebaseAPI()}) {
             }
         )
         checkRecipeValidity()
+        if (searchRef.current) {
+          searchRef.current.focus()
+          window.scrollTo(0, 0)
+        }
       }
     }
   }
-
-  useEffect(() => {
-    if (searchRef.current) {
-      searchRef.current.focus()
-      window.scrollTo(0, 0)
-    }
-  }, [recipe])
 
   function changeRecipeItemAmount(idx: number) {
     return (input: string, evaluated: number, isValid: boolean) => {

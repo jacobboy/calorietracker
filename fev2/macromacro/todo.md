@@ -1,11 +1,14 @@
 # current
 ## recipe non-gram inputs
+### input metric, imperial, custom
+### input multiple measurements
 
 # TODO
+## meals and days
 ## handle ingredient portions
 ## handle ingredient different units
 ### https://fdc.nal.usda.gov/fdc-app.html#/food-details/2086725/nutrients has ml
-### https://fdc.nal.usda.gov/fdc-app.html#/food-details/748278/nutrients might have ml?
+### https://fdc.nal.usda.gov/fdc-app.html#/food-details/748278/nutrients has g and ml maybe?
 ## ingredient notes, starred, default portions, and portion aliases
 ## Recipe notes and links
 ## make 1g portions

@@ -46,7 +46,7 @@ function PortionTableRow(
                 </form>
             </TableCell>
             <TableCell align="right">{scaledMacros.description}</TableCell>
-            <TableCell align="right">{scaledMacros.amount}</TableCell>
+            <TableCell align="right">{round(scaledMacros.amount)}</TableCell>
             <TableCell align="right">{scaledMacros.unit}</TableCell>
             <TableCell align="right">{round(scaledMacros.calories)}</TableCell>
             <TableCell align="right">{round(scaledMacros.fat)}</TableCell>
@@ -164,7 +164,8 @@ export function IngredientsTable(
     searchData: IngredientRowData[],
     detailedMacros: Record<IngredientId, PortionMacros[]>,
     rowsOpen: Record<string, boolean>,
-    toggleOpen: (id: IngredientId) => void, enteredAmounts: Record<IngredientId, Record<number, MathInputState>>,
+    toggleOpen: (id: IngredientId) => void,
+    enteredAmounts: Record<IngredientId, Record<number, MathInputState>>,
     changePortionAmount: (id: IngredientId) => (portionIdx: number) => (input: string, evaluated: number, isValid: boolean) => void,
     addRecipeItem: (source: IngredientSource) => (fromPortion: PortionMacros, amount: MathInputState) => () => void,
     copyRecipe?: Record<IngredientId, () => void>

@@ -7,13 +7,13 @@
 POST https://api.nal.usda.gov/fdc/v1/search?api_key=:FDC_API_KEY
 Content-Type: application/json
 {
-  "query": "white chocolate brandName:ghiradelli",
-  "dataType": ["Branded"]
+  "query": "oil, canola",
+  "dataType": ["Branded", "Foundation", "Survey (FNDDS)", "SR Legacy"]
 }
 
 # Get branded food
 
-GET https://api.nal.usda.gov/fdc/v1/2057648?api_key=:FDC_API_KEY
+GET https://api.nal.usda.gov/fdc/v1/2086725?api_key=:FDC_API_KEY
 
 # Get survey food
 
@@ -21,4 +21,4 @@ GET https://api.nal.usda.gov/fdc/v1/1098037?api_key=:FDC_API_KEY
 
 # Get foundation food
 
-GET https://api.nal.usda.gov/fdc/v1/328637?api_key=:FDC_API_KEY
+GET https://api.nal.usda.gov/fdc/v1/748278?api_key=:FDC_API_KEY

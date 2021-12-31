@@ -3,7 +3,7 @@ import './App.css';
 import {
     AbridgedFoodNutrient,
     BrandedFoodItem,
-    FoundationFoodItem,
+    FoundationFoodItem, SearchResultFood,
     SRLegacyFoodItem,
     SurveyFoodItem
 } from "./usda";
@@ -54,10 +54,11 @@ export function scaleBaseMacro(
 export function getPortionMacrosForMeasures(
     foodItem: BrandedFoodItem | FoundationFoodItem | SRLegacyFoodItem | SurveyFoodItem
 ): PortionMacros[] {
+    const unitString = 'servingSizeUnit' in foodItem ? foodItem.servingSizeUnit : 'g'
     const baseMacros: DetailedMacros = {
         amount: 100,
-        unit: Unit.g,
-        description: '100 g',
+        unit:  Unit[(unitString as keyof typeof Unit)],
+        description: `100 ${unitString}`,
     };
 
     (foodItem.foodNutrients || []).forEach((nutrient) => {
@@ -118,11 +119,13 @@ export function getPortionMacrosForMeasures(
     return [{...baseMacros, baseMacros: baseMacros, portionSource: {source: '100g'}}, ...portions];
 }
 
-export function getMacros(foodNutrients: AbridgedFoodNutrient[]): SimpleMacros {
+export function getMacros(searchResult: SearchResultFood): SimpleMacros {
+    const foodNutrients = searchResult.foodNutrients || []
+    const unit = Unit[((searchResult.servingSizeUnit || 'g') as keyof typeof Unit)]
     const macros: SimpleMacros = {
-        unit: Unit.g,
+        unit: unit,
         amount: 100,
-        description: '100 g'
+        description: `100 ${unit}`
     }
 
     foodNutrients.forEach((nutrient) => {
